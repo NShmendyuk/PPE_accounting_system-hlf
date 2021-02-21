@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public final class ScriptRunner {
@@ -27,7 +28,7 @@ public final class ScriptRunner {
             System.out.println(e.getMessage());
         }
         if (read != null) {
-            return read.toString();
+            return read.lines().collect(Collectors.joining());
         } else
             return "empty response";
     }
