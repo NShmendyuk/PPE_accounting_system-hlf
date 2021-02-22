@@ -13,14 +13,13 @@ import java.util.stream.Collectors;
 public final class ScriptRunner {
 
     public String runScript(String scriptPath){
-        BufferedReader read = null;
+        BufferedReader read;
         StringBuilder builder = new StringBuilder();
         try {
             Process proc = Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c", scriptPath });
             read = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             try {
                 proc.waitFor();
-                System.out.println("output: " + proc.getOutputStream().toString());
             } catch (InterruptedException e) {
                 log.error("Error. Script executing were interrupted.");
             }
@@ -31,7 +30,7 @@ public final class ScriptRunner {
             log.error("Cannot run script");
         }
         if (builder.length() != 0) {
-            log.info("returning next output information:\n" + read);
+            log.info("returning next output information:\n" + builder);
             return builder.toString();
         } else
             return "empty response";
