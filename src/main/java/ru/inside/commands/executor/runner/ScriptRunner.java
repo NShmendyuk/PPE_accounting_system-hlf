@@ -16,10 +16,11 @@ public final class ScriptRunner {
         BufferedReader read = null;
         StringBuilder builder = new StringBuilder();
         try {
-            Process proc = Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c", scriptPath }); //Whatever you want to execute
+            Process proc = Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c", scriptPath });
             read = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             try {
                 proc.waitFor();
+                System.out.println("output: " + proc.getOutputStream().toString());
             } catch (InterruptedException e) {
                 log.error("Error. Script executing were interrupted.");
             }
@@ -27,9 +28,10 @@ public final class ScriptRunner {
                 builder.append(read.readLine());
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error("Cannot run script");
         }
-        if (read != null) {
+        if (builder.length() != 0) {
+            log.info("returning next output information:\n" + read);
             return builder.toString();
         } else
             return "empty response";

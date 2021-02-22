@@ -17,7 +17,7 @@ public class ScriptController {
 
     @GetMapping("/{scriptName}")
     public String runHlfScript(@PathVariable String scriptName) {
-        log.info("Executing script " + scriptName);
+        log.info("Executing script: " + scriptName);
         return scriptExecutor.executeScript(scriptName);
     }
 }
