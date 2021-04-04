@@ -1,4 +1,4 @@
-package ru.inside.commands.executor.runner;
+package ru.inside.commands.outsider.executor.runner;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.stream.Collectors;
 
 @UtilityClass
 @Slf4j

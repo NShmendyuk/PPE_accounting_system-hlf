@@ -1,7 +1,7 @@
-package ru.inside.commands.executor;
+package ru.inside.commands.outsider.executor;
 
 import org.springframework.stereotype.Service;
-import ru.inside.commands.executor.runner.ScriptRunner;
+import ru.inside.commands.outsider.executor.runner.ScriptRunner;
 
 @Service
 public class ScriptExecutor {

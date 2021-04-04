@@ -1,4 +1,4 @@
-package ru.inside.commands.controller;
+package ru.inside.commands.outsider.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
