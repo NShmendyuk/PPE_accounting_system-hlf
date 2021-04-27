@@ -30,18 +30,19 @@ public class SubsidiaryServiceImpl implements SubsidiaryService {
     public SubsidiaryDto add(SubsidiaryDto subsidiaryDto){
         for (Subsidiary subsidiary : subsidiaryRepository.findAll()) {
             if (subsidiary.getName().equals(subsidiaryDto.getName())) {
-                return DtoConverter.convertSubsidiaryToDto(subsidiary);
+                subsidiary.setPeerName(subsidiaryDto.getPeerName());
+                return DtoConverter.convertSubsidiaryToDto(subsidiaryRepository.save(subsidiary));
+            }
+            if (subsidiary.getPeerName().equals(subsidiaryDto.getPeerName())) {
+                subsidiary.setName(subsidiaryDto.getName());
+                return DtoConverter.convertSubsidiaryToDto(subsidiaryRepository.save(subsidiary));
             }
         }
         return DtoConverter.convertSubsidiaryToDto(subsidiaryRepository.save(DtoConverter.convertDtoToSubsidiary(subsidiaryDto)));
     }
 
-    public List<SubsidiaryDto> getAll() {
-        List<SubsidiaryDto> subsidiaryDtos = new ArrayList<>();
-        subsidiaryRepository.findAll().forEach(subsidiary -> {
-            subsidiaryDtos.add(DtoConverter.convertSubsidiaryToDto(subsidiary));
-        });
-        return subsidiaryDtos;
+    public List<Subsidiary> getAll() {
+        return subsidiaryRepository.findAll();
     }
 
     public List<EmployeeDto> getAllEmployeeFromSubsidiary(Long id) {

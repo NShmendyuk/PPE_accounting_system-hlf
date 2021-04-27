@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>В сети HLF</title>
+        <!--    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>-->
+    </head>
+    <body>
+
+    <p class="subsidiary_connected">
+        <p>Подключенные к сети дочерние общества</p>
+        <table class="subsidiary_connected_table">
+            <tr>
+                <th>Название</th>
+                <th>обозначение в сети</th>
+                <th>статус</th>
+            </tr>
+            <tr th:each="subsidiary : ${subsidiaryConnected}">
+                <td th:text="${subsidiary.name}"> </td>
+                <td th:text="${subsidiary.peerName}"> </td>
+                <td th:text="${subsidiary.status}"> </td>
+            </tr>
+        </table>
+    </p>
+
+
+    <p>
+        <form class="apply_new_subsidiary"
+              th:action="@{/subsidiary/add}"
+              th:object="${subsidiaryFormApply}"
+              th:method="POST">
+            Название:
+            <input type="text" name="name" th:field="*{name}" />
+            <br/>
+            peer-обозначение:
+            <input type="text" name="peerName" th:field="*{peerName}" />
+            <br/>
+            <button type="submit" class="apply_button">Принять</button>
+        </form>
+    </p>
+
+    </body>
+</html>

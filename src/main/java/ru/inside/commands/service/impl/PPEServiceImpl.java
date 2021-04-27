@@ -8,6 +8,8 @@ import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.enums.PPEStatus;
+import ru.inside.commands.entity.forms.PPEForm;
+import ru.inside.commands.hyperledger.ChainCodeControllerService;
 import ru.inside.commands.repository.EmployeeRepository;
 import ru.inside.commands.repository.PPERepository;
 import ru.inside.commands.service.PPEService;
@@ -16,36 +18,43 @@ import ru.inside.commands.service.helper.DtoConverter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PPEServiceImpl implements PPEService {
+    private final ChainCodeControllerService chainCodeControllerService;
     private final PPERepository ppeRepository;
     private final EmployeeRepository employeeRepository;
 
-    public PPEDto getPPE(Long id) throws NoEntityException {
+    public PPE getPPE(Long id) throws NoEntityException {
         PPE ppe = ppeRepository.findById(id).orElseThrow(() ->
                 NoEntityException.createWithId(PPE.class.getSimpleName().toLowerCase(), id));
-        return DtoConverter.convertPPEToDto(ppe);
+        return ppe;
     }
 
-    public PPEDto updateStatus(Long id, PPEStatus status) throws NoEntityException {
+    public int getTotalPPE() {
+        List<PPE> ppeList = ppeRepository.findAll();
+        return ppeList.size();
+    }
+
+    public PPE updateStatus(Long id, PPEStatus status) throws NoEntityException {
         PPE ppe = ppeRepository.findById(id).orElseThrow(() ->
                 NoEntityException.createWithId(PPE.class.getSimpleName().toLowerCase(), id));
         ppe.setPpeStatus(status);
-        return DtoConverter.convertPPEToDto(ppeRepository.save(ppe));
+        return ppeRepository.save(ppe);
     }
 
-    public PPEDto addPPE(PPEDto ppeDto) throws NoEntityException {
+    public PPE addPPE(PPEDto ppeDto) throws NoEntityException {
         Employee employee = null;
         Long ownerId = ppeDto.getOwnerId();
         if (ownerId != null) {
             employee = employeeRepository.findById(ownerId).orElseThrow(() ->
                     NoEntityException.createWithId(Employee.class.getSimpleName().toLowerCase(), ownerId));
         }
-        return DtoConverter.convertPPEToDto(ppeRepository.save(DtoConverter.convertDtoToPPE(ppeDto, employee)));
+        return ppeRepository.save(DtoConverter.convertDtoToPPE(ppeDto, employee));
     }
 
     public void updateAllStatus() {
@@ -62,5 +71,29 @@ public class PPEServiceImpl implements PPEService {
                 ppe.setPpeStatus(PPEStatus.SPOILED);
             }
         });
+    }
+
+    public List<PPEForm> getAllInWaitList() {
+        List<PPEForm> ppeFormList = new ArrayList<>();
+        PPEForm stubForm = new PPEForm();
+
+        //TODO: stubbed
+        stubForm.setInventoryNumber("244405500422");
+        stubForm.setLifeTime(Duration.ofDays(300));
+        stubForm.setOwnerName("Иванов Иван Петрович");
+        stubForm.setOwnerPersonnelNumber("220222");
+        stubForm.setStartUseDate(LocalDateTime.now());
+        stubForm.setPpeName("Перчатки рабочие, 35");
+        stubForm.setPrice(400F);
+        stubForm.setPpeStatus(PPEStatus.TRANSFER.toString());
+        stubForm.setSubsidiaryName("ГПН-Снабжение");
+
+        ppeFormList.add(stubForm);
+        ppeFormList.add(stubForm);
+        ppeFormList.add(stubForm);
+        ppeFormList.add(stubForm);
+        ppeFormList.add(stubForm);
+//        chainCodeControllerService.getAllPPE();
+        return ppeFormList;
     }
 }

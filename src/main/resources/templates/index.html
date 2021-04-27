@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Система учета СИЗ</title>
+    <!--    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>-->
+    </head>
+    <body>
+        <h1>Система учета средств индивидуальной защиты</h1>
+        <h2>Газпромнефть-Цифровые решения</h2>
+
+        <div class="total_stock">
+            <table>
+                <tr>
+                    <th>Ожидают подтверждения</th>
+                    <th>Всего в организации</th>
+                </tr>
+                <tr>
+                    <td th:text="${waitAll}">...</td>
+                    <td th:utext="${countPPEAtSubsidiary}">...</td>
+                </tr>
+            </table>
+            <a class="waiting_page_redirect" th:href="@{/waiting_apply}">
+                <button>Просмотреть список</button>
+            </a>
+        </div>
+
+        <p class="control_panels">
+            <a class="control_panel_page_redirect" th:href="@{/ppe}">
+                <button>Средства индивидуальной защиты</button>
+            </a>
+            <a class="control_panel_page_redirect" th:href="@{/employee}">
+                <button>Сотрудники</button>
+            </a>
+            <a class="control_panel_page_redirect" th:href="@{/subsidiary}">
+                <button>Дочерние общества</button>
+            </a>
+        </p>
+
+    </body>
+
+</html>

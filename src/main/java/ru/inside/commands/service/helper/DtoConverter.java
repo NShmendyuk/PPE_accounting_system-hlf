@@ -9,6 +9,8 @@ import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.dto.SubsidiaryDto;
 import ru.inside.commands.entity.enums.PPEStatus;
 
+import java.util.List;
+
 @UtilityClass
 public class DtoConverter {
 
@@ -16,11 +18,16 @@ public class DtoConverter {
         SubsidiaryDto subsidiaryDto = new SubsidiaryDto();
         subsidiaryDto.setId(subsidiary.getId());
         subsidiaryDto.setName(subsidiary.getName());
+        subsidiaryDto.setPeerName(subsidiary.getPeerName());
         return subsidiaryDto;
     }
 
     public Subsidiary convertDtoToSubsidiary(SubsidiaryDto subsidiaryDto) {
-        return Subsidiary.builder().id(subsidiaryDto.getId()).name(subsidiaryDto.getName()).build();
+        return Subsidiary.builder()
+                .id(subsidiaryDto.getId())
+                .name(subsidiaryDto.getName())
+                .peerName(subsidiaryDto.getPeerName())
+                .build();
     }
 
     public EmployeeDto convertEmployeeToDto(Employee employee) {
@@ -29,13 +36,15 @@ public class DtoConverter {
         employeeDto.setEmployeeName(employee.getEmployeeName());
         employeeDto.setId(employee.getId());
         employeeDto.setOccupation(employee.getOccupation());
-        employeeDto.setPpeId(employee.getPpe().getId());
+        employee.getPpe().forEach(ppe -> {
+            employeeDto.getPpeId().add(ppe.getId());
+        });
         employeeDto.setSubsidiaryId(employee.getSubsidiary().getId());
 
         return employeeDto;
     }
 
-    public Employee convertDtoToEmployee(EmployeeDto employeeDto, PPE ppe, Subsidiary subsidiary) {
+    public Employee convertDtoToEmployee(EmployeeDto employeeDto, List<PPE> ppe, Subsidiary subsidiary) {
         return Employee.builder().id(employeeDto.getId())
                 .employeeID(employeeDto.getEmployeeID())
                 .employeeName(employeeDto.getEmployeeName())
@@ -50,7 +59,7 @@ public class DtoConverter {
         ppeDto.setLifeTime(ppe.getLifeTime());
         ppeDto.setName(ppe.getName());
         ppeDto.setOwnerId(ppe.getEmployee().getId());
-        ppeDto.setPpeStatus(ppe.getPpeStatus().toString());
+        ppeDto.setPpeStatus(ppe.getPpeStatus());
         ppeDto.setPrice(ppe.getPrice());
         ppeDto.setStartUseDate(ppe.getStartUseDate());
         return ppeDto;
@@ -58,7 +67,7 @@ public class DtoConverter {
 
     public PPE convertDtoToPPE(PPEDto ppeDto, Employee employee) {
         return PPE.builder().id(ppeDto.getId()).employee(employee).inventoryNumber(ppeDto.getInventoryNumber())
-                .lifeTime(ppeDto.getLifeTime()).name(ppeDto.getName()).ppeStatus(PPEStatus.valueOf(ppeDto.getPpeStatus()))
+                .lifeTime(ppeDto.getLifeTime()).name(ppeDto.getName()).ppeStatus(ppeDto.getPpeStatus())
                 .price(ppeDto.getPrice()).startUseDate(ppeDto.getStartUseDate()).build();
     }
 }

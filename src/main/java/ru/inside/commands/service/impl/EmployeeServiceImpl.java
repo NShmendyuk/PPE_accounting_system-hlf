@@ -23,12 +23,15 @@ import java.util.List;
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final SubsidiaryRepository subsidiaryRepository;
-    private final PPERepository ppeRepository;
 
     public EmployeeDto getEmployee(Long id) throws NoEntityException {
-        employeeRepository.findById(id).orElseThrow(() ->
-                NoEntityException.createWithId(Employee.class.getSimpleName().toLowerCase(), id));
-        return null;
+        return DtoConverter.convertEmployeeToDto(employeeRepository.findById(id).orElseThrow(() ->
+                NoEntityException.createWithId(Employee.class.getSimpleName().toLowerCase(), id)));
+    }
+
+    public Employee getEmployeeByPersonnelNumber(Long personnelNumber) throws NoEntityException {
+        return employeeRepository.findByEmployeeID(personnelNumber).orElseThrow(() ->
+                NoEntityException.createWithParam(Employee.class.getSimpleName().toLowerCase(), personnelNumber.toString()));
     }
 
     public List<EmployeeDto> getAllEmployee() {
@@ -56,13 +59,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public EmployeeDto addEmployee(EmployeeDto employeeDto) throws NoEntityException {
-        PPE ppe = null;
+        List<PPE> ppe = null;
         Subsidiary subsidiary = null;
 
-        if (employeeDto.getPpeId() != null) {
-            ppe = ppeRepository.findById(employeeDto.getPpeId()).orElseThrow(() ->
-                    NoEntityException.createWithId(PPE.class.getSimpleName().toLowerCase(), employeeDto.getPpeId()));
-        }
         if (employeeDto.getSubsidiaryId() != null) {
             subsidiary = subsidiaryRepository.findById(employeeDto.getSubsidiaryId()).orElseThrow(() ->
                     NoEntityException.createWithId(Subsidiary.class.getSimpleName().toLowerCase(), employeeDto.getSubsidiaryId()));

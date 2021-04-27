@@ -49,7 +49,7 @@ public class PPE {
     /**
      * Поле lifeTime - cрок службы
      */
-    @Column(columnDefinition = "interval")
+    @Column(columnDefinition = "bigint")
     private Duration lifeTime;
 
     /**
@@ -58,7 +58,12 @@ public class PPE {
     @Column
     private PPEStatus ppeStatus;
 
-    @MapsId
-    @OneToOne
+
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "employee_ppe",
+            joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "ppe_id", referencedColumnName = "id"))
     private Employee employee;
 }

@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -38,10 +39,15 @@ public class Employee {
     private String occupation;
 
     /**
-     * Поле ppe - средство индивидуальной защиты, закрепленное за сотрудником
+     * Поле ppe - средства индивидуальной защиты, закрепленные за сотрудником
      */
-    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private PPE ppe;
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "employee_ppe",
+            joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "ppe_id", referencedColumnName = "id"))
+    private List<PPE> ppe;
 
     /**
      * Поле subsidiary - дочернее общество в котором находится сотрудник

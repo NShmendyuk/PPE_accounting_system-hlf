@@ -26,6 +26,13 @@ public class Subsidiary {
     private String name;
 
     /**
+     * Поле peerName - название дочернего общества в сети блокчейна
+     */
+    @Column(columnDefinition = "TEXT")
+    @NotNull
+    private String peerName;
+
+    /**
      * Поле employee - сотрудники дочернего общества
      */
     @OneToMany(fetch = FetchType.LAZY,

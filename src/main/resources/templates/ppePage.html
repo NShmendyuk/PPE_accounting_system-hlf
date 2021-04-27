@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Панель контроля СИЗ</title>
+            <link rel="stylesheet" type="text/css" th:href="@{/css/ppePageStyle.css}"/>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready( function () {
+                $('#apply_new_ppe').submit( function () {
+                    var formdata = $(this).serialize();
+                    $.ajax({
+                        type: "POST",
+                        url: "/ppe/apply_new_ppe",
+                        data: formdata
+                    });
+                    return false;
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+    <h1>Система учета средств индивидуальной защиты</h1>
+    <h2>Газпромнефть-Цифровые решения</h2>
+        <p class="ppe_search">
+            <h3>Поиск информацию о СИЗ</h3>
+            <form class="search_ppe_with_id"
+                  th:action="@{/ppe/}"
+                  th:method="GET">
+                <td>
+                    <input type="text" name="id" placeholder="id"/>
+                </td>
+                <td>
+                    <button type="submit" class="apply_button">Принять</button>
+                </td>
+            </form>
+
+            <table class="ppe_search_table">
+                <tr>
+                    <th>Название</th>
+                    <th>владелец</th>
+                    <th>инвентарный номер</th>
+                    <th>дата начала использования</th>
+                    <th>Срок годности</th>
+                    <th>Статус</th>
+                </tr>
+                <tr th:object="${ppeForm}">
+                    <td th:text="${ppeForm.ppeName}">...</td>
+                    <td th:text="${ppeForm.ownerName}">...</td>
+                    <td th:text="${ppeForm.inventoryNumber}">...</td>
+                    <td th:text="${ppeForm.startUseDate == null} ? '' : ${#temporals.format(ppeForm.startUseDate, 'dd/MM/yyyy')}">...</td>
+                    <td th:text="${ppeForm.lifeTime == null} ? '' : ${ppeForm.lifeTime.toDays()}">...</td>
+                    <td th:text="${ppeForm.ppeStatus}">...</td>
+                </tr>
+            </table>
+        </p>
+         <p>
+            <h3>Добавить СИЗ</h3>
+            <form id="apply_new_ppe"
+                  th:action="@{/ppe/apply_new_ppe}"
+                  th:method="POST">
+                <input type="text" name="ppeName" placeholder="название"/><br/>
+                <input type="text" name="price" placeholder="цена"/><br/>
+                <input type="text" name="inventoryNumber" placeholder="инвентарный номер"/><br/>
+                <input type="text" name="ownerPersonnelNumber" placeholder="таб номер владельца"/><br/>
+                <input type="date" name="date" placeholder="дата"/><br/>
+                <input type="text" name="lifeTimeDays" placeholder="макс. дней эксплуатации"/><br/>
+
+                <button type="submit" class="apply_button">Сохранить</button>
+            </form>
+        </p>
+    </body>
+</html>
