@@ -1,10 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Сотрудники организации</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/employeePageStyle.css}"/>
 
-</body>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>Система учета средств индивидуальной защиты</h1>
+        <h2>Газпромнефть-Цифровые решения</h2>
+
+        <table>
+            <tr>
+                <th>ФИО</th>
+                <th>Табельный номер</th>
+                <th>должность</th>
+                <th>средства инд защиты</th>
+                <th>перевод в другое ДО</th>
+            </tr>
+            <tr th:each="employee: ${employees}">
+                <td th:text="${employee.employeeName}"> </td>
+                <td th:text="${employee.personnelNumber}"> </td>
+                <td th:text="${employee.occupation}"> </td>
+                <td class="td button">
+                    <form th:method="GET" class="check_ppe_form" th:action="@{/employee/ppe}">
+                        <input type="hidden" name="personnelNumber" th:value="${employee.personnelNumber}" />
+                        <button type="submit" name="show_employee_ppe" class="check_button">Просмотр</button>
+                    </form>
+                </td>
+                <td class="td button">
+                    <form th:method="GET" class="show_transfer_page" th:action="@{/employee/transfer_init}">
+                        <input type="hidden" name="personnelNumber" th:value="${employee.personnelNumber}" />
+                        <button type="submit" name="show_transfer_employee_page" class="check_button">Перевести</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+
+    </body>
 </html>

@@ -26,11 +26,11 @@ public class Employee {
     private String employeeName;
 
     /**
-     * Поле employeeID - табельный номер сотрудника
+     * Поле personnelNumber - табельный номер сотрудника
      */
     @Column
     @NotNull
-    private Long employeeID;
+    private String personnelNumber;
 
     /**
      * Поле occupation - должность сотрудника

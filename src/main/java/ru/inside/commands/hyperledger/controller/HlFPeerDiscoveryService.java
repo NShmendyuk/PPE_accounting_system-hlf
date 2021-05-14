@@ -1,69 +1,36 @@
 package ru.inside.commands.hyperledger.controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hyperledger.fabric.sdk.Channel;
+import org.hyperledger.fabric.gateway.Network;
+import org.hyperledger.fabric.sdk.Peer;
 import org.springframework.stereotype.Service;
-import ru.inside.commands.hyperledger.PeerDiscoveryService;
-import ru.inside.commands.hyperledger.fabric.chaincode.PPEChainCodeController;
-import ru.inside.commands.hyperledger.fabric.channel.HlfChannel;
 import ru.inside.commands.hyperledger.fabric.configuration.HlfConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-public class HlFPeerDiscoveryService implements PeerDiscoveryService {
-    private HlfChannel currentChannel;
+public class HlFPeerDiscoveryService {
+    private Network network;
 
     private HlFPeerDiscoveryService(HlfConfiguration hlfConfiguration) {
-        try {
-            currentChannel = hlfConfiguration.getChannel();
-        } catch (Exception ex) {
-            log.error("Cannot find channel. Hyperledger environment unactive");
-        }
+        this.network = hlfConfiguration.getNetwork();
     }
 
-    //TODO: stubbed
-    public List<String> getAllActivePeersName() {
-        try {
-            if (currentChannel != null && currentChannel.getChannel() != null) {
-                List<String> peersName = new ArrayList<>();
-                currentChannel.getChannel().getPeers().forEach(peer -> {
-                    peersName.add(peer.getName());
-                });
-
-                return peersName;
-            }
-        } catch (Exception ex) {
-            log.error("Cannot find peers name by hyperledger environment. Channel is not active.");
-        }
-
-        List<String> stubbedPeersName = new ArrayList<>();
-        stubbedPeersName.add("peer0.gpn-gs1.gazprom.com");
-        stubbedPeersName.add("peer0.gpn-supply.gazprom.com");
-        return stubbedPeersName;
-    }
-
-    public List<String> getAllActiveMspId() {
-        try {
-            if (currentChannel != null && currentChannel.getChannel() != null) {
-                List<String> mspIds = new ArrayList<>();
-                currentChannel.getChannel().getPeersOrganizationMSPIDs().forEach(mspId -> {
-                    mspIds.add(mspId);
-                });
-
-                return mspIds;
-            }
-        } catch (Exception ex) {
-            log.error("Cannot find msp id by hyperledger environment. Channel is not active.");
-        }
-
-        List<String> stubbedPeersName = new ArrayList<>();
-        stubbedPeersName.add("peer0.gpn-gs1.gazprom.com");
-        stubbedPeersName.add("peer0.gpn-supply.gazprom.com");
-        return stubbedPeersName;
+    public Collection<Peer> getPeersInfo() {
+        log.info("===begin info===");
+        Collection<Peer> peers = network.getChannel().getPeers();
+        log.info("===peers info===");
+        peers.forEach(peer -> {
+            log.info(peer.toString());
+        });
+        log.info("===peers org msp ids===");
+        log.info("{}", network.getChannel().getPeersOrganizationMSPIDs().toString());
+        log.info("===orderers org msp ids===");
+        log.info("{}", network.getChannel().getOrderersOrganizationMSPIDs().toString());
+        log.info("===discovered chaincode names===");
+        log.info("{}", network.getChannel().getDiscoveredChaincodeNames().toString());
+        log.info("===end info===");
+        return peers;
     }
 }

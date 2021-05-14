@@ -2,66 +2,53 @@ package ru.inside.commands.hyperledger.fabric.configuration;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.hyperledger.fabric.sdk.Channel;
-import org.hyperledger.fabric.sdk.HFClient;
-import org.hyperledger.fabric.sdk.exception.TransactionException;
-import org.hyperledger.fabric_ca.sdk.HFCAClient;
-import org.hyperledger.fabric_ca.sdk.exception.EnrollmentException;
-import org.hyperledger.fabric_ca.sdk.exception.InvalidArgumentException;
+import org.hyperledger.fabric.gateway.*;
 import org.springframework.stereotype.Component;
-import ru.inside.commands.hyperledger.fabric.ca.HlfUser;
 import ru.inside.commands.hyperledger.fabric.ca.RegistCAClient;
-import ru.inside.commands.hyperledger.fabric.ca.admin.CAAuthAdmin;
-import ru.inside.commands.hyperledger.fabric.chaincode.PPEChainCodeController;
-import ru.inside.commands.hyperledger.fabric.channel.HlfChannel;
-import ru.inside.commands.hyperledger.fabric.client.HlfClient;
 
-import javax.annotation.PostConstruct;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-@Component
+@Component(value="HlfConfiguration")
 @Slf4j
 public class HlfConfiguration {
-    private RegistCAClient registCAClient;
-    private CAAuthAdmin adminCA;
-    private HlfClient hlfClient; // admin
-    @Getter
-    private HlfChannel channel;
+    private Gateway gateway;
 
     @Getter
-    private PPEChainCodeController chainCodeController;
+    private Contract contract;
 
-    private HFClient currentClient;
-    private Channel currentChannel;
+    @Getter
+    private Network network;
 
-    public HlfConfiguration() {
-        registCAClient = new RegistCAClient();
-        adminCA = new CAAuthAdmin();
-        hlfClient = new HlfClient();
-        channel = new HlfChannel();
-        chainCodeController = new PPEChainCodeController();
+    static {
+        System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "true");
     }
 
-    //@PostConstruct TODO:
-    public PPEChainCodeController initializeHyperledgerFabricConfiguration() {
-        HFCAClient caClient = registCAClient.initializeCryptoSuite();
-        HlfUser adminUser;
+    public HlfConfiguration () {
+        RegistCAClient.initializeUsersCA(); // проинициализируем пользователя в Fabric CA
+        initConnect(); // подключимся к сети
+    }
 
+    // helper function for getting connected to the gateway
+    private static Gateway connect() throws Exception {
+        // Load a file system based wallet for managing identities.
+        Path walletPath = Paths.get("wallet");
+        Wallet wallet = Wallets.newFileSystemWallet(walletPath);
+        // load a CCP
+        Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations", "peerOrganizations", "org1.example.com", "connection-org1.yaml");
+
+        Gateway.Builder builder = Gateway.createBuilder();
+        builder.identity(wallet, "appUser2").networkConfig(networkConfigPath).discovery(true);
+        return builder.connect();
+    }
+
+    public void initConnect() {
         try {
-            adminUser = adminCA.enrollAdmin(caClient);
-        } catch (EnrollmentException | InvalidArgumentException e) {
-            log.error("Required enroll admin were rejected");
-            return null;
+            gateway = connect();
+        } catch (Exception e) {
+            log.error("Cannot init connection to gateway");
         }
-
-        currentClient = hlfClient.initClient(adminUser);
-
-        try {
-            currentChannel = channel.initChannel(currentClient);
-        } catch (org.hyperledger.fabric.sdk.exception.InvalidArgumentException | TransactionException e) {
-            log.error("Cannot initialize channel!", e);
-        }
-
-        chainCodeController.initializeChainCodeActivity(hlfClient, currentChannel);
-        return chainCodeController;
+        network = gateway.getNetwork("mychannel");
+        contract = network.getContract("ppesmart");
     }
 }

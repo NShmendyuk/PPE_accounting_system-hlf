@@ -1,10 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <title>История транзакций</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/mainPageStyle.css}"/>
 </head>
-<body>
+    <body>
+        <h1>Система учета средств индивидуальной защиты</h1>
+        <h2>Газпромнефть-Цифровые решения</h2>
+        <h3>история транзакций средства индивидуальной защиты</h3>
 
-</body>
+        <div class="wrapper">
+            <table class="ppe_history_table">
+                <tr>
+                    <th>история</th>
+                    <th>название</th>
+                    <th>прикреплен к</th>
+                    <th>инвентарный номер</th>
+                    <th>дата начала использования</th>
+                    <th>Срок годности</th>
+                    <th>Статус</th>
+                    <th>Организация</th>
+                </tr>
+                <tr th:object="${ppeForm}">
+                    <td th:text="${ppeHistoryPage}">...</td>
+                    <td th:text="${ppeForm.ppeName}">...</td>
+                    <td th:text="${ppeForm.ownerName}">...</td>
+                    <td th:text="${ppeForm.inventoryNumber}">...</td>
+                    <td th:text="${ppeForm.startUseDate == null} ? '' : ${#temporals.format(ppeForm.startUseDate, 'dd/MM/yyyy')}">...</td>
+                    <td th:text="${ppeForm.lifeTime == null} ? '' : ${ppeForm.lifeTime.toDays()}">...</td>
+                    <td th:text="${ppeForm.ppeStatus}">...</td>
+                    <td th:text="${ppeForm.subsidiaryName}">...</td>
+                </tr>
+            </table>
+            <p class="control_panels">
+
+                <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history/previous}">
+                    <input type="hidden" name="inventoryNumber" th:value="${ppeForm.inventoryNumber}" />
+                    <input type="hidden" name="ppeHistoryPage" th:value="${ppeHistoryPage}" />
+                    <button type="submit" name="show_ppe_history_page" class="turn_button">Предыдущее</button>
+                </form>
+
+                <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history/next}">
+                    <input type="hidden" name="inventoryNumber" th:value="${ppeForm.inventoryNumber}" />
+                    <input type="hidden" name="ppeHistoryPage" th:value="${ppeHistoryPage}" />
+                    <button type="submit" name="show_ppe_history_page" class="turn_button">Следующее</button>
+                </form>
+            </p>
+        </div>
+    </body>
 </html>

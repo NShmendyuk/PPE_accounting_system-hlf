@@ -32,7 +32,7 @@ public class DtoConverter {
 
     public EmployeeDto convertEmployeeToDto(Employee employee) {
         EmployeeDto employeeDto = new EmployeeDto();
-        employeeDto.setEmployeeID(employee.getEmployeeID());
+        employeeDto.setPersonnelNumber(employee.getPersonnelNumber());
         employeeDto.setEmployeeName(employee.getEmployeeName());
         employeeDto.setId(employee.getId());
         employeeDto.setOccupation(employee.getOccupation());
@@ -46,7 +46,7 @@ public class DtoConverter {
 
     public Employee convertDtoToEmployee(EmployeeDto employeeDto, List<PPE> ppe, Subsidiary subsidiary) {
         return Employee.builder().id(employeeDto.getId())
-                .employeeID(employeeDto.getEmployeeID())
+                .personnelNumber(employeeDto.getPersonnelNumber())
                 .employeeName(employeeDto.getEmployeeName())
                 .occupation(employeeDto.getOccupation())
                 .ppe(ppe).subsidiary(subsidiary).build();

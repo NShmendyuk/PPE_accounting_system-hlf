@@ -29,9 +29,9 @@ public class PPEServiceImpl implements PPEService {
     private final PPERepository ppeRepository;
     private final EmployeeRepository employeeRepository;
 
-    public PPE getPPE(Long id) throws NoEntityException {
-        PPE ppe = ppeRepository.findById(id).orElseThrow(() ->
-                NoEntityException.createWithId(PPE.class.getSimpleName().toLowerCase(), id));
+    public PPE getPPEByInventoryNumber(String inventoryNumber) throws NoEntityException {
+        PPE ppe = ppeRepository.findByInventoryNumber(inventoryNumber).orElseThrow(() ->
+                NoEntityException.createWithParam(PPE.class.getSimpleName().toLowerCase(), inventoryNumber));
         return ppe;
     }
 

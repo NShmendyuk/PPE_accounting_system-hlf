@@ -9,7 +9,7 @@ import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.service.controller.PPEControllerService;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RestController
 @RequestMapping("/ppe")
@@ -25,11 +25,77 @@ public class PPEPageController {
         return modelAndView;
     }
 
+    @GetMapping("/history")
+    public ModelAndView getPPEHistoryPage(@RequestParam String inventoryNumber) {
+        log.info("GET request with ppe inventoryNumber: {}; show history page", inventoryNumber);
+        ModelAndView modelAndView = new ModelAndView("historyPage");
+
+        List<PPEForm> ppeHistoryForms = ppeControllerService.getPPEHistory(inventoryNumber);
+
+        if (ppeHistoryForms.size() == 0 ) {
+            modelAndView.addObject("ppeForm", new PPEForm());
+            modelAndView.addObject("ppeHistoryPage", "0/0");
+            return modelAndView;
+        }
+
+        String ppeHistoryPage = ppeHistoryForms.size() + "/" + ppeHistoryForms.size();
+
+        modelAndView.addObject("ppeForm", ppeHistoryForms.get(ppeHistoryForms.size() - 1));
+        modelAndView.addObject("ppeHistoryPage", ppeHistoryPage);
+        return modelAndView;
+    }
+
+    @GetMapping("/history/previous")
+    public ModelAndView getPPEHistoryPagePrevious(@RequestParam String inventoryNumber, @RequestParam String ppeHistoryPage) {
+        log.info("GET request with ppe inventoryNumber: {}; show history page", inventoryNumber);
+        ModelAndView modelAndView = new ModelAndView("historyPage");
+
+        int ppeHistoryPageRequest = Integer.parseInt(ppeHistoryPage.substring(0, ppeHistoryPage.indexOf("/")).replace("/", "")) - 1;
+        if (ppeHistoryPageRequest < 1) {
+            ppeHistoryPageRequest = 1;
+        }
+        List<PPEForm> ppeHistoryForms = ppeControllerService.getPPEHistory(inventoryNumber);
+
+        if (ppeHistoryForms.size() == 0 ) {
+            modelAndView.addObject("ppeForm", new PPEForm());
+            modelAndView.addObject("ppeHistoryPage", "0/0");
+            return modelAndView;
+        }
+
+        modelAndView.addObject("ppeForm", ppeHistoryForms.get(ppeHistoryPageRequest - 1));
+        modelAndView.addObject("ppeHistoryPage", ppeHistoryPage + "/" + ppeHistoryForms.size());
+        return modelAndView;
+    }
+
+    @GetMapping("/history/next")
+    public ModelAndView getPPEHistoryPageNext(@RequestParam String inventoryNumber, @RequestParam String ppeHistoryPage) {
+        log.info("GET request with ppe inventoryNumber: {}; show history page", inventoryNumber);
+        ModelAndView modelAndView = new ModelAndView("historyPage");
+
+        int ppeHistoryPageRequest = Integer.parseInt(ppeHistoryPage.substring(0, ppeHistoryPage.indexOf("/")).replace("/", "")) - 1;
+
+        List<PPEForm> ppeHistoryForms = ppeControllerService.getPPEHistory(inventoryNumber);
+
+        if (ppeHistoryForms.size() == 0 ) {
+            modelAndView.addObject("ppeForm", new PPEForm());
+            modelAndView.addObject("ppeHistoryPage", "0/0");
+            return modelAndView;
+        }
+
+        if (ppeHistoryPageRequest > ppeHistoryForms.size()) {
+            ppeHistoryPageRequest = ppeHistoryForms.size();
+        }
+
+        modelAndView.addObject("ppeForm", ppeHistoryForms.get(ppeHistoryPageRequest - 1));
+        modelAndView.addObject("ppeHistoryPage", ppeHistoryPage + "/" + ppeHistoryForms.size());
+        return modelAndView;
+    }
+
     @GetMapping("/")
-    public ModelAndView getPPEById(@RequestParam Long id) {
-        log.info("GET request with ppe id: {}", id);
+    public ModelAndView getPPEByInventoryNumber(@RequestParam String inventoryNumber) {
+        log.info("GET request with ppe inventoryNumber: {}", inventoryNumber);
         ModelAndView modelAndView = new ModelAndView("ppePage");
-        PPEForm ppeForm = ppeControllerService.getPPEForm(id);
+        PPEForm ppeForm = ppeControllerService.getPPEForm(inventoryNumber);
         log.info("response: {}", ppeForm.toString());
 
         modelAndView.addObject("ppeForm", ppeForm);

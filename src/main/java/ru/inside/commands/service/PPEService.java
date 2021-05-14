@@ -9,7 +9,7 @@ import ru.inside.commands.entity.forms.PPEForm;
 import java.util.List;
 
 public interface PPEService {
-    PPE getPPE(Long id) throws NoEntityException;
+    PPE getPPEByInventoryNumber(String inventoryNumber) throws NoEntityException;
     PPE updateStatus(Long id, PPEStatus status) throws NoEntityException;
     PPE addPPE(PPEDto ppeDto) throws NoEntityException;
     int getTotalPPE();

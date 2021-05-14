@@ -11,6 +11,6 @@ public class EmployeeDto implements Serializable {
     private List<Long> ppeId;
     private Long subsidiaryId;
     private String employeeName;
-    private Long employeeID;
+    private String personnelNumber;
     private String occupation;
 }

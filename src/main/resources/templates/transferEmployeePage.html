@@ -1,10 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Перевод сотрудника вместе с СИЗ</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/transferEmployeePageStyle.css}"/>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>Система учета средств индивидуальной защиты</h1>
+        <h2>Газпромнефть-Цифровые решения</h2>
+        <table>
+            <tr>
+                <th>ФИО</th>
+                <th>Табельный номер</th>
+                <th>должность</th>
+            </tr>
+            <tr th:object="${employee}">
+                <td th:text="${employee.employeeName}"> </td>
+                <td th:text="${employee.personnelNumber}"> </td>
+                <td th:text="${employee.occupation}"> </td>
+            </tr>
+        </table>
+        <div class="div_transfer">
+            <form th:method="POST" class="transfer_employee_form" th:action="@{/employee/transfer}">
 
-</body>
+                <input type="hidden" name="personnelNumber" th:value="${employee.personnelNumber}" />
+
+                <select name="name">
+                    <option value=""> -- </option>
+                    <option th:each="subsidiary : ${subsidiaryList}"
+                            th:value="${subsidiary.name}"
+                            th:utext="${subsidiary.name}">
+                    </option>
+                </select>
+
+                <button type="submit" name="show_employee_ppe" class="check_button">Перевод</button>
+            </form>
+        </div>
+
+    </body>
 </html>

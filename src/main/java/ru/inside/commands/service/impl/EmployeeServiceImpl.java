@@ -9,12 +9,10 @@ import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.Subsidiary;
 import ru.inside.commands.entity.dto.EmployeeDto;
 import ru.inside.commands.repository.EmployeeRepository;
-import ru.inside.commands.repository.PPERepository;
 import ru.inside.commands.repository.SubsidiaryRepository;
 import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.helper.DtoConverter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,22 +27,18 @@ public class EmployeeServiceImpl implements EmployeeService {
                 NoEntityException.createWithId(Employee.class.getSimpleName().toLowerCase(), id)));
     }
 
-    public Employee getEmployeeByPersonnelNumber(Long personnelNumber) throws NoEntityException {
-        return employeeRepository.findByEmployeeID(personnelNumber).orElseThrow(() ->
+    public Employee getEmployeeByPersonnelNumber(String personnelNumber) throws NoEntityException {
+        return employeeRepository.findByPersonnelNumber(personnelNumber).orElseThrow(() ->
+                NoEntityException.createWithParam(Employee.class.getSimpleName().toLowerCase(), personnelNumber));
+    }
+
+    public List<Employee> getAllEmployee() {
+        return employeeRepository.findAll();
+    }
+
+    public EmployeeDto transferToSubsidiary(Long personnelNumber, Long subsidiaryId) throws NoEntityException {
+        Employee employee = employeeRepository.findById(personnelNumber).orElseThrow(() ->
                 NoEntityException.createWithParam(Employee.class.getSimpleName().toLowerCase(), personnelNumber.toString()));
-    }
-
-    public List<EmployeeDto> getAllEmployee() {
-        List<EmployeeDto> employeeDtos = new ArrayList<>();
-        employeeRepository.findAll().forEach(employee -> {
-            employeeDtos.add(DtoConverter.convertEmployeeToDto(employee));
-        });
-        return employeeDtos;
-    }
-
-    public EmployeeDto transferToSubsidiary(Long employeeId, Long subsidiaryId) throws NoEntityException {
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
-                NoEntityException.createWithParam(Employee.class.getSimpleName().toLowerCase(), employeeId.toString()));
         Subsidiary subsidiary = subsidiaryRepository.findById(subsidiaryId).orElseThrow(() ->
                 NoEntityException.createWithId(Subsidiary.class.getSimpleName().toLowerCase(), subsidiaryId));
         employee.setSubsidiary(subsidiary);
@@ -68,5 +62,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return DtoConverter.convertEmployeeToDto(employeeRepository.save(DtoConverter.convertDtoToEmployee(employeeDto, ppe, subsidiary)));
+    }
+
+    public Employee addEmployee(Employee employee) throws NoEntityException {
+        return employeeRepository.save(employee);
     }
 }

@@ -16,7 +16,7 @@ public class FormConverter {
         ppeForm.setLifeTime(ppe.getLifeTime());
         if (ppe.getEmployee() != null) {
             ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
-            ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getEmployeeID().toString());
+            ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber().toString());
             ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
         }
         return ppeForm;

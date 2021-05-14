@@ -8,9 +8,10 @@ import java.util.List;
 
 public interface EmployeeService {
     EmployeeDto getEmployee(Long id) throws NoEntityException;
-    Employee getEmployeeByPersonnelNumber(Long personnelNumber) throws NoEntityException;
-    List<EmployeeDto> getAllEmployee();
-    EmployeeDto transferToSubsidiary(Long employeeId, Long subsidiaryId) throws NoEntityException;
+    Employee getEmployeeByPersonnelNumber(String personnelNumber) throws NoEntityException;
+    List<Employee> getAllEmployee();
+    EmployeeDto transferToSubsidiary(Long personnelNumber, Long subsidiaryId) throws NoEntityException;
     EmployeeDto dismissEmployee(Long id) throws NoEntityException;
     EmployeeDto addEmployee(EmployeeDto employeeDto) throws NoEntityException;
+    Employee addEmployee(Employee employee) throws NoEntityException;
 }

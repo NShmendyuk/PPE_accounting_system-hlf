@@ -1,10 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>СИЗ сотрудника</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/employeePageStyle.css}"/>
 
-</body>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>Система учета средств индивидуальной защиты</h1>
+        <h2>Газпромнефть-Цифровые решения</h2>
+        <table class="employee_table">
+            <tr>
+                <th>ФИО</th>
+                <th>Табельный номер</th>
+                <th>должность</th>
+            </tr>
+            <tr th:object="${employee}">
+                <td th:text="${employee.employeeName}"> </td>
+                <td th:text="${employee.personnelNumber}"> </td>
+                <td th:text="${employee.occupation}"> </td>
+            </tr>
+        </table>
+        <table class="owner_ppe_table">
+            <tr>
+                <th>Название</th>
+                <th>Инвентарный номер</th>
+                <th>Дата начала использования</th>
+                <th>Срок жизни</th>
+                <th>Статус</th>
+                <th>История</th>
+            </tr>
+            <tr th:each="ppe: ${ppeList}">
+                <td th:text="${ppe.ppeName}"> </td>
+                <td th:text="${ppe.inventoryNumber}"> </td>
+                <td th:text="${ppe.startUseDate == null} ? '' : ${#temporals.format(ppe.startUseDate, 'dd/MM/yyyy')}">...</td>
+                <td th:text="${ppe.lifeTime == null} ? '' : ${ppe.lifeTime.toDays()}">...</td>
+                <td th:text="${ppe.ppeStatus}"> </td>
+                <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history}">
+                    <input type="hidden" name="inventoryNumber" th:value="${ppe.inventoryNumber}" />
+                    <button type="submit" name="show_ppe_history_page" class="redirect_button">Просмотреть</button>
+                </form>
+            </tr>
+        </table>
+
+    </body>
 </html>

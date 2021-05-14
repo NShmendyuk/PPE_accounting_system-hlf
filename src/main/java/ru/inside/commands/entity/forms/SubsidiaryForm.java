@@ -14,4 +14,8 @@ public class SubsidiaryForm {
     String name;
     String peerName;
     SubsidiaryStatus status;
+
+    public String toString() {
+        return name;
+    }
 }

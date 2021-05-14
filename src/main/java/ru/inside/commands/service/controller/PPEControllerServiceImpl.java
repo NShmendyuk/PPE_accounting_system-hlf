@@ -7,6 +7,8 @@ import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.enums.PPEStatus;
 import ru.inside.commands.entity.forms.PPEForm;
+import ru.inside.commands.hyperledger.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.entity.PPEContract;
 import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.helper.FormConverter;
@@ -15,6 +17,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +26,12 @@ import java.time.LocalTime;
 public class PPEControllerServiceImpl implements PPEControllerService {
     private final PPEService ppeService;
     private final EmployeeService employeeService;
+    private final ChainCodeControllerService chainCodeControllerService;
 
-    public PPEForm getPPEForm(Long id) {
+    public PPEForm getPPEForm(String inventoryNumber) {
         PPEForm ppeForm = new PPEForm();
         try {
-            ppeForm = FormConverter.getPPEAsForm(ppeService.getPPE(id));
+            ppeForm = FormConverter.getPPEAsForm(ppeService.getPPEByInventoryNumber(inventoryNumber));
         } catch (NoEntityException e) {
             log.warn("{}", e.getMessage());
         }
@@ -47,7 +52,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         ppeDto.setPpeStatus(PPEStatus.APPLIED);
 
         try {
-            ppeDto.setOwnerId(employeeService.getEmployeeByPersonnelNumber(Long.valueOf(ownerPersonnelNumber)).getId());
+            ppeDto.setOwnerId(employeeService.getEmployeeByPersonnelNumber(ownerPersonnelNumber).getId());
         } catch (NoEntityException e) {
             log.warn("No employee with personnel number: {}", ownerPersonnelNumber);
             ppeDto.setOwnerId(null);
@@ -56,5 +61,26 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             ppeService.addPPE(ppeDto);
         } catch (NoEntityException ignored) {
         }
+    }
+
+    public List<PPEForm> getPPEHistory(String inventoryNumber) {
+        List<PPEContract> ppeHistoryList = chainCodeControllerService.getPPEHistoryByInventoryNumber(inventoryNumber);
+        List<PPEForm> ppeHistoryForms = new ArrayList<>();
+        ppeHistoryList.forEach(ppeContract -> {
+            PPEForm ppeForm = new PPEForm();
+            ppeForm.setPpeName(ppeContract.getName());
+            ppeForm.setPrice(ppeContract.getPrice());
+            ppeForm.setInventoryNumber(ppeContract.getInventoryNumber());
+            ppeForm.setLifeTime(Duration.ofDays(ppeContract.getLifeTime()));
+            ppeForm.setStartUseDate(LocalDateTime.parse(ppeContract.getStartUseDate()));
+
+            ppeForm.setPpeStatus(PPEStatus.COMMISSIONED.toString()); //TODO: add status to chaincode
+
+            ppeForm.setOwnerPersonnelNumber(ppeContract.getOwnerID());
+            ppeForm.setOwnerName(ppeContract.getOwnerName());
+            ppeForm.setSubsidiaryName(ppeContract.getSubsidiary());
+            ppeHistoryForms.add(ppeForm);
+        });
+        return ppeHistoryForms;
     }
 }

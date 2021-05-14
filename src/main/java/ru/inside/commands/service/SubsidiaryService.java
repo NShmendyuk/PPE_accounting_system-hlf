@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface SubsidiaryService {
     SubsidiaryDto get(Long id) throws NoEntityException;
+    Subsidiary getByName(String subsidiaryName) throws NoEntityException;
     SubsidiaryDto add(SubsidiaryDto subsidiaryDto);
+    Subsidiary add(Subsidiary subsidiary);
     List<Subsidiary> getAll();
     List<EmployeeDto> getAllEmployeeFromSubsidiary(Long id);
 }
