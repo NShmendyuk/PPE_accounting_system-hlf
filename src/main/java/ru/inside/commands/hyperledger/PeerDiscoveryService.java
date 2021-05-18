@@ -1,8 +1,7 @@
 package ru.inside.commands.hyperledger;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface PeerDiscoveryService {
-    List<String> getAllActivePeersName();
-    List<String> getAllActiveMspId();
+    Collection<String> getPeersInfo();
 }

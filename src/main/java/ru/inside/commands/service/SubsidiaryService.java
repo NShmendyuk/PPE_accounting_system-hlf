@@ -13,5 +13,5 @@ public interface SubsidiaryService {
     SubsidiaryDto add(SubsidiaryDto subsidiaryDto);
     Subsidiary add(Subsidiary subsidiary);
     List<Subsidiary> getAll();
-    List<EmployeeDto> getAllEmployeeFromSubsidiary(Long id);
+    Subsidiary getSelfSubsidiary() throws NoEntityException;
 }

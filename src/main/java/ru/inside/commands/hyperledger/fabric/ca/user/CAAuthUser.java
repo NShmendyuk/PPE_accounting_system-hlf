@@ -1,7 +1,5 @@
 package ru.inside.commands.hyperledger.fabric.ca.user;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.*;
 import org.hyperledger.fabric.sdk.Enrollment;
@@ -10,8 +8,6 @@ import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric.sdk.security.CryptoSuiteFactory;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
-import ru.inside.commands.hyperledger.fabric.ca.HlfUser;
-import ru.inside.commands.hyperledger.fabric.ca.RegistCAClient;
 
 import java.nio.file.Paths;
 import java.security.PrivateKey;
@@ -21,21 +17,6 @@ import java.util.Set;
 
 @Slf4j
 public class CAAuthUser {
-    @Getter
-    private HlfUser commonUser;
-    private RegistCAClient registCAClient;
-    private RegistrationRequest registrationRequest;
-    private Enrollment userEnrollment;
-
-    private String userSecret;
-
-    private String HLF_MANAGER_USER_NAME = "managerUser";
-    private String ORG_NAME = "org1";
-    private String ORG_MSP_ID = "Org1MSP";
-
-//    CAAuthUser(RegistCAClient registCAClient) {
-//        this.registCAClient = registCAClient;
-//    }
 
     public static void enrollUser() throws Exception {
         // Create a CA client for interacting with the CA.
@@ -43,7 +24,8 @@ public class CAAuthUser {
         props.put("pemFile",
                 "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem");
         props.put("allowAllHostNames", "true");
-        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:7054", props);
+        String HLF_CA_CLIENT_URL = "https://localhost:7054";
+        HFCAClient caClient = HFCAClient.createNewInstance(HLF_CA_CLIENT_URL, props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();
         caClient.setCryptoSuite(cryptoSuite);
 

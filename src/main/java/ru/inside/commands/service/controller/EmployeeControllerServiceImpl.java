@@ -2,6 +2,7 @@ package ru.inside.commands.service.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
@@ -15,7 +16,10 @@ import ru.inside.commands.entity.forms.SubsidiaryForm;
 import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.SubsidiaryService;
+import ru.inside.commands.service.helper.PdfGenerator;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +30,7 @@ public class EmployeeControllerServiceImpl implements EmployeeControllerService 
     private final EmployeeService employeeService;
     private final SubsidiaryService subsidiaryService;
     private final PPEService ppeService;
+    private final PdfGenerator pdfGenerator;
 
     public List<EmployeeForm> getAllEmployee() {
         List<EmployeeForm> employeeFormList = new ArrayList<>();
@@ -103,34 +108,62 @@ public class EmployeeControllerServiceImpl implements EmployeeControllerService 
         return subsidiaryFormList;
     }
 
-    public void transferEmployeeToSubsidiary(String personnelNumber, String subsidiaryName) {
+    public byte[] transferEmployeeToSubsidiary(String personnelNumber, String subsidiaryName) {
+        try {
+            String selfSubsidiaryName = subsidiaryService.getSelfSubsidiary().getName();
+            if (subsidiaryName.equals(selfSubsidiaryName)) {
+                log.warn("transfer to self organization not valid!");
+                return new byte[0];
+            }
+        } catch (NoEntityException ignored) {
+        }
+
         Employee employee;
         try {
             employee = employeeService.getEmployeeByPersonnelNumber(personnelNumber);
         } catch (NoEntityException e) {
-            log.error("{}", e.getMessage());
-            return ;
+            log.error("Cannot find employee {}!! Cannot transfer to {}", personnelNumber, subsidiaryName);
+            return null;
+        }
+
+        Subsidiary subsidiary;
+        try {
+            subsidiary = subsidiaryService.getByName(subsidiaryName);
+            employee.setSubsidiary(subsidiary);
+        } catch (NoEntityException e) {
+            log.error("Cannot find definition for subsidiary {}", subsidiaryName);
+            return "NOT FOUND! NOT TRANSFERED".getBytes();
+        }
+        employee.getPpe().forEach(ppe -> {
+            ppeService.transferPPE(ppe, subsidiary);
+            log.info("need to transfer by smartContract for ppe: {}, status: {} to {}",
+                    ppe.getName(), ppe.getPpeStatus(), subsidiary.getName());
+        });
+
+        File file = pdfGenerator.generateTransferDocument(employee, subsidiaryName);
+        byte[] bytePdfArray = new byte[0];
+        try {
+            bytePdfArray = FileUtils.readFileToByteArray(file);
+        } catch (IOException e) {
+            log.warn("generated file not found");
         }
 
         try {
-            employee.setSubsidiary(subsidiaryService.getByName(subsidiaryName));
+            employeeService.dismissEmployee(personnelNumber);
         } catch (NoEntityException e) {
-            log.error("{}", e.getMessage());
+            log.error("Cannot dismiss employee {} when ppe transfer! Employee not found", personnelNumber);
         }
-        employee.getPpe().forEach(ppe -> {
-            //TODO: by smartContract
-            log.info("need to transfer by smartContract for ppe: {}, status: {}", ppe.getName(), ppe.getPpeStatus());
-        });
 
+        return bytePdfArray;
     }
 
     public void addEmployee(String name, String occupation, String personnelNumber) {
-        EmployeeDto employeeDto = new EmployeeDto();
-        employeeDto.setEmployeeName(name);
-        employeeDto.setOccupation(occupation);
-        employeeDto.setPersonnelNumber(personnelNumber);
+        Employee employee = new Employee();
+        employee.setEmployeeName(name);
+        employee.setOccupation(occupation);
+        employee.setPersonnelNumber(personnelNumber);
         try {
-            employeeService.addEmployee(employeeDto);
+            employeeService.addEmployee(employee);
         } catch (NoEntityException e) {
             log.error("Add employee to database failed!");
         }

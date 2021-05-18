@@ -2,6 +2,8 @@ package ru.inside.commands.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
@@ -22,24 +24,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubsidiaryServiceImpl implements SubsidiaryService {
     private final SubsidiaryRepository subsidiaryRepository;
-    private final EmployeeRepository employeeRepository;
+
 
     private String selfSubsidiaryName = "ГПН-Д1";
     private String selfPeerMspId = "Org1MSP";
 
     @PostConstruct
     private void initSelfOrgDefinition() {
-        log.info("self subsidiary: name={}, peerMspId=", selfSubsidiaryName, selfPeerMspId);
-        Subsidiary subsidiary = new Subsidiary();
-        subsidiary.setPeerName(selfPeerMspId);
-        subsidiary.setName(selfSubsidiaryName);
-        subsidiaryRepository.save(subsidiary);
+        log.info("self subsidiary: name={}, peerMspId={}", selfSubsidiaryName, selfPeerMspId);
+        if (subsidiaryRepository.findByName(selfSubsidiaryName).isEmpty()) {
+            Subsidiary subsidiary = new Subsidiary();
+            subsidiary.setPeerName(selfPeerMspId);
+            subsidiary.setName(selfSubsidiaryName);
+            subsidiaryRepository.save(subsidiary);
+        }
     }
 
     public SubsidiaryDto get(Long id) throws NoEntityException {
         Subsidiary subsidiary = subsidiaryRepository.findById(id).orElseThrow(() ->
             NoEntityException.createWithId(Subsidiary.class.getSimpleName().toLowerCase(), id));
         return DtoConverter.convertSubsidiaryToDto(subsidiary);
+    }
+
+    public Subsidiary getSelfSubsidiary() throws NoEntityException {
+        return subsidiaryRepository.findByName(selfSubsidiaryName).orElseThrow(() ->
+                NoEntityException.createWithParam(Subsidiary.class.getSimpleName(), selfSubsidiaryName));
     }
 
     public Subsidiary getByName(String subsidiaryName) throws NoEntityException {
@@ -68,14 +77,5 @@ public class SubsidiaryServiceImpl implements SubsidiaryService {
 
     public List<Subsidiary> getAll() {
         return subsidiaryRepository.findAll();
-    }
-
-    public List<EmployeeDto> getAllEmployeeFromSubsidiary(Long id) {
-        List<EmployeeDto> employeeDtos = new ArrayList<>();
-        List<Employee> employeeList = employeeRepository.findAllBySubsidiaryId(id);
-        employeeList.forEach(employee -> {
-            employeeDtos.add(DtoConverter.convertEmployeeToDto(employee));
-        });
-        return employeeDtos;
     }
 }

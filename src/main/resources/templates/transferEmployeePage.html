@@ -9,34 +9,36 @@
     <body>
         <h1>Система учета средств индивидуальной защиты</h1>
         <h2>Газпромнефть-Цифровые решения</h2>
-        <table>
-            <tr>
-                <th>ФИО</th>
-                <th>Табельный номер</th>
-                <th>должность</th>
-            </tr>
-            <tr th:object="${employee}">
-                <td th:text="${employee.employeeName}"> </td>
-                <td th:text="${employee.personnelNumber}"> </td>
-                <td th:text="${employee.occupation}"> </td>
-            </tr>
-        </table>
-        <div class="div_transfer">
-            <form th:method="POST" class="transfer_employee_form" th:action="@{/employee/transfer}">
+        <h3>Перевести сотрудника в другое ДО</h3>
+        <div class="wrapper">
+            <table>
+                <tr>
+                    <th>ФИО</th>
+                    <th>Табельный номер</th>
+                    <th>должность</th>
+                </tr>
+                <tr th:object="${employee}">
+                    <td th:text="${employee.employeeName}"> </td>
+                    <td th:text="${employee.personnelNumber}"> </td>
+                    <td th:text="${employee.occupation}"> </td>
+                </tr>
+            </table>
+            <div class="div_transfer">
+                <form th:method="POST" class="transfer_employee_form" th:action="@{/employee/transfer}">
 
-                <input type="hidden" name="personnelNumber" th:value="${employee.personnelNumber}" />
+                    <input type="hidden" name="personnelNumber" th:value="${employee.personnelNumber}" />
 
-                <select name="name">
-                    <option value=""> -- </option>
-                    <option th:each="subsidiary : ${subsidiaryList}"
-                            th:value="${subsidiary.name}"
-                            th:utext="${subsidiary.name}">
-                    </option>
-                </select>
+                    <select name="name">
+                        <option value=""> -- </option>
+                        <option th:each="subsidiary : ${subsidiaryList}"
+                                th:value="${subsidiary.name}"
+                                th:utext="${subsidiary.name}">
+                        </option>
+                    </select>
 
-                <button type="submit" name="show_employee_ppe" class="check_button">Перевод</button>
-            </form>
+                    <button type="submit" name="show_employee_ppe" class="check_button">Перевод</button>
+                </form>
+            </div>
         </div>
-
     </body>
 </html>

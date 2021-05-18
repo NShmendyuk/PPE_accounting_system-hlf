@@ -10,6 +10,7 @@
     <body>
         <h1>Система учета средств индивидуальной защиты</h1>
         <h2>Газпромнефть-Цифровые решения</h2>
+        <h3>Управление сотрудниками</h3>
 
         <table>
             <tr>
@@ -30,13 +31,26 @@
                     </form>
                 </td>
                 <td class="td button">
-                    <form th:method="GET" class="show_transfer_page" th:action="@{/employee/transfer_init}">
+                    <form th:method="GET" class="show_transfer_page" th:action="@{/employee/transfer}">
                         <input type="hidden" name="personnelNumber" th:value="${employee.personnelNumber}" />
                         <button type="submit" name="show_transfer_employee_page" class="check_button">Перевести</button>
                     </form>
                 </td>
             </tr>
         </table>
+
+        <p>
+        <h3>Добавить сотрудника в организацию</h3>
+        <form id="apply_new_employee"
+              th:action="@{/employee/add}"
+              th:method="POST">
+            <input type="text" name="name" placeholder="ФИО"/><br/>
+            <input type="text" name="occupation" placeholder="должность"/><br/>
+            <input type="text" name="personnelNumber" placeholder="табельный номер"/><br/>
+
+            <button type="submit" class="apply_button">Сохранить</button>
+        </form>
+        </p>
 
     </body>
 </html>

@@ -11,6 +11,6 @@ public interface EmployeeControllerService {
     List<PPEForm> getAllPPEOfEmployee(String personnelNumber);
     EmployeeForm getEmployeeByPersonnelNumber(String personnelNumber);
     List<SubsidiaryForm> getAllSubsidiary();
-    void transferEmployeeToSubsidiary(String personnelNumber, String subsidiaryName);
+    byte[] transferEmployeeToSubsidiary(String personnelNumber, String subsidiaryName);
     void addEmployee(String name, String occupation, String personnelNumber);
 }

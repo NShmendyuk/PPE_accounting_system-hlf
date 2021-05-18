@@ -65,8 +65,8 @@ public class DtoConverter {
         return ppeDto;
     }
 
-    public PPE convertDtoToPPE(PPEDto ppeDto, Employee employee) {
-        return PPE.builder().id(ppeDto.getId()).employee(employee).inventoryNumber(ppeDto.getInventoryNumber())
+    public PPE convertDtoToPPE(PPEDto ppeDto) {
+        return PPE.builder().id(ppeDto.getId()).employee(null).inventoryNumber(ppeDto.getInventoryNumber())
                 .lifeTime(ppeDto.getLifeTime()).name(ppeDto.getName()).ppeStatus(ppeDto.getPpeStatus())
                 .price(ppeDto.getPrice()).startUseDate(ppeDto.getStartUseDate()).build();
     }

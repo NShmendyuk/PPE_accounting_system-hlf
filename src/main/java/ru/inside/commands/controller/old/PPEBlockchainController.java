@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.inside.commands.hyperledger.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.entity.PPEContract;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,12 +25,12 @@ public class PPEBlockchainController {
     }
 
     @GetMapping("/all")
-    public String getAllPPE() {
+    public List<PPEContract> getAllPPE() {
         return chainCodeControllerService.getAllPPE();
     }
 
-    @GetMapping("/{id}")
-    public String getPPE(@PathVariable Long id){
-        return chainCodeControllerService.getPPEById(id);
+    @GetMapping("/{inventoryNumber}")
+    public PPEContract getPPE(@PathVariable String inventoryNumber){
+        return chainCodeControllerService.getPPEByInventoryNumber(inventoryNumber);
     }
 }

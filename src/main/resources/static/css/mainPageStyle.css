@@ -12,6 +12,16 @@ h2 {
     text-align: center
 }
 
+h3 {
+    margin-top: 20px;
+    border-bottom: 1px groove;
+    padding-bottom: 1px;
+    text-align: center;
+    font-size: 24px;
+    vertical-align: bottom;
+}
+
+
 table {
     width: 50%;
     margin-bottom: 20px;
@@ -52,4 +62,8 @@ button {
 
 .control_panel_page_redirect {
     margin-top: 5px;
+}
+
+.wrapper {
+    width: 50%;
 }

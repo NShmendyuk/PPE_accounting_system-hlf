@@ -2,12 +2,18 @@ package ru.inside.commands.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.forms.EmployeeForm;
 import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.entity.forms.SubsidiaryForm;
 import ru.inside.commands.service.controller.EmployeeControllerService;
+import ru.inside.commands.service.helper.PdfGenerator;
 
 import java.util.List;
 
@@ -19,7 +25,7 @@ public class EmployeePageController {
     private final EmployeeControllerService employeeControllerService;
 
     @GetMapping("")
-    public ModelAndView getAllEmployee() {
+    public ModelAndView getAllEmployeePage() {
         ModelAndView modelAndView = new ModelAndView("employeePage");
         List<EmployeeForm> employeeFormList = employeeControllerService.getAllEmployee();
 
@@ -40,7 +46,7 @@ public class EmployeePageController {
         return modelAndView;
     }
 
-    @GetMapping("/transfer_init")
+    @GetMapping("/transfer")
     public ModelAndView getTransferEmployeePage(@RequestParam String personnelNumber) {
         log.info("transfer page request. employee with personnelNumber: \"{}\"", personnelNumber);
         ModelAndView modelAndView = new ModelAndView("transferEmployeePage");
@@ -53,16 +59,27 @@ public class EmployeePageController {
     }
 
     @PostMapping("/add")
-    public void addEmployee(@RequestParam String name, @RequestParam String occupation, @RequestParam String personnelNumber) {
+    public ModelAndView addEmployee(@RequestParam String name, @RequestParam String occupation,
+                            @RequestParam String personnelNumber) {
         log.info("POST request, add new employee with name: {}, occupation: {}, personnelNumber: {}", name, occupation, personnelNumber);
-        employeeControllerService.addEmployee(name, occupation, personnelNumber);
+        try {
+            employeeControllerService.addEmployee(name, occupation, personnelNumber);
+        } catch (Exception ex) {
+            log.warn("Some warnings were catch when add new employee {}.", personnelNumber);
+        }
+        return new ModelAndView("redirect:/employee");
     }
 
     @PostMapping("/transfer")
-    public ModelAndView transferEmployeeToSubsidiaryWithPPEs(@RequestParam String personnelNumber, @RequestParam String name) {
-//        log.info("{}", subsidiary);
+    public ResponseEntity<byte[]> transferEmployeeToSubsidiaryWithPPEs(
+            @RequestParam String personnelNumber, @RequestParam String name) {
         log.info("transfer employee with personnelNumber ({}) to another subsidiary ({})", personnelNumber, name);
-//        employeeControllerService.transferEmployeeToSubsidiary(personnelNumber, subsidaryName);
-        return new ModelAndView("redirect:/employee");
+        byte[] contents = employeeControllerService.transferEmployeeToSubsidiary(personnelNumber, name);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        String filename = personnelNumber + "_to_" + name + "_transfer" + ".pdf";
+        headers.setContentDispositionFormData(filename, filename);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return new ResponseEntity<>(contents, headers, HttpStatus.OK);
     }
 }

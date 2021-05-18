@@ -6,14 +6,19 @@ import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
+import ru.inside.commands.entity.Subsidiary;
 import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.enums.PPEStatus;
 import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.hyperledger.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.entity.PPEContract;
 import ru.inside.commands.repository.EmployeeRepository;
 import ru.inside.commands.repository.PPERepository;
+import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
+import ru.inside.commands.service.SubsidiaryService;
 import ru.inside.commands.service.helper.DtoConverter;
+import ru.inside.commands.service.helper.PPEConverter;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -26,74 +31,91 @@ import java.util.List;
 @Slf4j
 public class PPEServiceImpl implements PPEService {
     private final ChainCodeControllerService chainCodeControllerService;
+    private final SubsidiaryService subsidiaryService;
+    private final EmployeeService employeeService;
     private final PPERepository ppeRepository;
-    private final EmployeeRepository employeeRepository;
 
     public PPE getPPEByInventoryNumber(String inventoryNumber) throws NoEntityException {
-        PPE ppe = ppeRepository.findByInventoryNumber(inventoryNumber).orElseThrow(() ->
+        return ppeRepository.findByInventoryNumber(inventoryNumber).orElseThrow(() ->
                 NoEntityException.createWithParam(PPE.class.getSimpleName().toLowerCase(), inventoryNumber));
-        return ppe;
     }
 
     public int getTotalPPE() {
-        List<PPE> ppeList = ppeRepository.findAll();
-        return ppeList.size();
+        return ppeRepository.findAll().size();
     }
 
-    public PPE updateStatus(Long id, PPEStatus status) throws NoEntityException {
-        PPE ppe = ppeRepository.findById(id).orElseThrow(() ->
-                NoEntityException.createWithId(PPE.class.getSimpleName().toLowerCase(), id));
-        ppe.setPpeStatus(status);
+    public PPE addPPE(PPE ppe) {
         return ppeRepository.save(ppe);
-    }
-
-    public PPE addPPE(PPEDto ppeDto) throws NoEntityException {
-        Employee employee = null;
-        Long ownerId = ppeDto.getOwnerId();
-        if (ownerId != null) {
-            employee = employeeRepository.findById(ownerId).orElseThrow(() ->
-                    NoEntityException.createWithId(Employee.class.getSimpleName().toLowerCase(), ownerId));
-        }
-        return ppeRepository.save(DtoConverter.convertDtoToPPE(ppeDto, employee));
     }
 
     public void updateAllStatus() {
         List<PPE> ppeList = ppeRepository.findAll();
         ppeList.forEach(ppe -> {
-            LocalDateTime startUseDate = ppe.getStartUseDate();
-            LocalDateTime nowTime = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-            Duration lifeTimeSpent = Duration.between(nowTime, startUseDate);
-            Duration lifeTimeDuration = ppe.getLifeTime();
+            if (ppe.getEmployee() != null) {
+                LocalDateTime startUseDate = ppe.getStartUseDate();
+                if (startUseDate == null) {
+                    startUseDate = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+                    ppe.setStartUseDate(startUseDate);
+                }
 
-            if (ppe.getPpeStatus() != PPEStatus.DECOMMISSIONED
-                    && ppe.getPpeStatus() != PPEStatus.SPOILED
-                    && lifeTimeSpent.minus(lifeTimeDuration).toDays() < 0) {
-                ppe.setPpeStatus(PPEStatus.SPOILED);
+                LocalDateTime nowTime = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+                Duration lifeTimeSpent = Duration.between(startUseDate, nowTime);
+                Duration lifeTimeDuration = ppe.getLifeTime();
+
+                log.info("ppe {}: days for use: {}", ppe.getInventoryNumber(), lifeTimeDuration.minus(lifeTimeSpent).toDays());
+
+                if (ppe.getPpeStatus() != PPEStatus.DECOMMISSIONED
+                        && ppe.getPpeStatus() != PPEStatus.SPOILED
+                        && lifeTimeDuration.minus(lifeTimeSpent).toDays() < 0) {
+                    ppe.setPpeStatus(PPEStatus.SPOILED);
+                    log.info("ppe {} were spoiled by time! Replacement required!", ppe.getInventoryNumber());
+                    ppeRepository.save(ppe);
+                }
             }
         });
     }
 
-    public List<PPEForm> getAllInWaitList() {
-        List<PPEForm> ppeFormList = new ArrayList<>();
-        PPEForm stubForm = new PPEForm();
 
-        //TODO: stubbed
-        stubForm.setInventoryNumber("244405500422");
-        stubForm.setLifeTime(Duration.ofDays(300));
-        stubForm.setOwnerName("Иванов Иван Петрович");
-        stubForm.setOwnerPersonnelNumber("220222");
-        stubForm.setStartUseDate(LocalDateTime.now());
-        stubForm.setPpeName("Перчатки рабочие, 35");
-        stubForm.setPrice(400F);
-        stubForm.setPpeStatus(PPEStatus.TRANSFER.toString());
-        stubForm.setSubsidiaryName("ГПН-Снабжение");
+    public void dismissPPE(String inventoryNumber) throws NoEntityException {
+        PPE ppe = ppeRepository.findByInventoryNumber(inventoryNumber).orElseThrow(() ->
+                NoEntityException.createWithParam(PPE.class.getSimpleName().toLowerCase(), inventoryNumber));
+        ppe.setPpeStatus(PPEStatus.DECOMMISSIONED);
+        ppeRepository.save(ppe);
+        chainCodeControllerService.deletePPE(inventoryNumber);
+    }
 
-        ppeFormList.add(stubForm);
-        ppeFormList.add(stubForm);
-        ppeFormList.add(stubForm);
-        ppeFormList.add(stubForm);
-        ppeFormList.add(stubForm);
-//        chainCodeControllerService.getAllPPE();
-        return ppeFormList;
+    public void transferPPE(PPE ppe, Subsidiary subsidiary) {
+        chainCodeControllerService.transferPPEToSubsidiary(ppe, subsidiary);
+        ppe.setPpeStatus(PPEStatus.TRANSFER);
+        ppe.setEmployee(null);
+        ppeRepository.save(ppe);
+    }
+
+    public List<PPE> getAllWaitFromChainCode() {
+        List<PPEContract> ppeContracts = new ArrayList<>();
+        try{
+            ppeContracts = chainCodeControllerService.getAllPPE();
+        } catch (NullPointerException ex) {
+            log.warn("ChainCode getAllPPE returned null.");
+        }
+        List<PPE> ppeWaitList = new ArrayList<>();
+        ppeContracts.forEach(ppeContract -> {
+            try {
+                if (ppeContract.getSubsidiary().equals(subsidiaryService.getSelfSubsidiary().getName()) &&
+                        getPPEByInventoryNumber(ppeContract.getInventoryNumber()) == null) {
+                    Employee employee = employeeService.getEmployeeByPersonnelNumber(ppeContract.getOwnerID());
+                    if (employee == null) {
+                        log.warn("employee {} not applied when transfering ppe {} by chaincode!",
+                                ppeContract.getOwnerID(), ppeContract.getInventoryNumber());
+                    } else {
+                        PPE ppe = PPEConverter.ppeContractToPPE(ppeContract, employee);
+                        ppeWaitList.add(ppe);
+                    }
+                }
+            } catch (NoEntityException e) {
+                log.error("Cannot find self subsidiary definition");
+            }
+        });
+        return ppeWaitList;
     }
 }

@@ -35,12 +35,12 @@ public class PPEChainCodeService {
         log.info("test leadger init requested to chaincode");
     }
 
-    public void addPPE(String ownerName, String ownerID, String name, Float price, String inventoryNumber,
+    public void addPPE(String ownerName, String ownerID, String name, String status, Float price, String inventoryNumber,
                          String startUseDate, Integer lifeTime, String subsidiary)
             throws InterruptedException, TimeoutException, ContractException {
         log.info("create ppe by request to chaincode with inv numb:{}, employee name: {}, ppe name: {}, subsidiary: {}",
                 inventoryNumber, ownerName, name, subsidiary);
-        contract.submitTransaction(HLF_CHAINCODE_PPESMART_FUNCTION_NAME_CREATE, ownerName, ownerID, name,
+        contract.submitTransaction(HLF_CHAINCODE_PPESMART_FUNCTION_NAME_CREATE, ownerName, ownerID, name, status,
                 price.toString(), inventoryNumber, startUseDate, lifeTime.toString(), subsidiary);
     }
 
@@ -54,11 +54,12 @@ public class PPEChainCodeService {
         return contract.evaluateTransaction(HLF_CHAINCODE_PPESMART_FUNCTION_NAME_READHISTORY, ppeID);
     }
 
-    public void changePPE(String ownerName, String ownerID, String name, Float price, String inventoryNumber,
+    public void changePPE(String ownerName, String ownerID,
+                          String name, String status, Float price, String inventoryNumber,
                             String startUseDate, Integer lifeTime, String subsidiary)
             throws InterruptedException, TimeoutException, ContractException {
         log.info("update ppe {} by request to chaincode", inventoryNumber);
-        contract.submitTransaction(HLF_CHAINCODE_PPESMART_FUNCTION_NAME_UPDATE, ownerName, ownerID, name,
+        contract.submitTransaction(HLF_CHAINCODE_PPESMART_FUNCTION_NAME_UPDATE, ownerName, ownerID, name, status,
                 price.toString(), inventoryNumber, startUseDate, lifeTime.toString(), subsidiary);
     }
 

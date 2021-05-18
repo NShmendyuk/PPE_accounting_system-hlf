@@ -25,8 +25,12 @@ public class HlfConfiguration {
     }
 
     public HlfConfiguration () {
-        RegistCAClient.initializeUsersCA(); // проинициализируем пользователя в Fabric CA
-        initConnect(); // подключимся к сети
+        try {
+            RegistCAClient.initializeUsersCA(); // проинициализируем пользователя в Fabric CA
+            initConnect(); // подключимся к сети
+        } catch (Exception ex) {
+            log.error("Cannot init connection to hyperledger instances");
+        }
     }
 
     // helper function for getting connected to the gateway
@@ -45,10 +49,10 @@ public class HlfConfiguration {
     public void initConnect() {
         try {
             gateway = connect();
+            network = gateway.getNetwork("mychannel");
+            contract = network.getContract("ppesmart");
         } catch (Exception e) {
             log.error("Cannot init connection to gateway");
         }
-        network = gateway.getNetwork("mychannel");
-        contract = network.getContract("ppesmart");
     }
 }

@@ -12,6 +12,15 @@ h2 {
     text-align: center
 }
 
+h3 {
+    margin-top: 20px;
+    border-bottom: 1px groove;
+    padding-bottom: 1px;
+    text-align: center;
+    font-size: 24px;
+    vertical-align: bottom;
+}
+
 table {
     width: 50%;
     margin-bottom: 20px;
@@ -47,5 +56,9 @@ button {
 }
 
 .div_transfer {
-    margin-left: 1000px;
+    margin-left: 60%;
+}
+
+.wrapper {
+    width: 100%;
 }

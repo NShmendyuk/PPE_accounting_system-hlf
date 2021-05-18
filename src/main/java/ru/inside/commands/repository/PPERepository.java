@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PPERepository extends JpaRepository<PPE, Long> {
     Optional<PPE> findByInventoryNumber(String inventoryNumber);
+    void deleteByInventoryNumber(String inventoryNumber);
 }

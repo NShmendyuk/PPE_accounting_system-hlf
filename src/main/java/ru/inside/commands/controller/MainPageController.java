@@ -1,13 +1,20 @@
 package ru.inside.commands.controller;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.service.PPEService;
+import ru.inside.commands.service.controller.PPEControllerService;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -15,11 +22,12 @@ import java.util.List;
 @Slf4j
 public class MainPageController {
     private final PPEService ppeService;
+    private final PPEControllerService ppeControllerService;
 
     @GetMapping(value = {"/", "/index", "/mainpage"})
     public ModelAndView getMainPage() {
         ModelAndView modelAndView = new ModelAndView("index");
-        Long waitAll = 35L;
+        int waitAll = ppeControllerService.getAllInWaitList().size();
         int countPPEAtSubsidiary = ppeService.getTotalPPE();
         modelAndView.addObject("waitAll", waitAll);
         modelAndView.addObject("countPPEAtSubsidiary", countPPEAtSubsidiary);
@@ -30,7 +38,7 @@ public class MainPageController {
     public ModelAndView getWaitingAccessPage() {
         ModelAndView modelAndView = new ModelAndView("waitApplyPage");
         try {
-            List<PPEForm> waitAllPPE = ppeService.getAllInWaitList(); //TODO: stubbed
+            List<PPEForm> waitAllPPE = ppeControllerService.getAllInWaitList();
 
             Float allCost = 0F;
             for (PPEForm ppe : waitAllPPE) {

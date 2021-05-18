@@ -14,7 +14,14 @@
                     $.ajax({
                         type: "POST",
                         url: "/smart_contract/transfer/apply",
-                        data: formdata
+                        data: formdata,
+                        success: function () {
+                            alert("Принято");
+                            window.location = "/waiting_apply";
+                        },
+                        error: function () {
+                            alert("Возникли ошибки при принятии средства индивидуальной защиты через смарт-контракт");
+                        }
                     });
                     return false;
                 });
@@ -23,9 +30,18 @@
         <script type="text/javascript">
             $(document).ready( function () {
                 $('.apply_form_all').submit( function () {
+                    var formData = $(this).serialize();
                     $.ajax({
                         type: "POST",
                         url: "/smart_contract/transfer/apply/all",
+                        data: formData,
+                        success: function () {
+                            alert("Принято всё");
+                            window.location = "/waiting_apply";
+                        },
+                        error: function () {
+                            alert("Возникли ошибки при принятии всех средств индивидуальной защиты через смарт-контракт");
+                        }
                     });
                     return false;
                 });
@@ -35,6 +51,7 @@
     <body>
         <h1>Система учета средств индивидуальной защиты</h1>
         <h2>Газпромнефть-Цифровые решения</h2>
+        <h3>Ожидающие подтверждения</h3>
 
         <div class="all_in_wait_list">
             <table>
@@ -46,7 +63,9 @@
                     <td th:text="${countWaitAll}"></td>
                     <td th:utext="${allCost}"></td>
                     <td class="td button">
-                        <form th:method="POST" class="apply_form_all" th:action="@{/smart_contract/transfer/apply/all}">
+                        <form th:method="POST" class="apply_form_all"
+                              th:object="${waitAllPPE}" th:action="@{/smart_contract/transfer/apply/all}">
+
                             <button type="submit" name="apply_transfer_all" class="apply_button">Принять всё</button>
                         </form>
                     </td>
@@ -58,6 +77,7 @@
             <table>
                 <tr>
                     <th>Название</th>
+                    <th>Инвентарный номер</th>
                     <th>ФИО владельца</th>
                     <th>дата введения в эксплуатацию</th>
                     <th>срок жизни, дней</th>
@@ -65,6 +85,7 @@
                 </tr>
                 <tr th:each="ppe : ${waitAllPPE}">
                     <td th:text="${ppe.ppeName}"> </td>
+                    <td th:text="${ppe.inventoryNumber}"> </td>
                     <td th:text="${ppe.ownerName}"> </td>
                     <td th:text="${#temporals.format(ppe.startUseDate, 'dd MM yyyy')}"> </td>
                     <td th:text="${ppe.lifeTime.toDays()}"> </td>
@@ -72,6 +93,7 @@
                     <td class="td button">
                         <form th:method="POST" class="apply_form" th:action="@{/smart_contract/transfer/apply}">
                             <input type="hidden" name="ppeName" th:value="${ppe.ppeName}" />
+                            <input type="hidden" name="inventoryNumber" th:value="${ppe.inventoryNumber}" />
                             <input type="hidden" name="ownerName" th:value="${ppe.ownerName}" />
                             <input type="hidden" name="subsidiaryName" th:value="${ppe.subsidiaryName}" />
                             <input type="hidden" name="price" th:value="${ppe.price}" />

@@ -28,7 +28,7 @@ public class Employee {
     /**
      * Поле personnelNumber - табельный номер сотрудника
      */
-    @Column
+    @Column(unique = true)
     @NotNull
     private String personnelNumber;
 
@@ -42,7 +42,7 @@ public class Employee {
      * Поле ppe - средства индивидуальной защиты, закрепленные за сотрудником
      */
     @OneToMany(fetch = FetchType.LAZY,
-            cascade = {CascadeType.ALL})
+            cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "employee_ppe",
             joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"),

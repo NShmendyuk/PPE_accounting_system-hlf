@@ -36,7 +36,7 @@ public class Subsidiary {
      * Поле employee - сотрудники дочернего общества
      */
     @OneToMany(fetch = FetchType.LAZY,
-            cascade = {CascadeType.ALL})
+            cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "subsidiary_employee",
             joinColumns = @JoinColumn(name = "subsidiary_id", referencedColumnName = "id"),

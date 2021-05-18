@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Перевод сотрудника</title>
+    <style type="text/css">
+        body {
+            font-family: Calibri, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: left;">Перевод сотрудника в дочернее общество</h2>
+    <p style="font-size: 22px; ">Перевод в организацию:</p>
+    <p style="font-size: 18px; " th:text="${subsidiaryName}"></p>
+    <p style="font-size: 22px; ">Сотрудник:</p>
+    <table style="border: 1px solid #dddddd; border-collapse: collapse;">
+        <tr  style="font-weight: bold;
+        padding: 5px;
+        background: #efefef;
+        border: 1px solid #dddddd;">
+            <th>ФИО</th>
+            <th>Табельный номер</th>
+            <th>Должность</th>
+        </tr>
+        <tr th:object="${employee}">
+            <td
+                    style="border: 1px solid #dddddd; padding: 5px;"
+                    th:text="${employee.employeeName}"></td>
+            <td
+                    style="border: 1px solid #dddddd; padding: 5px;"
+                    th:text="${employee.personnelNumber}"></td>
+            <td
+                    style="border: 1px solid #dddddd; padding: 5px;"
+                    th:text="${employee.occupation}"></td>
+        </tr>
+    </table>
+    <p style="font-size: 22px; ">Средства индивидуальной защиты:</p>
+    <table>
+        <tr  style="font-weight: bold;
+        padding: 5px;
+        background: #efefef;
+        border: 1px solid #dddddd;">
+            <th>Название</th>
+            <th>Инвентарный номер</th>
+            <th>Дата начала использования</th>
+            <th>Срок эксплуатации, дни</th>
+            <th>Цена, руб</th>
+        </tr>
+        <tr th:each="ppe: ${ppeList}">
+            <td style="border: 1px solid #dddddd; padding: 5px;"
+                th:text="${ppe.ppeName}"></td>
+            <td style="border: 1px solid #dddddd; padding: 5px;"
+                th:text="${ppe.inventoryNumber}"></td>
+            <td style="border: 1px solid #dddddd; padding: 5px;"
+                th:text="${ppe.startUseDate == null} ? '' : ${#temporals.format(ppe.startUseDate, 'dd/MM/yyyy')}"></td>
+            <td style="border: 1px solid #dddddd; padding: 5px;"
+                th:text="${ppe.lifeTime == null} ? '' : ${ppe.lifeTime.toDays()}"></td>
+            <td style="border: 1px solid #dddddd; padding: 5px;"
+                th:text="${ppe.price}"></td>
+        </tr>
+    </table>
+</body>
+</html>

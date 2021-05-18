@@ -13,8 +13,28 @@
                     $.ajax({
                         type: "POST",
                         url: "/ppe/apply_new_ppe",
+                        data: formdata,
+                        success: function () {
+                            alert("Средство индивидуальной защиты добавлено");
+                        },
+                        error: function () {
+                            alert("Возникли ошибки при добавлении нового средства защиты");
+                        }
+                    });
+                    return false;
+                });
+            });
+        </script>
+        <script type="text/javascript">
+            $(document).ready( function () {
+                $('.decommissioning_ppe').submit( function () {
+                    var formdata = $(this).serialize();
+                    $.ajax({
+                        type: "PATCH",
+                        url: "/ppe/decommiss",
                         data: formdata
                     });
+                    alert("decommissioned");
                     return false;
                 });
             });
@@ -24,9 +44,11 @@
     <body>
         <h1>Система учета средств индивидуальной защиты</h1>
         <h2>Газпромнефть-Цифровые решения</h2>
+        <h3>Управление средствами индивидуальной защиты</h3>
+
         <div class="wrapper">
             <p class="ppe_search">
-                <h3>Поиск информацию о СИЗ</h3>
+                <h3>Поиск информации о СИЗ</h3>
                 <form class="search_ppe_with_inventory_id"
                       th:action="@{/ppe/}"
                       th:method="GET">
@@ -34,7 +56,7 @@
                         <input type="text" name="inventoryNumber" placeholder="инвентарный номер"/>
                     </td>
                     <td>
-                        <button type="submit" class="apply_button">Принять</button>
+                        <button type="submit" class="check_button">Найти</button>
                     </td>
                 </form>
 
@@ -54,6 +76,11 @@
                         <td th:text="${ppeForm.startUseDate == null} ? '' : ${#temporals.format(ppeForm.startUseDate, 'dd/MM/yyyy')}">...</td>
                         <td th:text="${ppeForm.lifeTime == null} ? '' : ${ppeForm.lifeTime.toDays()}">...</td>
                         <td th:text="${ppeForm.ppeStatus}">...</td>
+                        <form th:method="PATCH" class="decommissioning_ppe" th:action="@{/ppe/decomiss}">
+                            <input type="hidden" name="personnelNumber" th:value="${ppeForm.ownerPersonnelNumber}" />
+                            <input type="hidden" name="inventoryNumber" th:value="${ppeForm.inventoryNumber}" />
+                            <button type="submit" id="decommissioning_ppe_button" name="decommissioning_ppe" class="check_button">Списать</button>
+                        </form>
                     </tr>
                 </table>
             </p>

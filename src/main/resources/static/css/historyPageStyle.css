@@ -11,3 +11,18 @@ h2 {
     font-size: 32px;
     text-align: center
 }
+
+h3 {
+    margin-top: 20px;
+    border-bottom: 1px groove;
+    padding-bottom: 1px;
+    text-align: center;
+    font-size: 24px;
+    vertical-align: bottom;
+}
+
+.button_panels {
+    display: flex;
+    align-items: baseline;
+    align-content: space-between;
+}

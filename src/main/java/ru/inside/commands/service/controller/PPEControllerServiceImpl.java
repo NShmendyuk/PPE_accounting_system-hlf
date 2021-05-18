@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
+import ru.inside.commands.entity.Employee;
+import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.enums.PPEStatus;
 import ru.inside.commands.entity.forms.PPEForm;
@@ -12,6 +14,7 @@ import ru.inside.commands.hyperledger.entity.PPEContract;
 import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.helper.FormConverter;
+import ru.inside.commands.service.helper.PPEConverter;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -42,24 +45,30 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     public void addPPEForm(String name, Float price, String inventoryNumber,
                            String ownerPersonnelNumber,  LocalDate date, Long lifeTimeDays) {
         log.info("add new ppe: {}, owner: {}", name, ownerPersonnelNumber);
-        PPEDto ppeDto = new PPEDto();
-        ppeDto.setName(name);
-        ppeDto.setPrice(price);
-        ppeDto.setInventoryNumber(inventoryNumber);
-        ppeDto.setStartUseDate(LocalDateTime.of(date, LocalTime.MIDNIGHT));
-        ppeDto.setLifeTime(Duration.ofDays(lifeTimeDays));
+        PPE ppe = new PPE();
+        ppe.setName(name);
+        ppe.setPrice(price);
+        ppe.setInventoryNumber(inventoryNumber);
+        ppe.setLifeTime(Duration.ofDays(lifeTimeDays));
+        ppe.setPpeStatus(PPEStatus.APPLIED);
 
-        ppeDto.setPpeStatus(PPEStatus.APPLIED);
+        ppe.setStartUseDate(null);
+        ppe = ppeService.addPPE(ppe);
+        if (date != null) {
+            ppe.setStartUseDate(LocalDateTime.of(date, LocalTime.MIDNIGHT));
+        }
 
-        try {
-            ppeDto.setOwnerId(employeeService.getEmployeeByPersonnelNumber(ownerPersonnelNumber).getId());
-        } catch (NoEntityException e) {
-            log.warn("No employee with personnel number: {}", ownerPersonnelNumber);
-            ppeDto.setOwnerId(null);
+        if (!ownerPersonnelNumber.equals("")) {
+            try {
+                employeeService.addPPEToEmployee(ppe, ownerPersonnelNumber);
+            } catch (NoEntityException ex) {
+                log.error("Cannot add ppe {} to employee {}", inventoryNumber, ownerPersonnelNumber);
+            }
         }
         try {
-            ppeService.addPPE(ppeDto);
-        } catch (NoEntityException ignored) {
+            chainCodeControllerService.addPPE(ppe);
+        } catch (NullPointerException ex) {
+            log.warn("Cannot add ppe {} into chaincode", inventoryNumber);
         }
     }
 
@@ -68,13 +77,12 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         List<PPEForm> ppeHistoryForms = new ArrayList<>();
         ppeHistoryList.forEach(ppeContract -> {
             PPEForm ppeForm = new PPEForm();
+            ppeForm.setInventoryNumber(ppeContract.getInventoryNumber());
             ppeForm.setPpeName(ppeContract.getName());
             ppeForm.setPrice(ppeContract.getPrice());
-            ppeForm.setInventoryNumber(ppeContract.getInventoryNumber());
             ppeForm.setLifeTime(Duration.ofDays(ppeContract.getLifeTime()));
             ppeForm.setStartUseDate(LocalDateTime.parse(ppeContract.getStartUseDate()));
-
-            ppeForm.setPpeStatus(PPEStatus.COMMISSIONED.toString()); //TODO: add status to chaincode
+            ppeForm.setPpeStatus(ppeContract.getStatus());
 
             ppeForm.setOwnerPersonnelNumber(ppeContract.getOwnerID());
             ppeForm.setOwnerName(ppeContract.getOwnerName());
@@ -82,5 +90,82 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             ppeHistoryForms.add(ppeForm);
         });
         return ppeHistoryForms;
+    }
+
+    public void decommissioning(String employeePersonnelNumber, String inventoryNumber) {
+        Employee employee;
+        try {
+            employee = employeeService.getEmployeeByPersonnelNumber(employeePersonnelNumber);
+        } catch (NoEntityException e) {
+            log.warn("Employee {} not found! Cannot decommission ppe {}", employeePersonnelNumber, inventoryNumber);
+            return;
+        }
+        List<PPE> updatedPPEList = new ArrayList<>();
+        employee.getPpe().forEach(ppe -> {
+            if (!ppe.getInventoryNumber().equals(inventoryNumber)) {
+                updatedPPEList.add(ppe);
+            }
+        });
+        employee.setPpe(updatedPPEList);
+        try {
+            employeeService.addEmployee(employee);
+        } catch (NoEntityException e) {
+            log.error("Cannot update list of ppe to employee {} by saving", employeePersonnelNumber);
+        }
+        try {
+            ppeService.dismissPPE(inventoryNumber);
+        } catch (NoEntityException e) {
+            log.error("ppe {} not found while executing process to decommission!", inventoryNumber);
+        }
+        chainCodeControllerService.deletePPE(inventoryNumber);
+    }
+
+    public List<PPEForm> getAllInWaitList() {
+        List<PPE> ppeList = ppeService.getAllWaitFromChainCode();
+        List<PPEForm> ppeFormList = new ArrayList<>();
+        ppeList.forEach(ppe -> {
+            PPEForm ppeForm = new PPEForm();
+
+            ppeForm.setPpeName(ppe.getName());
+            ppeForm.setPrice(ppe.getPrice());
+            ppeForm.setInventoryNumber(ppe.getInventoryNumber());
+            ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
+            ppeForm.setLifeTime(ppe.getLifeTime());
+            ppeForm.setStartUseDate(ppe.getStartUseDate());
+
+            ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
+            ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
+            ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
+
+            ppeFormList.add(ppeForm);
+        });
+        return ppeFormList;
+    }
+
+    public void applyPPEFromChainCode(String inventoryNumber) {
+        PPEContract ppeContract = chainCodeControllerService.getPPEByInventoryNumber(inventoryNumber);
+        Employee employee;
+        try {
+            employee = employeeService.getEmployeeByPersonnelNumber(ppeContract.getOwnerID());
+        } catch (NoEntityException e) {
+            log.error("Cannot find employee {} for transfering ppe {} from another subsidiary by chaincode",
+                    ppeContract.getOwnerID(), inventoryNumber);
+            return;
+        }
+
+        PPE ppe = PPEConverter.ppeContractToPPE(ppeContract, employee);
+
+        try {
+            employeeService.addPPEToEmployee(ppe, employee.getPersonnelNumber());
+        } catch (NoEntityException e) {
+            log.error("Employee {} were deleted from database while adding new ppe {}!!! Cannot add new ppe from chaincode",
+                    employee.getPersonnelNumber(), inventoryNumber);
+        }
+    }
+
+    public void applyAllPPEFromChainCode(List<PPEForm> ppeWaitList) {
+        ppeWaitList.forEach(ppeForm -> {
+            applyPPEFromChainCode(ppeForm.getInventoryNumber());
+        });
     }
 }

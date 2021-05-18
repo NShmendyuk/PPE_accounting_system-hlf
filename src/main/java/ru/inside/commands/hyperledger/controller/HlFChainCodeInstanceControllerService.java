@@ -23,6 +23,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     private HlFChainCodeInstanceControllerService(HlfConfiguration hlfConfiguration) {
         try {
             chainCodeController = new PPEChainCodeService(hlfConfiguration.getContract());
+            log.info("ChainCode instance initialized. Connected to hyperledger environment");
         } catch (Exception ex) {
             log.error("Cannot init ChainCode instance. Hyperledger environment unactive", ex);
         }
@@ -31,49 +32,57 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public void initTestLedger() {
         try {
             chainCodeController.initializeTestPPELedger();
+            log.info("contract (initTestLedger) submit");
         } catch (Exception e) {
             log.error("Init test ledger request to chaincode were denied", e);
         }
-        log.info("contract (initTestLedger) submit");
     }
 
     public List<PPEContract> getAllPPE() {
         List<PPEContract> allPPE = new ArrayList<>();
         try {
             allPPE = Arrays.asList(genson.deserialize(chainCodeController.getAllPPE(), PPEContract[].class));
+            log.info("chaincode message: {}", allPPE);
         } catch (Exception e) {
-            log.error("Get All request to chaincode were denied", e);
+            log.error("Get All request to chaincode were denied");
         }
-        log.info("chaincode message: {}", allPPE);
         return allPPE;
     }
 
     public void addPPE(PPE ppe) {
-        String ownerName = ppe.getEmployee().getEmployeeName();
-        String ownerID = ppe.getEmployee().getPersonnelNumber();
+        String ownerName = "";
+        String ownerID = "";
+        if (ppe.getEmployee() != null) {
+            ownerName = ppe.getEmployee().getEmployeeName();
+            ownerID = ppe.getEmployee().getPersonnelNumber();
+        }
+
         String name = ppe.getName();
+        String status = ppe.getPpeStatus().toString();
         Float price = ppe.getPrice();
         String inventoryNumber = ppe.getInventoryNumber();
         String startUseDate = ppe.getStartUseDate().toString();
         Integer lifeTime = Integer.parseInt(String.valueOf(ppe.getLifeTime().toDays()));
-        String subsidiary = ppe.getEmployee().getSubsidiary().getName();
+
+        String subsidiary = ppe.getEmployee().getSubsidiary().getName(); //must have
         try {
             chainCodeController.addPPE(ownerName, ownerID,
-                    name, price, inventoryNumber, startUseDate, lifeTime, subsidiary);
+                    name, status, price, inventoryNumber,
+                    startUseDate, lifeTime, subsidiary);
+            log.info("contract (addPPE) submit");
         } catch (Exception e) {
             log.error("Add new PPE request to chaincode were denied", e);
         }
-        log.info("contract (addPPE) submit");
     }
 
     public PPEContract getPPEByInventoryNumber(String inventoryNumber) {
-        PPEContract ppeInfo = null;
+        PPEContract ppeInfo = new PPEContract();
         try {
             ppeInfo = genson.deserialize(chainCodeController.getPPE(inventoryNumber), PPEContract.class);
+            log.info("chaincode (getPPEByInventoryNumber) message: {}", ppeInfo.toString());
         } catch (Exception ex) {
-            log.error("Get All request to chaincode were denied", ex);
+            log.error("Get ppe {} request to chaincode were denied", inventoryNumber);
         }
-        log.info("chaincode (getPPEById) message: {}", ppeInfo.toString());
         return ppeInfo;
     }
 
@@ -81,10 +90,10 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         List<PPEContract> ppeHistoryList = new ArrayList<>();
         try {
             ppeHistoryList = Arrays.asList(genson.deserialize(chainCodeController.getPPEHistory(inventoryNumber), PPEContract[].class));
+            log.info("contract (getPPEHistoryById) message: {}", ppeHistoryList.toString());
         } catch (Exception ex) {
-            log.error("Get history request to chaincode were denied", ex);
+            log.error("Get ppe {} history request to chaincode were denied", inventoryNumber);
         }
-        log.info("contract (getPPEHistoryById) message: {}", ppeHistoryList.toString());
         return ppeHistoryList;
     }
 
@@ -92,6 +101,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         String ownerName = ppe.getEmployee().getEmployeeName();
         String ownerID = ppe.getEmployee().getId().toString();
         String name = ppe.getName();
+        String status = ppe.getPpeStatus().toString();
         Float price = ppe.getPrice();
         String inventoryNumber = ppe.getInventoryNumber();
         String startUseDate = ppe.getStartUseDate().toString();
@@ -100,29 +110,29 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
 
         try {
             chainCodeController.changePPE(ownerName, ownerID,
-                    name, price, inventoryNumber, startUseDate, lifeTime, subsidiary);
+                    name, status, price, inventoryNumber,
+                    startUseDate, lifeTime, subsidiary);
+            log.info("contract (changePPE) submit");
         } catch (Exception e) {
             log.error("change PPE {} request to chaincode were denied", inventoryNumber, e);
         }
-
-        log.info("contract (changePPE) submit");
     }
 
     public void deletePPE(String inventoryNumber) {
         try {
             chainCodeController.deletePPE(inventoryNumber);
+            log.info("contract (deletePPE) submit");
         } catch (Exception e) {
-            log.error("Delete PPE {} request to chaincode were denied", inventoryNumber, e);
+            log.error("Delete PPE {} request to chaincode were denied", inventoryNumber);
         }
-        log.info("contract (deletePPE) submit");
     }
 
     public boolean checkPPEExist(String inventoryNumber) {
-        String ppeInfo = "";
+        String ppeInfo = "chaincode executing denied";
         try {
             ppeInfo = Arrays.toString(chainCodeController.isPPEExist(inventoryNumber));
         } catch (Exception e) {
-            log.error("Check existing ppe sample request to chaincode were denied", e);
+            log.error("Check existing ppe {} sample request to chaincode were denied", inventoryNumber);
         }
         log.info("chaincode message isExist: {}", ppeInfo);
         return ppeInfo.equals("true");
@@ -134,9 +144,9 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
 
         try {
             chainCodeController.transferPPEToAnotherSubsidiary(inventoryNumber, toSubsidiary);
+            log.info("contract (transferPPEToSubsidiary) submit");
         } catch (Exception e) {
-            log.error("transfer ppe sample request to chaincode were denied", e);
+            log.error("transfer ppe {} request to chaincode were denied", inventoryNumber);
         }
-        log.info("contract (transferPPEToSubsidiary) submit");
     }
 }

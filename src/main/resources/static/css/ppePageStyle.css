@@ -12,6 +12,16 @@ h2 {
     text-align: center
 }
 
+h3 {
+    margin-top: 20px;
+    border-bottom: 1px groove;
+    padding-bottom: 1px;
+    text-align: center;
+    font-size: 24px;
+    vertical-align: bottom;
+}
+
+
 table.ppe_search_table {
     width: 50%;
     margin-bottom: 20px;
@@ -36,8 +46,12 @@ input {
     margin-bottom: 3px;
 }
 
-button {
-    background-color: rgb(50 255 0);
+.apply_button {
+    background-color: rgb(50 255 50)
+}
+
+.check_button {
+    background-color: #FFF0CB;
 }
 
 .wrapper {

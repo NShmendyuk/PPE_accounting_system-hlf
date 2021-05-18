@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class PPEContract {
     /**
-     * Инвентарный номер СИЗа
+     * Инвентарный номер средства индивидуальной защиты
      */
     private String inventoryNumber;
 
@@ -23,6 +23,11 @@ public class PPEContract {
      * Название средства индивидуальной защиты
      */
     private String name;
+
+    /**
+     * Статус средства индивидуальной защиты
+     */
+    private String status;
 
     /**
      * Цена СИЗа

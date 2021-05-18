@@ -12,6 +12,7 @@ import ru.inside.commands.hyperledger.PeerDiscoveryService;
 import ru.inside.commands.service.SubsidiaryService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -26,12 +27,13 @@ public class SubsidiaryPageController {
     public ModelAndView getSubsidiaryPage() {
         ModelAndView modelAndView = new ModelAndView("subsidiaryPage");
         List<SubsidiaryForm> subsidiaryForms = new ArrayList<>();
+        Collection<String> mspIds = new ArrayList<>();
+        try {
+            mspIds = peerDiscoveryService.getPeersInfo();
+        } catch (Exception ex) {
+            log.warn("Process to find peers in hlf network were denied!");
+        }
 
-        /**
-         * TODO: check peers availabling by compare names in database and mspIds/peersName(?) in HLF
-         */
-        List<String> peersName = peerDiscoveryService.getAllActivePeersName();
-        List<String> mspIds = peerDiscoveryService.getAllActiveMspId();
 
         List<Subsidiary> subsidiaryList = subsidiaryService.getAll();
 
@@ -40,6 +42,11 @@ public class SubsidiaryPageController {
             subsidiaryForm.setName(subsidiary.getName());
             subsidiaryForm.setPeerName(subsidiary.getPeerName());
             subsidiaryForm.setStatus(SubsidiaryStatus.UNACCESSED); //TODO: check by hyperledger service
+            mspIds.forEach(mspId -> {
+                if (mspId.equals(subsidiary.getPeerName())) {
+                    subsidiaryForm.setStatus(SubsidiaryStatus.ACCESSED);
+                }
+            });
             subsidiaryForms.add(subsidiaryForm);
         }
 

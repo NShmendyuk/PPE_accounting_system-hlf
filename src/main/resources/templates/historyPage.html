@@ -8,7 +8,7 @@
     <body>
         <h1>Система учета средств индивидуальной защиты</h1>
         <h2>Газпромнефть-Цифровые решения</h2>
-        <h3>история транзакций средства индивидуальной защиты</h3>
+        <h3>История транзакций средства индивидуальной защиты</h3>
 
         <div class="wrapper">
             <table class="ppe_history_table">
@@ -33,20 +33,22 @@
                     <td th:text="${ppeForm.subsidiaryName}">...</td>
                 </tr>
             </table>
-            <p class="control_panels">
-
+            <div class="button_panels">
+            <a>
                 <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history/previous}">
                     <input type="hidden" name="inventoryNumber" th:value="${ppeForm.inventoryNumber}" />
                     <input type="hidden" name="ppeHistoryPage" th:value="${ppeHistoryPage}" />
                     <button type="submit" name="show_ppe_history_page" class="turn_button">Предыдущее</button>
                 </form>
-
+            </a>
+            <a>
                 <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history/next}">
                     <input type="hidden" name="inventoryNumber" th:value="${ppeForm.inventoryNumber}" />
                     <input type="hidden" name="ppeHistoryPage" th:value="${ppeHistoryPage}" />
                     <button type="submit" name="show_ppe_history_page" class="turn_button">Следующее</button>
                 </form>
-            </p>
+            </a>
+            </div>
         </div>
     </body>
 </html>

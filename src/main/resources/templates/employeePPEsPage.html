@@ -6,43 +6,75 @@
         <link rel="stylesheet" type="text/css" th:href="@{/css/employeePageStyle.css}"/>
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready( function () {
+                $('.decommissioning_ppe').submit( function () {
+                    var formdata = $(this).serialize();
+                    $.ajax({
+                        type: "PATCH",
+                        url: "/ppe/decommiss",
+                        data: formdata,
+                        success: function () {
+                            alert("Выведено из эксплуатации");
+                        },
+                        error: function () {
+                            alert("Возникли ошибки при выводе из эксплуатации!");
+                        }
+                    });
+
+                    return false;
+                });
+            });
+        </script>
     </head>
     <body>
         <h1>Система учета средств индивидуальной защиты</h1>
         <h2>Газпромнефть-Цифровые решения</h2>
-        <table class="employee_table">
-            <tr>
-                <th>ФИО</th>
-                <th>Табельный номер</th>
-                <th>должность</th>
-            </tr>
-            <tr th:object="${employee}">
-                <td th:text="${employee.employeeName}"> </td>
-                <td th:text="${employee.personnelNumber}"> </td>
-                <td th:text="${employee.occupation}"> </td>
-            </tr>
-        </table>
-        <table class="owner_ppe_table">
-            <tr>
-                <th>Название</th>
-                <th>Инвентарный номер</th>
-                <th>Дата начала использования</th>
-                <th>Срок жизни</th>
-                <th>Статус</th>
-                <th>История</th>
-            </tr>
-            <tr th:each="ppe: ${ppeList}">
-                <td th:text="${ppe.ppeName}"> </td>
-                <td th:text="${ppe.inventoryNumber}"> </td>
-                <td th:text="${ppe.startUseDate == null} ? '' : ${#temporals.format(ppe.startUseDate, 'dd/MM/yyyy')}">...</td>
-                <td th:text="${ppe.lifeTime == null} ? '' : ${ppe.lifeTime.toDays()}">...</td>
-                <td th:text="${ppe.ppeStatus}"> </td>
-                <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history}">
-                    <input type="hidden" name="inventoryNumber" th:value="${ppe.inventoryNumber}" />
-                    <button type="submit" name="show_ppe_history_page" class="redirect_button">Просмотреть</button>
-                </form>
-            </tr>
-        </table>
-
+        <h3>Средства индивидуальной защиты сотрудника</h3>
+        <div class="wrapper">
+            <table class="employee_table">
+                <tr>
+                    <th>ФИО</th>
+                    <th>Табельный номер</th>
+                    <th>должность</th>
+                </tr>
+                <tr th:object="${employee}">
+                    <td th:text="${employee.employeeName}"> </td>
+                    <td th:text="${employee.personnelNumber}"> </td>
+                    <td th:text="${employee.occupation}"> </td>
+                </tr>
+            </table>
+            <table class="owner_ppe_table">
+                <tr>
+                    <th>Название</th>
+                    <th>Инвентарный номер</th>
+                    <th>Дата начала использования</th>
+                    <th>Срок жизни</th>
+                    <th>Статус</th>
+                    <th>История</th>
+                    <th>Вывести из эксплуатации</th>
+                </tr>
+                <tr th:each="ppe: ${ppeList}">
+                    <td th:text="${ppe.ppeName}"> </td>
+                    <td th:text="${ppe.inventoryNumber}"> </td>
+                    <td th:text="${ppe.startUseDate == null} ? '' : ${#temporals.format(ppe.startUseDate, 'dd/MM/yyyy')}">...</td>
+                    <td th:text="${ppe.lifeTime == null} ? '' : ${ppe.lifeTime.toDays()}">...</td>
+                    <td th:text="${ppe.ppeStatus}"> </td>
+                    <td>
+                            <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history}">
+                            <input type="hidden" name="inventoryNumber" th:value="${ppe.inventoryNumber}" />
+                            <button type="submit" name="show_ppe_history_page" class="redirect_button">Просмотреть</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form th:method="PATCH" class="decommissioning_ppe" th:action="@{/ppe/decomiss}">
+                            <input type="hidden" name="personnelNumber" th:value="${employee.personnelNumber}" />
+                            <input type="hidden" name="inventoryNumber" th:value="${ppe.inventoryNumber}" />
+                            <button type="submit" id="decommissioning_ppe_button" name="decommissioning_ppe" class="decommissioning_ppe">Списать</button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </body>
 </html>
