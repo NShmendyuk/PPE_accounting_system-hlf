@@ -158,6 +158,11 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         }
 
         PPE ppe = PPEConverter.ppeContractToPPE(ppeContract, employee);
+        try {
+            PPE existedPPE = ppeService.getPPEByInventoryNumber(inventoryNumber);
+            ppe.setId(ppe.getId());
+        } catch (NoEntityException ignored) {
+        }
 
         try {
             employeeService.addPPEToEmployee(ppe, employee.getPersonnelNumber());
