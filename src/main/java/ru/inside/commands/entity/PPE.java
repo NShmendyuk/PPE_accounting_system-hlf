@@ -2,9 +2,9 @@ package ru.inside.commands.entity;
 
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 import ru.inside.commands.entity.enums.PPEStatus;
 
-import javax.annotation.concurrent.Immutable;
 import javax.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -66,6 +66,6 @@ public class PPE {
             name = "employee_ppe",
             joinColumns = @JoinColumn(name = "ppe_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
-//    @Column(updatable = false) //TODO: check if writed to db and field is immutable
+    @Immutable
     private Employee employee;
 }

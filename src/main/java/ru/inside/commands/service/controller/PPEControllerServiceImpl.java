@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
-import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.enums.PPEStatus;
 import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.hyperledger.ChainCodeControllerService;
@@ -53,7 +52,13 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         ppe.setPpeStatus(PPEStatus.APPLIED);
 
         ppe.setStartUseDate(null);
-        ppe = ppeService.addPPE(ppe);
+        try {
+            ppe = ppeService.addPPE(ppe);
+        } catch (Exception ex) {
+            log.error("Cannot add new ppe {}! Check inventory number for existing", inventoryNumber);
+            throw ex;
+        }
+
         if (date != null) {
             ppe.setStartUseDate(LocalDateTime.of(date, LocalTime.MIDNIGHT));
         }
@@ -117,7 +122,6 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         } catch (NoEntityException e) {
             log.error("ppe {} not found while executing process to decommission!", inventoryNumber);
         }
-        chainCodeControllerService.deletePPE(inventoryNumber);
     }
 
     public List<PPEForm> getAllInWaitList() {
