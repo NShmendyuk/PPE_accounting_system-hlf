@@ -13,6 +13,11 @@ import java.nio.file.Paths;
 @Slf4j
 public class HlfConfiguration {
     private Gateway gateway;
+    private String HLF_USER_NAME = "appUser1";
+    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
+    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
+    private String HLF_CHANNEL_NAME = "mychannel";
+    private String HLF_CHAINCODE_NAME = "ppesmart";
 
     @Getter
     private Contract contract;
@@ -26,7 +31,7 @@ public class HlfConfiguration {
 
     public HlfConfiguration () {
         try {
-            RegistCAClient.initializeUsersCA(); // проинициализируем пользователя в Fabric CA
+            RegistCAClient.initializeUsersCA(HLF_USER_NAME); // проинициализируем пользователя в Fabric CA
             initConnect(); // подключимся к сети
         } catch (Exception ex) {
             log.error("Cannot init connection to hyperledger instances");
@@ -34,23 +39,26 @@ public class HlfConfiguration {
     }
 
     // helper function for getting connected to the gateway
-    private static Gateway connect() throws Exception {
+    private static Gateway connect(String HLF_USER_NAME,
+                                   String HLF_PART_OF_PATH_RELATIVE_ORG,
+                                   String HLF_PART_OF_PATH_RELATIVE_YAML) throws Exception {
         // Load a file system based wallet for managing identities.
         Path walletPath = Paths.get("wallet");
         Wallet wallet = Wallets.newFileSystemWallet(walletPath);
         // load a CCP
-        Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations", "peerOrganizations", "org1.example.com", "connection-org1.yaml");
+        Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations", "peerOrganizations",
+                HLF_PART_OF_PATH_RELATIVE_ORG, HLF_PART_OF_PATH_RELATIVE_YAML);
 
         Gateway.Builder builder = Gateway.createBuilder();
-        builder.identity(wallet, "appUser2").networkConfig(networkConfigPath).discovery(true);
+        builder.identity(wallet, HLF_USER_NAME).networkConfig(networkConfigPath).discovery(true);
         return builder.connect();
     }
 
-    public void initConnect() {
+    private void initConnect() {
         try {
-            gateway = connect();
-            network = gateway.getNetwork("mychannel");
-            contract = network.getContract("ppesmart");
+            gateway = connect(HLF_USER_NAME, HLF_PART_OF_PATH_RELATIVE_ORG, HLF_PART_OF_PATH_RELATIVE_YAML);
+            network = gateway.getNetwork(HLF_CHANNEL_NAME);
+            contract = network.getContract(HLF_CHAINCODE_NAME);
         } catch (Exception e) {
             log.error("Cannot init connection to gateway");
         }

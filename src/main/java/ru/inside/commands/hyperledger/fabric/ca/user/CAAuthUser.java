@@ -18,14 +18,15 @@ import java.util.Set;
 @Slf4j
 public class CAAuthUser {
 
-    public static void enrollUser() throws Exception {
+    public static void enrollUser(String HLF_CA_URL, String HLF_CA_PEM_PATH,
+                                  String HLF_USER_NAME, String HLF_ORG_MSP_DEFINITION,
+                                  String HLF_ADMIN_USER, String HLF_ORG_AFFILIATION) throws Exception {
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
         props.put("pemFile",
-                "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem");
+                HLF_CA_PEM_PATH);
         props.put("allowAllHostNames", "true");
-        String HLF_CA_CLIENT_URL = "https://localhost:7054";
-        HFCAClient caClient = HFCAClient.createNewInstance(HLF_CA_CLIENT_URL, props);
+        HFCAClient caClient = HFCAClient.createNewInstance(HLF_CA_URL, props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();
         caClient.setCryptoSuite(cryptoSuite);
 
@@ -33,21 +34,21 @@ public class CAAuthUser {
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
 
         // Check to see if we've already enrolled the user.
-        if (wallet.get("appUser2") != null) {
-            System.out.println("An identity for the user \"appUser2\" already exists in the wallet");
+        if (wallet.get(HLF_USER_NAME) != null) {
+            System.out.println("An identity for the user \"" + HLF_USER_NAME + "\" already exists in the wallet");
             return;
         }
 
-        X509Identity adminIdentity = (X509Identity)wallet.get("admin");
+        X509Identity adminIdentity = (X509Identity)wallet.get(HLF_ADMIN_USER);
         if (adminIdentity == null) {
-            System.out.println("\"admin\" needs to be enrolled and added to the wallet first");
+            System.out.println("\"" + HLF_ADMIN_USER + "\" needs to be enrolled and added to the wallet first");
             return;
         }
         User admin = new User() {
 
             @Override
             public String getName() {
-                return "admin";
+                return HLF_ADMIN_USER;
             }
 
             @Override
@@ -62,7 +63,7 @@ public class CAAuthUser {
 
             @Override
             public String getAffiliation() {
-                return "org1.department1";
+                return HLF_ORG_AFFILIATION;
             }
 
             @Override
@@ -83,19 +84,19 @@ public class CAAuthUser {
 
             @Override
             public String getMspId() {
-                return "Org1MSP";
+                return HLF_ORG_MSP_DEFINITION;
             }
 
         };
 
         // Register the user, enroll the user, and import the new identity into the wallet.
-        RegistrationRequest registrationRequest = new RegistrationRequest("appUser2");
-        registrationRequest.setAffiliation("org1.department1");
-        registrationRequest.setEnrollmentID("appUser2");
+        RegistrationRequest registrationRequest = new RegistrationRequest(HLF_USER_NAME);
+        registrationRequest.setAffiliation(HLF_ORG_AFFILIATION);
+        registrationRequest.setEnrollmentID(HLF_USER_NAME);
         String enrollmentSecret = caClient.register(registrationRequest, admin);
-        Enrollment enrollment = caClient.enroll("appUser2", enrollmentSecret);
-        Identity user = Identities.newX509Identity("Org1MSP", enrollment);
-        wallet.put("appUser2", user);
-        System.out.println("Successfully enrolled user \"appUser2\" and imported it into the wallet");
+        Enrollment enrollment = caClient.enroll(HLF_USER_NAME, enrollmentSecret);
+        Identity user = Identities.newX509Identity(HLF_ORG_MSP_DEFINITION, enrollment);
+        wallet.put(HLF_USER_NAME, user);
+        System.out.println("Successfully enrolled user \"" + HLF_USER_NAME + "\" and imported it into the wallet");
     }
 }
