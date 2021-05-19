@@ -12,8 +12,7 @@ import java.nio.file.Paths;
 @Component(value="HlfConfiguration")
 @Slf4j
 public class HlfConfiguration {
-    private Gateway gateway;
-    private String HLF_USER_NAME = "managerUser103";
+    private String HLF_USER_NAME = "managerUser105";
     private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
     private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
     private String HLF_CHANNEL_NAME = "mychannel";
@@ -43,19 +42,23 @@ public class HlfConfiguration {
     private static Gateway connect() throws Exception {
         // Load a file system based wallet for managing identities.
         Path walletPath = Paths.get("wallet");
+        log.info("path to wallet: {}", walletPath.toAbsolutePath().toString());
         Wallet wallet = Wallets.newFileSystemWallet(walletPath);
         // load a CCP
         Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations",
                 "peerOrganizations", "org1.example.com", "connection-org1.yaml");
 
         Gateway.Builder builder = Gateway.createBuilder();
-        builder.identity(wallet, "managerUser103").networkConfig(networkConfigPath).discovery(true);
+        builder.identity(wallet, "managerUser105").networkConfig(networkConfigPath).discovery(true);
+        log.info("gateway found");
         return builder.connect();
     }
 
     private void initConnect() {
+        Gateway gateway = null;
         try {
             gateway = connect();
+            log.info("Connected to hyperledger");
         } catch (Exception e) {
             log.error("Cannot init connection to gateway", e);
         }
