@@ -1,6 +1,5 @@
 package ru.inside.commands.hyperledger.fabric.ca.admin;
 
-import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.Identities;
 import org.hyperledger.fabric.gateway.Identity;
 import org.hyperledger.fabric.gateway.Wallet;
@@ -14,7 +13,7 @@ import org.hyperledger.fabric_ca.sdk.HFCAClient;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-@Slf4j
+
 public class CAAuthAdmin {
 
     public static void main(String[] args) throws Exception {
@@ -33,7 +32,7 @@ public class CAAuthAdmin {
 
         // Check to see if we've already enrolled the admin user.
         if (wallet.get("admin") != null) {
-            log.info("An identity for the admin user \"admin\" already exists in the wallet");
+            System.out.println("An identity for the admin user \"admin\" already exists in the wallet");
             return;
         }
 
@@ -44,6 +43,6 @@ public class CAAuthAdmin {
         Enrollment enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS);
         Identity user = Identities.newX509Identity("Org1MSP", enrollment);
         wallet.put("admin", user);
-        log.info("Successfully enrolled user \"admin\" and imported it into the wallet");
+        System.out.println("Successfully enrolled user \"admin\" and imported it into the wallet");
     }
 }

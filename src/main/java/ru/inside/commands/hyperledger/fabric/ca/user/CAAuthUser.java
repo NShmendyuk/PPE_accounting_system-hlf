@@ -1,6 +1,5 @@
 package ru.inside.commands.hyperledger.fabric.ca.user;
 
-import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.*;
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.User;
@@ -15,7 +14,6 @@ import java.util.Properties;
 import java.util.Set;
 
 
-@Slf4j
 public class CAAuthUser {
 
     public static void main(String[] args) throws Exception {
