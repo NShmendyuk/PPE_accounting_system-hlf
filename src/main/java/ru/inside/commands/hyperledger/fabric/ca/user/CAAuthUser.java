@@ -33,8 +33,8 @@ public class CAAuthUser {
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
 
         // Check to see if we've already enrolled the user.
-        if (wallet.get("managerUser0001") != null) {
-            System.out.println("An identity for the user \"managerUser0001\" already exists in the wallet");
+        if (wallet.get("managerUser101") != null) {
+            System.out.println("An identity for the user \"managerUser101\" already exists in the wallet");
             return;
         }
 
@@ -89,13 +89,13 @@ public class CAAuthUser {
         };
 
         // Register the user, enroll the user, and import the new identity into the wallet.
-        RegistrationRequest registrationRequest = new RegistrationRequest("managerUser0001");
+        RegistrationRequest registrationRequest = new RegistrationRequest("managerUser101");
         registrationRequest.setAffiliation("org1.department1");
-        registrationRequest.setEnrollmentID("managerUser0001");
+        registrationRequest.setEnrollmentID("managerUser101");
         String enrollmentSecret = caClient.register(registrationRequest, admin);
-        Enrollment enrollment = caClient.enroll("managerUser0001", enrollmentSecret);
+        Enrollment enrollment = caClient.enroll("managerUser101", enrollmentSecret);
         Identity user = Identities.newX509Identity("Org1MSP", enrollment);
-        wallet.put("managerUser0001", user);
-        System.out.println("Successfully enrolled user \"managerUser0001\" and imported it into the wallet");
+        wallet.put("managerUser101", user);
+        System.out.println("Successfully enrolled user \"managerUser101\" and imported it into the wallet");
     }
 }

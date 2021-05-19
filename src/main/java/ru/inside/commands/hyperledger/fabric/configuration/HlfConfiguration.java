@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 @Slf4j
 public class HlfConfiguration {
     private Gateway gateway;
-    private String HLF_USER_NAME = "managerUser0001";
+    private String HLF_USER_NAME = "managerUser101";
     private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
     private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
     private String HLF_CHANNEL_NAME = "mychannel";
@@ -50,7 +50,7 @@ public class HlfConfiguration {
         log.info("connection via configuration: ../../test-network/organizations/peerOrganizations/"
                 + HLF_PART_OF_PATH_RELATIVE_ORG + "/" + HLF_PART_OF_PATH_RELATIVE_YAML);
         Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations", "peerOrganizations",
-                HLF_PART_OF_PATH_RELATIVE_ORG, HLF_PART_OF_PATH_RELATIVE_YAML);
+                "org1.example.com", "connection-org1.yaml");
 
         Gateway.Builder builder = Gateway.createBuilder();
         builder.identity(wallet, HLF_USER_NAME).networkConfig(networkConfigPath).discovery(true);
@@ -63,7 +63,7 @@ public class HlfConfiguration {
             network = gateway.getNetwork(HLF_CHANNEL_NAME);
             contract = network.getContract(HLF_CHAINCODE_NAME);
         } catch (Exception e) {
-            log.error("Cannot init connection to gateway");
+            log.error("Cannot init connection to gateway", e);
         }
     }
 }
