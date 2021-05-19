@@ -57,7 +57,7 @@ public class PdfGenerator {
             ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(processedHtml);
             try {
-                renderer.getFontResolver().addFont("/fonts/Calibri.ttf", BaseFont.IDENTITY_H, true);
+                renderer.getFontResolver().addFont(System.getProperty("user.dir") + "src/main/resources/fonts/Calibri.ttf", BaseFont.IDENTITY_H, true);
             } catch (Exception ex) {
                 log.warn("Cannot set font");
             }
