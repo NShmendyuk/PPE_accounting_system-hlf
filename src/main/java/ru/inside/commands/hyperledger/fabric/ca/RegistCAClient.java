@@ -6,6 +6,9 @@ import ru.inside.commands.hyperledger.fabric.ca.user.CAAuthUser;
 
 @Slf4j
 public class RegistCAClient {
+    static {
+        System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "true");
+    }
 
     public void initializeUsersCA() {
         // enrolls the admin and registers the user

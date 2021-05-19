@@ -15,6 +15,9 @@ import java.util.Set;
 
 
 public class CAAuthUser {
+    static {
+        System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "true");
+    }
 
     public static void main(String[] args) throws Exception {
         // Create a CA client for interacting with the CA.
