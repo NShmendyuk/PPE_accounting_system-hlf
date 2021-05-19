@@ -18,9 +18,14 @@ import java.util.Set;
 @Slf4j
 public class CAAuthUser {
 
-    public static void enrollUser(String HLF_CA_URL, String HLF_CA_PEM_PATH,
-                                  String HLF_USER_NAME, String HLF_ORG_MSP_DEFINITION,
-                                  String HLF_ADMIN_USER, String HLF_ORG_AFFILIATION) throws Exception {
+    public static void main(String[] args) throws Exception {
+        String HLF_CA_URL = "https://localhost:7054";
+        String HLF_CA_PEM_PATH = "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem";
+        String HLF_USER_NAME = "managerUser1";
+        String HLF_ORG_MSP_DEFINITION = "Org1MSP";
+        String HLF_ADMIN_USER = "admin";
+        String HLF_ORG_AFFILIATION = "org1.department1";
+
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
         props.put("pemFile",

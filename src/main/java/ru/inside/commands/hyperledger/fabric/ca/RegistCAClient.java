@@ -10,21 +10,12 @@ import ru.inside.commands.hyperledger.fabric.ca.user.CAAuthUser;
 @Component
 @NoArgsConstructor
 public class RegistCAClient {
-    static String HLF_CA_URL = "https://localhost:7054";
-    static String HLF_CA_PEM_PATH = "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem";
-    static String HLF_ADMIN_USER = "admin";
-    static String HLF_ADMIN_PASS = "adminpw";
-    static String HLF_ORG_MSP_DEFINITION = "Org1MSP";
-    static String HLF_ORG_AFFILIATION = "org1.department1";
 
-    public static void initializeUsersCA(String HLF_USER_NAME) {
+    public static void initializeUsersCA() {
         // enrolls the admin and registers the user
         try {
-            CAAuthAdmin.enrollAdmin(HLF_CA_URL, HLF_CA_PEM_PATH,
-                    HLF_ADMIN_USER, HLF_ADMIN_PASS,
-                    HLF_ORG_MSP_DEFINITION);
-            CAAuthUser.enrollUser(HLF_CA_URL, HLF_CA_PEM_PATH, HLF_USER_NAME,
-                    HLF_ORG_MSP_DEFINITION, HLF_ADMIN_USER, HLF_ORG_AFFILIATION);
+            CAAuthAdmin.main(null);
+            CAAuthUser.main(null);
         } catch (Exception e) {
             log.error("Cannot enroll users");
         }

@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 @Slf4j
 public class HlfConfiguration {
     private Gateway gateway;
-    private String HLF_USER_NAME = "appUser10";
+    private String HLF_USER_NAME = "managerUser1";
     private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
     private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
     private String HLF_CHANNEL_NAME = "mychannel";
@@ -31,7 +31,7 @@ public class HlfConfiguration {
 
     public HlfConfiguration () {
         try {
-            RegistCAClient.initializeUsersCA(HLF_USER_NAME); // проинициализируем пользователя в Fabric CA
+            RegistCAClient.initializeUsersCA(); // проинициализируем пользователя в Fabric CA
             initConnect(); // подключимся к сети
         } catch (Exception ex) {
             log.error("Cannot init connection to hyperledger instances");

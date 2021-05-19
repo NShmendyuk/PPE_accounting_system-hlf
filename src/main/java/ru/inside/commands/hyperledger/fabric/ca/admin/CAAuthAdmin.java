@@ -17,9 +17,13 @@ import java.util.Properties;
 @Slf4j
 public class CAAuthAdmin {
 
-    public static void enrollAdmin(String HLF_CA_URL, String HLF_CA_PEM_PATH,
-                                   String HLF_ADMIN_USER, String HLF_ADMIN_PASS,
-                                   String HLF_ORG_MSP_DEFINITION) throws Exception {
+    public static void main(String[] args) throws Exception {
+        String HLF_CA_URL = "https://localhost:7054";
+        String HLF_CA_PEM_PATH = "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem";
+        String HLF_ADMIN_USER = "admin";
+        String HLF_ADMIN_PASS = "adminpw";
+        String HLF_ORG_MSP_DEFINITION = "Org1MSP";
+
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
         props.put("pemFile",
