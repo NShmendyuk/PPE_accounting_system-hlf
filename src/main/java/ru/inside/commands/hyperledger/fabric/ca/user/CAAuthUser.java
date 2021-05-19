@@ -23,9 +23,9 @@ public class CAAuthUser {
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
         props.put("pemFile",
-                "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem");
+                "../../test-network/organizations/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem");
         props.put("allowAllHostNames", "true");
-        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:7054", props);
+        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:8054", props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();
         caClient.setCryptoSuite(cryptoSuite);
 
@@ -33,8 +33,8 @@ public class CAAuthUser {
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
 
         // Check to see if we've already enrolled the user.
-        if (wallet.get("managerUser001") != null) {
-            System.out.println("An identity for the user \"managerUser001\" already exists in the wallet");
+        if (wallet.get("managerUser002") != null) {
+            System.out.println("An identity for the user \"managerUser002\" already exists in the wallet");
             return;
         }
 
@@ -62,7 +62,7 @@ public class CAAuthUser {
 
             @Override
             public String getAffiliation() {
-                return "org1.department1";
+                return "org2.department1";
             }
 
             @Override
@@ -83,19 +83,19 @@ public class CAAuthUser {
 
             @Override
             public String getMspId() {
-                return "Org1MSP";
+                return "Org2MSP";
             }
 
         };
 
         // Register the user, enroll the user, and import the new identity into the wallet.
-        RegistrationRequest registrationRequest = new RegistrationRequest("managerUser001");
-        registrationRequest.setAffiliation("org1.department1");
-        registrationRequest.setEnrollmentID("managerUser001");
+        RegistrationRequest registrationRequest = new RegistrationRequest("managerUser002");
+        registrationRequest.setAffiliation("org2.department1");
+        registrationRequest.setEnrollmentID("managerUser002");
         String enrollmentSecret = caClient.register(registrationRequest, admin);
-        Enrollment enrollment = caClient.enroll("managerUser001", enrollmentSecret);
-        Identity user = Identities.newX509Identity("Org1MSP", enrollment);
-        wallet.put("managerUser001", user);
-        System.out.println("Successfully enrolled user \"managerUser001\" and imported it into the wallet");
+        Enrollment enrollment = caClient.enroll("managerUser002", enrollmentSecret);
+        Identity user = Identities.newX509Identity("Org2MSP", enrollment);
+        wallet.put("managerUser002", user);
+        System.out.println("Successfully enrolled user \"managerUser002\" and imported it into the wallet");
     }
 }
