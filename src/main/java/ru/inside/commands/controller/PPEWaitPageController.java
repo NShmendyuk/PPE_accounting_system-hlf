@@ -20,13 +20,6 @@ import java.util.List;
 public class PPEWaitPageController {
     private final PPEControllerService ppeControllerService;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    class FormList{
-        List<PPEForm> ppeForms = new ArrayList<>();
-    }
-
     @PostMapping("/apply")
     public void applyPPEFromSmartContract(@RequestParam String inventoryNumber, @RequestParam String ppeName,
                                           @RequestParam String ownerName, @RequestParam String subsidiaryName,
