@@ -22,7 +22,9 @@ public class PPEChainCodeService {
 
     public PPEChainCodeService(Contract contract) {
         this.contract = contract;
-        log.info("initialized chaincode activity");
+        if (contract != null) {
+            log.info("initialized chaincode activity");
+        }
     }
 
     public byte[] getAllPPE() throws ContractException {

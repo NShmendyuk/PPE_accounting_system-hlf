@@ -15,7 +15,9 @@ public class RegistCAClient {
         // enrolls the admin and registers the user
         try {
             CAAuthAdmin.main(null);
+            log.info("admin enrolled");
             CAAuthUser.main(null);
+            log.info("user enrolled");
         } catch (Exception e) {
             log.error("Cannot enroll users");
         }

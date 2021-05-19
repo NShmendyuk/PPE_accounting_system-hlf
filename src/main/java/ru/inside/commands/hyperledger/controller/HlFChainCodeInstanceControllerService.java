@@ -23,9 +23,13 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     private HlFChainCodeInstanceControllerService(HlfConfiguration hlfConfiguration) {
         try {
             chainCodeController = new PPEChainCodeService(hlfConfiguration.getContract());
-            log.info("ChainCode instance initialized. Connected to hyperledger environment");
+            if (hlfConfiguration.getContract() != null) {
+                log.info("ChainCode instance initialized. Connected to hyperledger environment");
+            } else {
+                log.warn("Cannot init ChainCode instance. Hyperledger environment unactive");
+            }
         } catch (Exception ex) {
-            log.error("Cannot init ChainCode instance. Hyperledger environment unactive", ex);
+            log.error("Initializing ChainCode service layer were denied!");
         }
     }
 

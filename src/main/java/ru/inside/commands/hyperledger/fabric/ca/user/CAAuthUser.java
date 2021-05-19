@@ -19,19 +19,12 @@ import java.util.Set;
 public class CAAuthUser {
 
     public static void main(String[] args) throws Exception {
-        String HLF_CA_URL = "https://localhost:7054";
-        String HLF_CA_PEM_PATH = "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem";
-        String HLF_USER_NAME = "managerUser1";
-        String HLF_ORG_MSP_DEFINITION = "Org1MSP";
-        String HLF_ADMIN_USER = "admin";
-        String HLF_ORG_AFFILIATION = "org1.department1";
-
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
         props.put("pemFile",
-                HLF_CA_PEM_PATH);
+                "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem");
         props.put("allowAllHostNames", "true");
-        HFCAClient caClient = HFCAClient.createNewInstance(HLF_CA_URL, props);
+        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:7054", props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();
         caClient.setCryptoSuite(cryptoSuite);
 
@@ -39,21 +32,21 @@ public class CAAuthUser {
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
 
         // Check to see if we've already enrolled the user.
-        if (wallet.get(HLF_USER_NAME) != null) {
-            System.out.println("An identity for the user \"" + HLF_USER_NAME + "\" already exists in the wallet");
+        if (wallet.get("managerUser001") != null) {
+            System.out.println("An identity for the user \"managerUser001\" already exists in the wallet");
             return;
         }
 
-        X509Identity adminIdentity = (X509Identity)wallet.get(HLF_ADMIN_USER);
+        X509Identity adminIdentity = (X509Identity)wallet.get("admin");
         if (adminIdentity == null) {
-            System.out.println("\"" + HLF_ADMIN_USER + "\" needs to be enrolled and added to the wallet first");
+            System.out.println("\"admin\" needs to be enrolled and added to the wallet first");
             return;
         }
         User admin = new User() {
 
             @Override
             public String getName() {
-                return HLF_ADMIN_USER;
+                return "admin";
             }
 
             @Override
@@ -68,7 +61,7 @@ public class CAAuthUser {
 
             @Override
             public String getAffiliation() {
-                return HLF_ORG_AFFILIATION;
+                return "org1.department1";
             }
 
             @Override
@@ -89,19 +82,19 @@ public class CAAuthUser {
 
             @Override
             public String getMspId() {
-                return HLF_ORG_MSP_DEFINITION;
+                return "Org1MSP";
             }
 
         };
 
         // Register the user, enroll the user, and import the new identity into the wallet.
-        RegistrationRequest registrationRequest = new RegistrationRequest(HLF_USER_NAME);
-        registrationRequest.setAffiliation(HLF_ORG_AFFILIATION);
-        registrationRequest.setEnrollmentID(HLF_USER_NAME);
+        RegistrationRequest registrationRequest = new RegistrationRequest("managerUser001");
+        registrationRequest.setAffiliation("org1.department1");
+        registrationRequest.setEnrollmentID("managerUser001");
         String enrollmentSecret = caClient.register(registrationRequest, admin);
-        Enrollment enrollment = caClient.enroll(HLF_USER_NAME, enrollmentSecret);
-        Identity user = Identities.newX509Identity(HLF_ORG_MSP_DEFINITION, enrollment);
-        wallet.put(HLF_USER_NAME, user);
-        System.out.println("Successfully enrolled user \"" + HLF_USER_NAME + "\" and imported it into the wallet");
+        Enrollment enrollment = caClient.enroll("managerUser001", enrollmentSecret);
+        Identity user = Identities.newX509Identity("Org1MSP", enrollment);
+        wallet.put("managerUser001", user);
+        System.out.println("Successfully enrolled user \"managerUser001\" and imported it into the wallet");
     }
 }
