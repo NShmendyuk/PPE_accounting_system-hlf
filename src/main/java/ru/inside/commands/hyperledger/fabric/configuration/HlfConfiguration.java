@@ -13,9 +13,9 @@ import java.nio.file.Paths;
 @Slf4j
 public class HlfConfiguration {
     private Gateway gateway;
-    private String HLF_USER_NAME = "managerUser002";
-    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org2.example.com";
-    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org2.yaml";
+    private String HLF_USER_NAME = "managerUser0001";
+    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
+    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
     private String HLF_CHANNEL_NAME = "mychannel";
     private String HLF_CHAINCODE_NAME = "ppesmart";
 
