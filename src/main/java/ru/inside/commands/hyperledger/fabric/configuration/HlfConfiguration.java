@@ -13,9 +13,9 @@ import java.nio.file.Paths;
 @Slf4j
 public class HlfConfiguration {
     private Gateway gateway;
-    private String HLF_USER_NAME = "appUser2";
-    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org2.example.com";
-    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org2.yaml";
+    private String HLF_USER_NAME = "appUser10";
+    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
+    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
     private String HLF_CHANNEL_NAME = "mychannel";
     private String HLF_CHAINCODE_NAME = "ppesmart";
 
@@ -46,6 +46,8 @@ public class HlfConfiguration {
         Path walletPath = Paths.get("wallet");
         Wallet wallet = Wallets.newFileSystemWallet(walletPath);
         // load a CCP
+        log.info("connection via configuration: ../../test-network/organizations/peerOrganizations/"
+                + HLF_PART_OF_PATH_RELATIVE_ORG + "/" + HLF_PART_OF_PATH_RELATIVE_YAML);
         Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations", "peerOrganizations",
                 HLF_PART_OF_PATH_RELATIVE_ORG, HLF_PART_OF_PATH_RELATIVE_YAML);
 
