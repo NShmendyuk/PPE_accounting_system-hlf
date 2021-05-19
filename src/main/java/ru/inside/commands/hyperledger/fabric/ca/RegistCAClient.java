@@ -7,7 +7,7 @@ import ru.inside.commands.hyperledger.fabric.ca.user.CAAuthUser;
 @Slf4j
 public class RegistCAClient {
 
-    public static void initializeUsersCA() {
+    public void initializeUsersCA() {
         // enrolls the admin and registers the user
         try {
             log.info("trying enroll users");
@@ -16,7 +16,7 @@ public class RegistCAClient {
             CAAuthUser.main(null);
             log.info("user enrolled");
         } catch (Exception e) {
-            log.error("Cannot enroll users");
+            log.error("Cannot enroll users", e);
         }
     }
 }

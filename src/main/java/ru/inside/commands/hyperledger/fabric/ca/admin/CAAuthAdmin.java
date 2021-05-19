@@ -33,7 +33,7 @@ public class CAAuthAdmin {
 
         // Check to see if we've already enrolled the admin user.
         if (wallet.get("admin") != null) {
-            System.out.println("An identity for the admin user \"admin\" already exists in the wallet");
+            log.info("An identity for the admin user \"admin\" already exists in the wallet");
             return;
         }
 
@@ -44,6 +44,6 @@ public class CAAuthAdmin {
         Enrollment enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS);
         Identity user = Identities.newX509Identity("Org1MSP", enrollment);
         wallet.put("admin", user);
-        System.out.println("Successfully enrolled user \"admin\" and imported it into the wallet");
+        log.info("Successfully enrolled user \"admin\" and imported it into the wallet");
     }
 }

@@ -31,7 +31,8 @@ public class HlfConfiguration {
 
     public HlfConfiguration () {
         try {
-            RegistCAClient.initializeUsersCA(); // проинициализируем пользователя в Fabric CA
+            RegistCAClient registCAClient = new RegistCAClient();
+            registCAClient.initializeUsersCA(); // проинициализируем пользователя в Fabric CA
             initConnect(); // подключимся к сети
         } catch (Exception ex) {
             log.error("Cannot init connection to hyperledger instances");
