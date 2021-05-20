@@ -6,10 +6,8 @@ import org.hyperledger.fabric.gateway.*;
 import org.springframework.stereotype.Component;
 import ru.inside.commands.hyperledger.fabric.ca.RegistCAClient;
 
-import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 @Component(value="HlfConfiguration")
 @Slf4j

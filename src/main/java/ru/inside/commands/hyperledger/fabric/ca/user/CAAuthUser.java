@@ -21,7 +21,7 @@ public class CAAuthUser {
         props.put("pemFile",
                 "../../test-network/organizations/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem");
         props.put("allowAllHostNames", "true");
-        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:7054", props);
+        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:8054", props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();
         caClient.setCryptoSuite(cryptoSuite);
 
@@ -79,7 +79,7 @@ public class CAAuthUser {
 
             @Override
             public String getMspId() {
-                return "Org1MSP";
+                return "Org2MSP";
             }
 
         };
@@ -90,7 +90,7 @@ public class CAAuthUser {
         registrationRequest.setEnrollmentID("manager-org2");
         String enrollmentSecret = caClient.register(registrationRequest, admin);
         Enrollment enrollment = caClient.enroll("manager-org2", enrollmentSecret);
-        Identity user = Identities.newX509Identity("Org1MSP", enrollment);
+        Identity user = Identities.newX509Identity("Org2MSP", enrollment);
         wallet.put("manager-org2", user);
         System.out.println("Successfully enrolled user \"manager-org2\" and imported it into the wallet");
     }

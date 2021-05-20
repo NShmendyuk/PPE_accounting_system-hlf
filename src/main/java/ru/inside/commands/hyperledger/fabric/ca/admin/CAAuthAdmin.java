@@ -21,7 +21,7 @@ public class CAAuthAdmin {
         props.put("pemFile",
                 "../../test-network/organizations/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem");
         props.put("allowAllHostNames", "true");
-        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:7054", props);
+        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:8054", props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();
         caClient.setCryptoSuite(cryptoSuite);
 
@@ -39,7 +39,7 @@ public class CAAuthAdmin {
         enrollmentRequestTLS.addHost("localhost");
         enrollmentRequestTLS.setProfile("tls");
         Enrollment enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS);
-        Identity user = Identities.newX509Identity("Org1MSP", enrollment);
+        Identity user = Identities.newX509Identity("Org2MSP", enrollment);
         wallet.put("admin", user);
         System.out.println("Successfully enrolled user \"admin\" and imported it into the wallet");
     }
