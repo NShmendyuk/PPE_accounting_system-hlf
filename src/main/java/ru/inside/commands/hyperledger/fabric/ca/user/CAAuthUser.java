@@ -15,7 +15,6 @@ import java.util.Set;
 
 
 public class CAAuthUser {
-
     public static void main(String[] args) throws Exception {
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
@@ -30,8 +29,8 @@ public class CAAuthUser {
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
 
         // Check to see if we've already enrolled the user.
-        if (wallet.get("managerUser110") != null) {
-            System.out.println("An identity for the user \"managerUser110\" already exists in the wallet");
+        if (wallet.get("appUser00004") != null) {
+            System.out.println("An identity for the user \"appUser00004\" already exists in the wallet");
             return;
         }
 
@@ -86,13 +85,13 @@ public class CAAuthUser {
         };
 
         // Register the user, enroll the user, and import the new identity into the wallet.
-        RegistrationRequest registrationRequest = new RegistrationRequest("managerUser110");
+        RegistrationRequest registrationRequest = new RegistrationRequest("appUser00004");
         registrationRequest.setAffiliation("org1.department1");
-        registrationRequest.setEnrollmentID("managerUser110");
+        registrationRequest.setEnrollmentID("appUser00004");
         String enrollmentSecret = caClient.register(registrationRequest, admin);
-        Enrollment enrollment = caClient.enroll("managerUser110", enrollmentSecret);
+        Enrollment enrollment = caClient.enroll("appUser00004", enrollmentSecret);
         Identity user = Identities.newX509Identity("Org1MSP", enrollment);
-        wallet.put("managerUser110", user);
-        System.out.println("Successfully enrolled user \"managerUser110\" and imported it into the wallet");
+        wallet.put("appUser00004", user);
+        System.out.println("Successfully enrolled user \"appUser00004\" and imported it into the wallet");
     }
 }

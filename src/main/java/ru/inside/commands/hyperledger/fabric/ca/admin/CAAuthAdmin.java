@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class CAAuthAdmin {
-
     public static void main(String[] args) throws Exception {
 
         // Create a CA client for interacting with the CA.
