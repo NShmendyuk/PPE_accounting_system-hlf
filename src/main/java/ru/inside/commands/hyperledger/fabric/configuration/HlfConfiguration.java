@@ -12,11 +12,11 @@ import java.nio.file.Paths;
 @Component(value="HlfConfiguration")
 @Slf4j
 public class HlfConfiguration {
-    private String HLF_USER_NAME = "managerUser105";
-    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
-    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
-    private String HLF_CHANNEL_NAME = "mychannel";
-    private String HLF_CHAINCODE_NAME = "ppesmart";
+//    private String HLF_USER_NAME = "managerUser106";
+//    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
+//    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
+//    private String HLF_CHANNEL_NAME = "mychannel";
+//    private String HLF_CHAINCODE_NAME = "ppesmart";
 
     @Getter
     private Contract contract;
@@ -49,7 +49,7 @@ public class HlfConfiguration {
                 "peerOrganizations", "org1.example.com", "connection-org1.yaml");
 
         Gateway.Builder builder = Gateway.createBuilder();
-        builder.identity(wallet, "managerUser105").networkConfig(networkConfigPath).discovery(true);
+        builder.identity(wallet, "managerUser106").networkConfig(networkConfigPath).discovery(true);
         log.info("gateway found");
         return builder.connect();
     }
@@ -60,9 +60,16 @@ public class HlfConfiguration {
             gateway = connect();
             log.info("Connected to hyperledger");
         } catch (Exception e) {
-            log.error("Cannot init connection to gateway", e);
+            log.error("Cannot init connection to gateway");
+            log.error("{}", e.getMessage());
+            log.error("{}", e.getCause().toString());
         }
-        network = gateway.getNetwork("mychannel");
+        if (gateway != null) {
+            network = gateway.getNetwork("mychannel");
+        } else {
+            log.error("Gateway to hlf peer not found!!!");
+            return;
+        }
         contract = network.getContract("ppesmart");
     }
 }
