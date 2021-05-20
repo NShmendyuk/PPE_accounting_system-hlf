@@ -14,9 +14,6 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class CAAuthAdmin {
-    static {
-        System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "true");
-    }
 
     public static void main(String[] args) throws Exception {
 

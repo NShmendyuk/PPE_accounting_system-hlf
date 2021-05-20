@@ -14,7 +14,7 @@ import java.util.Arrays;
 @Component(value="HlfConfiguration")
 @Slf4j
 public class HlfConfiguration {
-//    private String HLF_USER_NAME = "managerUser109";
+//    private String HLF_USER_NAME = "managerUser110";
 //    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
 //    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
 //    private String HLF_CHANNEL_NAME = "mychannel";
@@ -53,9 +53,10 @@ public class HlfConfiguration {
 
         Gateway.Builder builder = Gateway.createBuilder();
         log.info("Gateway builder created");
-        builder.identity(wallet.get("managerUser109"));
-        log.info("Set gateway identity as managerUser109");
-        builder.networkConfig(networkConfigPath);
+        builder.identity(wallet.get("managerUser110"));
+        log.info("Set gateway identity as managerUser110");
+        log.info("try to set network config by file {}; path:{}", networkConfigPath.getFileName(), networkConfigPath.toAbsolutePath().toString());
+        builder.networkConfig(networkConfigPath.toAbsolutePath());
         log.info("Added gateway network config by path");
         builder.discovery(true);
         log.info("Gateway discovery set true");
@@ -69,15 +70,6 @@ public class HlfConfiguration {
             log.info("Connected to hyperledger peer");
         } catch (Exception e) {
             log.error("Cannot init connection to gateway");
-            String exception = Arrays.toString(e.getStackTrace());
-            try {
-                File file = File.createTempFile("exception", ".txt", new File(System.getProperty("user.dir")));
-                OutputStream os = new FileOutputStream(file);
-                os.write(exception.getBytes());
-                os.flush();
-                os.close();
-            } catch (IOException ignored) {
-            }
         }
         if (gateway != null) {
             network = gateway.getNetwork("mychannel");
