@@ -51,8 +51,8 @@ public class HlfConfiguration {
         Gateway.Builder builder = Gateway.createBuilder();
         log.info("Gateway builder created");
 
-        builder.identity(wallet.get("appUser00005"));
-        log.info("Set gateway identity as appUser00005");
+        builder.identity(wallet.get("appUser00006"));
+        log.info("Set gateway identity as appUser00006");
 
         log.info("try to set network config by file {}; path:{}", networkConfigPath.getFileName(), networkConfigPath.toAbsolutePath().toString());
         builder.networkConfig(networkConfigPath.toAbsolutePath());

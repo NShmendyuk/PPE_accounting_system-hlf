@@ -1,6 +1,6 @@
 package ru.inside.commands.hyperledger.controller;
 
-import com.owlike.genson.Genson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.entity.PPE;
@@ -18,7 +18,6 @@ import java.util.List;
 @Slf4j
 public class HlFChainCodeInstanceControllerService implements ChainCodeControllerService {
     private PPEChainCodeService chainCodeController;
-    private final Genson genson = new Genson();
 
     private HlFChainCodeInstanceControllerService(HlfConfiguration hlfConfiguration) {
         try {
@@ -45,7 +44,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public List<PPEContract> getAllPPE() {
         List<PPEContract> allPPE = new ArrayList<>();
         try {
-            allPPE = Arrays.asList(genson.deserialize(chainCodeController.getAllPPE(), PPEContract[].class));
+            allPPE = Arrays.asList(new ObjectMapper().readValue(chainCodeController.getAllPPE(), PPEContract[].class));
             log.info("chaincode message: {}", allPPE);
         } catch (Exception e) {
             log.error("Get All request to chaincode were denied");
@@ -82,7 +81,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public PPEContract getPPEByInventoryNumber(String inventoryNumber) {
         PPEContract ppeInfo = new PPEContract();
         try {
-            ppeInfo = genson.deserialize(chainCodeController.getPPE(inventoryNumber), PPEContract.class);
+            ppeInfo = new ObjectMapper().readValue(chainCodeController.getPPE(inventoryNumber), PPEContract.class);
             log.info("chaincode (getPPEByInventoryNumber) message: {}", ppeInfo.toString());
         } catch (Exception ex) {
             log.error("Get ppe {} request to chaincode were denied", inventoryNumber);
@@ -93,7 +92,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public List<PPEContract> getPPEHistoryByInventoryNumber(String inventoryNumber) {
         List<PPEContract> ppeHistoryList = new ArrayList<>();
         try {
-            ppeHistoryList = Arrays.asList(genson.deserialize(chainCodeController.getPPEHistory(inventoryNumber), PPEContract[].class));
+            ppeHistoryList = Arrays.asList(new ObjectMapper().readValue(chainCodeController.getPPEHistory(inventoryNumber), PPEContract[].class));
             log.info("contract (getPPEHistoryById) message: {}", ppeHistoryList.toString());
         } catch (Exception ex) {
             log.error("Get ppe {} history request to chaincode were denied", inventoryNumber);
