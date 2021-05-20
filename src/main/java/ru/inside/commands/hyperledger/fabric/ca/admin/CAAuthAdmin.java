@@ -14,14 +14,16 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class CAAuthAdmin {
-    public static void main(String[] args) throws Exception {
+    public static void enrollAdmin(String HLF_PATH_ORG2_CONNECTION, String HLF_PEER_GRPC_URL,
+                                   String HLF_ADMIN_NAME, String HLF_ADMIN_PASS,
+                                   String HLF_ORG_MSP_ID, String HLF_HOST_PEER_IP) throws Exception {
 
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
         props.put("pemFile",
-                "../../test-network/organizations/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem");
+                HLF_PATH_ORG2_CONNECTION);
         props.put("allowAllHostNames", "true");
-        HFCAClient caClient = HFCAClient.createNewInstance("https://localhost:8054", props);
+        HFCAClient caClient = HFCAClient.createNewInstance(HLF_PEER_GRPC_URL, props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();
         caClient.setCryptoSuite(cryptoSuite);
 
@@ -29,18 +31,18 @@ public class CAAuthAdmin {
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
 
         // Check to see if we've already enrolled the admin user.
-        if (wallet.get("admin") != null) {
-            System.out.println("An identity for the admin user \"admin\" already exists in the wallet");
+        if (wallet.get(HLF_ADMIN_NAME) != null) {
+            System.out.println("An identity for the admin user \"" + HLF_ADMIN_NAME + "\" already exists in the wallet");
             return;
         }
 
         // Enroll the admin user, and import the new identity into the wallet.
         final EnrollmentRequest enrollmentRequestTLS = new EnrollmentRequest();
-        enrollmentRequestTLS.addHost("localhost");
+        enrollmentRequestTLS.addHost(HLF_HOST_PEER_IP);
         enrollmentRequestTLS.setProfile("tls");
-        Enrollment enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS);
-        Identity user = Identities.newX509Identity("Org2MSP", enrollment);
-        wallet.put("admin", user);
-        System.out.println("Successfully enrolled user \"admin\" and imported it into the wallet");
+        Enrollment enrollment = caClient.enroll(HLF_ADMIN_NAME, HLF_ADMIN_PASS, enrollmentRequestTLS);
+        Identity user = Identities.newX509Identity(HLF_ORG_MSP_ID, enrollment);
+        wallet.put(HLF_ADMIN_NAME, user);
+        System.out.println("Successfully enrolled user \"" + HLF_ADMIN_NAME + "\" and imported it into the wallet");
     }
 }

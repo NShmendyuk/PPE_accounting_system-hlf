@@ -23,10 +23,14 @@ public class HlfConfiguration {
     @Getter
     private Network network;
 
+    private final String HLF_USER_NAME = "manager-org3";
+    private final String HLF_CHAINCODE_NAME = "ppesmart";
+    private final String HLF_CHANNEL_NAME = "mychannel";
+
     public HlfConfiguration () {
         try {
             RegistCAClient registCAClient = new RegistCAClient();
-            registCAClient.initializeUsersCA(); // проинициализируем пользователя в Fabric CA
+            registCAClient.initializeUsersCA(HLF_USER_NAME); // проинициализируем пользователя в Fabric CA
             initConnect(); // подключимся к сети
         } catch (Exception ex) {
             log.error("Cannot init connection to hyperledger instances");
@@ -34,7 +38,7 @@ public class HlfConfiguration {
     }
 
     // helper function for getting connected to the gateway
-    private static Gateway connect() throws Exception {
+    private static Gateway connect(String HLF_USER_NAME) throws Exception {
         // Load a file system based wallet for managing identities.
         Path walletPath = Paths.get("wallet");
         log.info("path to wallet: {}", walletPath.toAbsolutePath().toString());
@@ -49,8 +53,8 @@ public class HlfConfiguration {
         Gateway.Builder builder = Gateway.createBuilder();
         log.info("Gateway builder created");
 
-        builder.identity(wallet.get("manager-org2"));
-        log.info("Set gateway identity as manager-org2");
+        builder.identity(wallet.get(HLF_USER_NAME));
+        log.info("Set gateway identity as {}", HLF_USER_NAME);
 
         log.info("try to set network config by file {}; path:{}", networkConfigPath.getFileName(), networkConfigPath.toAbsolutePath().toString());
         builder.networkConfig(networkConfigPath.toAbsolutePath());
@@ -65,17 +69,18 @@ public class HlfConfiguration {
     private void initConnect() {
         Gateway gateway = null;
         try {
-            gateway = connect();
+            gateway = connect(HLF_USER_NAME);
             log.info("Connected to hyperledger peer");
         } catch (Exception e) {
             log.error("Cannot init connection to gateway");
         }
         if (gateway != null) {
-            network = gateway.getNetwork("mychannel");
+            network = gateway.getNetwork(HLF_CHANNEL_NAME);
         } else {
             log.error("Gateway to hlf peer not found!!!");
             return;
         }
-        contract = network.getContract("ppesmart");
+        contract = network.getContract(HLF_CHAINCODE_NAME);
+        log.info("ChainCode {} found at {}", HLF_CHAINCODE_NAME, HLF_CHANNEL_NAME);
     }
 }
