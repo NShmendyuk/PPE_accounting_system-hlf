@@ -6,13 +6,15 @@ import org.hyperledger.fabric.gateway.*;
 import org.springframework.stereotype.Component;
 import ru.inside.commands.hyperledger.fabric.ca.RegistCAClient;
 
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 @Component(value="HlfConfiguration")
 @Slf4j
 public class HlfConfiguration {
-//    private String HLF_USER_NAME = "managerUser107";
+//    private String HLF_USER_NAME = "managerUser109";
 //    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
 //    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
 //    private String HLF_CHANNEL_NAME = "mychannel";
@@ -44,15 +46,19 @@ public class HlfConfiguration {
         Path walletPath = Paths.get("wallet");
         log.info("path to wallet: {}", walletPath.toAbsolutePath().toString());
         Wallet wallet = Wallets.newFileSystemWallet(walletPath);
-        log.info("wallet found. {}", wallet.list());
+        log.info("wallet found. list of identity: {}", wallet.list());
         // load a CCP
         Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations",
                 "peerOrganizations", "org1.example.com", "connection-org1.yaml");
 
         Gateway.Builder builder = Gateway.createBuilder();
         log.info("Gateway builder created");
-        builder.identity(wallet, "managerUser107").networkConfig(networkConfigPath).discovery(true);
-        log.info("Gateway identity accepted");
+        builder.identity(wallet.get("managerUser109"));
+        log.info("Set gateway identity as managerUser109");
+        builder.networkConfig(networkConfigPath);
+        log.info("Added gateway network config by path");
+        builder.discovery(true);
+        log.info("Gateway discovery set true");
         return builder.connect();
     }
 
@@ -63,6 +69,15 @@ public class HlfConfiguration {
             log.info("Connected to hyperledger peer");
         } catch (Exception e) {
             log.error("Cannot init connection to gateway");
+            String exception = Arrays.toString(e.getStackTrace());
+            try {
+                File file = File.createTempFile("exception", ".txt", new File(System.getProperty("user.dir")));
+                OutputStream os = new FileOutputStream(file);
+                os.write(exception.getBytes());
+                os.flush();
+                os.close();
+            } catch (IOException ignored) {
+            }
         }
         if (gateway != null) {
             network = gateway.getNetwork("mychannel");
