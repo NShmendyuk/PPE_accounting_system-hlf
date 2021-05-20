@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 @Component(value="HlfConfiguration")
 @Slf4j
 public class HlfConfiguration {
-//    private String HLF_USER_NAME = "managerUser106";
+//    private String HLF_USER_NAME = "managerUser107";
 //    private String HLF_PART_OF_PATH_RELATIVE_ORG = "org1.example.com";
 //    private String HLF_PART_OF_PATH_RELATIVE_YAML = "connection-org1.yaml";
 //    private String HLF_CHANNEL_NAME = "mychannel";
@@ -51,7 +51,7 @@ public class HlfConfiguration {
 
         Gateway.Builder builder = Gateway.createBuilder();
         log.info("Gateway builder created");
-        builder.identity(wallet, "managerUser106").networkConfig(networkConfigPath).discovery(true);
+        builder.identity(wallet, "managerUser107").networkConfig(networkConfigPath).discovery(true);
         log.info("Gateway identity accepted");
         return builder.connect();
     }
