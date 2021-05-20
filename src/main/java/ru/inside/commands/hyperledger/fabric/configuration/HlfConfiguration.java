@@ -40,21 +40,27 @@ public class HlfConfiguration {
         // Load a file system based wallet for managing identities.
         Path walletPath = Paths.get("wallet");
         log.info("path to wallet: {}", walletPath.toAbsolutePath().toString());
+
         Wallet wallet = Wallets.newFileSystemWallet(walletPath);
         log.info("wallet found. list of identity: {}", wallet.list());
+
         // load a CCP
         Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations",
                 "peerOrganizations", "org1.example.com", "connection-org1.yaml");
 
         Gateway.Builder builder = Gateway.createBuilder();
         log.info("Gateway builder created");
+
         builder.identity(wallet.get("appUser00005"));
         log.info("Set gateway identity as appUser00005");
+
         log.info("try to set network config by file {}; path:{}", networkConfigPath.getFileName(), networkConfigPath.toAbsolutePath().toString());
         builder.networkConfig(networkConfigPath.toAbsolutePath());
         log.info("Added gateway network config by path");
+
         builder.discovery(true);
         log.info("Gateway discovery set true");
+
         return builder.connect();
     }
 
