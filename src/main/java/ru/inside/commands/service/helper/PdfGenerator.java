@@ -1,6 +1,6 @@
 package ru.inside.commands.service.helper;
 
-import com.lowagie.text.pdf.BaseFont;
+//import com.lowagie.text.pdf.BaseFont;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.forms.EmployeeForm;
 import ru.inside.commands.entity.forms.PPEForm;
 
-import org.xhtmlrenderer.pdf.ITextRenderer;
+//import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,16 +54,16 @@ public class PdfGenerator {
                     new File(System.getProperty("user.dir")));
             os = new FileOutputStream(outputFile);
 
-            ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(processedHtml);
-            try {
-                renderer.getFontResolver().addFont("/fonts/Calibri.ttf", BaseFont.IDENTITY_H, true);
-            } catch (Exception ex) {
-                log.warn("Cannot set font");
-            }
-            renderer.layout();
-            renderer.createPDF(os, false);
-            renderer.finishPDF();
+//            ITextRenderer renderer = new ITextRenderer();
+//            renderer.setDocumentFromString(processedHtml);
+//            try {
+//                renderer.getFontResolver().addFont("/fonts/Calibri.ttf", BaseFont.IDENTITY_H, true);
+//            } catch (Exception ex) {
+//                log.warn("Cannot set font");
+//            }
+//            renderer.layout();
+//            renderer.createPDF(os, false);
+//            renderer.finishPDF();
         }
         finally {
             log.info("File generated as pdf");

@@ -44,13 +44,15 @@ public class HlfConfiguration {
         Path walletPath = Paths.get("wallet");
         log.info("path to wallet: {}", walletPath.toAbsolutePath().toString());
         Wallet wallet = Wallets.newFileSystemWallet(walletPath);
+        log.info("wallet found. {}", wallet.list());
         // load a CCP
         Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations",
                 "peerOrganizations", "org1.example.com", "connection-org1.yaml");
 
         Gateway.Builder builder = Gateway.createBuilder();
+        log.info("Gateway builder created");
         builder.identity(wallet, "managerUser106").networkConfig(networkConfigPath).discovery(true);
-        log.info("gateway found");
+        log.info("Gateway identity accepted");
         return builder.connect();
     }
 
@@ -58,11 +60,9 @@ public class HlfConfiguration {
         Gateway gateway = null;
         try {
             gateway = connect();
-            log.info("Connected to hyperledger");
+            log.info("Connected to hyperledger peer");
         } catch (Exception e) {
             log.error("Cannot init connection to gateway");
-            log.error("{}", e.getMessage());
-            log.error("{}", e.getCause().toString());
         }
         if (gateway != null) {
             network = gateway.getNetwork("mychannel");
