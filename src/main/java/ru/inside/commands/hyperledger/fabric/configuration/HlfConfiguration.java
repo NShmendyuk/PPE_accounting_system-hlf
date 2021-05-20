@@ -46,13 +46,13 @@ public class HlfConfiguration {
 
         // load a CCP
         Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations",
-                "peerOrganizations", "org1.example.com", "connection-org1.yaml");
+                "peerOrganizations", "org2.example.com", "connection-org2.yaml");
 
         Gateway.Builder builder = Gateway.createBuilder();
         log.info("Gateway builder created");
 
-        builder.identity(wallet.get("appUser00006"));
-        log.info("Set gateway identity as appUser00006");
+        builder.identity(wallet.get("manager-org2"));
+        log.info("Set gateway identity as manager-org2");
 
         log.info("try to set network config by file {}; path:{}", networkConfigPath.getFileName(), networkConfigPath.toAbsolutePath().toString());
         builder.networkConfig(networkConfigPath.toAbsolutePath());
