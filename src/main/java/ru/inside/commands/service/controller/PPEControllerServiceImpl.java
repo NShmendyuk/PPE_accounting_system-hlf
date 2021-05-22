@@ -2,6 +2,7 @@ package ru.inside.commands.service.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
@@ -59,22 +60,24 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             return ;
         }
 
-        if (date != null) {
-            ppe.setStartUseDate(LocalDateTime.of(date, LocalTime.MIDNIGHT));
-        }
-
         if (!ownerPersonnelNumber.equals("")) {
+            if (date != null) {
+                ppe.setStartUseDate(LocalDateTime.of(date, LocalTime.MIDNIGHT));
+            }
             try {
                 Employee employee = employeeService.addPPEToEmployee(ppe, ownerPersonnelNumber);
                 ppe.setEmployee(employee);
                 log.info("PPE {} is assigned to employee {}", inventoryNumber, employee.getPersonnelNumber());
             } catch (NoEntityException ex) {
                 log.error("Cannot add ppe {} to employee {}", inventoryNumber, ownerPersonnelNumber);
+            } catch (Exception ex) {
+                log.error("Something went wrong while add ppe to employee");
             }
         }
         try {
-            log.info("try to add ppe into chaincode. \nppe info: {}; \nwith employee: {}; \nwith subsidiary{}",
-                    ppe, ppe.getEmployee(), ppe.getEmployee().getSubsidiary());
+            log.info("try to add ppe {} into chaincode. \nppe info: {}; \nwith employee {}; \nwith subsidiary{}",
+                    ppe.getInventoryNumber(), ppe.toString(), ppe.getEmployee().getPersonnelNumber(),
+                    ppe.getEmployee().getSubsidiary().getName());
             chainCodeControllerService.addPPE(ppe);
         } catch (NullPointerException ex) {
             log.warn("Cannot add ppe {} into chaincode", inventoryNumber);

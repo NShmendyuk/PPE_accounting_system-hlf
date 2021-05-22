@@ -49,6 +49,11 @@ public class PPEBlockchainController {
         chainCodeControllerService.addPPE(ppe);
     }
 
+    @GetMapping("/history")
+    public String getHistory(String inventoryNumber) {
+        return chainCodeControllerService.getPPEHistoryByInventoryNumber(inventoryNumber).toString();
+    }
+
     @GetMapping("/exit")
     public void exit() {
         SpringApplication.exit(appContext, () -> 0);
