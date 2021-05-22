@@ -65,16 +65,17 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         Float price = ppe.getPrice();
         String inventoryNumber = ppe.getInventoryNumber();
         String startUseDate = ppe.getStartUseDate().toString();
-        Integer lifeTime = Integer.parseInt(String.valueOf(ppe.getLifeTime().toDays()));
+        Integer lifeTime = Integer.parseInt(Long.toString(ppe.getLifeTime().toDays()));
 
         String subsidiary = ppe.getEmployee().getSubsidiary().getName(); //must have
         try {
+            log.info("contract (addPPE) sending request");
             chainCodeController.addPPE(ownerName, ownerID,
                     name, status, price, inventoryNumber,
                     startUseDate, lifeTime, subsidiary);
             log.info("contract (addPPE) submit");
         } catch (Exception e) {
-            log.error("Add new PPE request to chaincode were denied", e);
+            log.error("Add new PPE request to chaincode were denied!", e);
         }
     }
 

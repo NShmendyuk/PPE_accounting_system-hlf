@@ -10,15 +10,15 @@ import java.util.concurrent.TimeoutException;
 public class PPEChainCodeService {
     private Contract contract;
 
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_GET_ALL = "GetAllPPEs";
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_INITTESTLEDGER = "InitTestLedger";
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_CREATE = "CreatePPE";
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_READ = "ReadPPE";
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_READHISTORY = "ReadPPEHistory";
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_UPDATE = "UpdatePPE";
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_DELETE = "DeletePPE";
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_ISEXIST = "PPEExists";
-    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_TRANSFER = "TransferPPE";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_GET_ALL = "getAllPPEs";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_INITTESTLEDGER = "initTestLedger";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_CREATE = "createPPE";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_READ = "readPPE";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_READHISTORY = "readPPEHistory";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_UPDATE = "updatePPE";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_DELETE = "deletePPE";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_ISEXIST = "isPPEExists";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_TRANSFER = "transferPPE";
 
     public PPEChainCodeService(Contract contract) {
         this.contract = contract;

@@ -5,10 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.inside.commands.entity.PPE;
 import ru.inside.commands.hyperledger.ChainCodeControllerService;
 import ru.inside.commands.hyperledger.PeerDiscoveryService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
@@ -44,6 +42,11 @@ public class PPEBlockchainController {
     @GetMapping("/{inventoryNumber}")
     public PPEContract getPPE(@PathVariable String inventoryNumber){
         return chainCodeControllerService.getPPEByInventoryNumber(inventoryNumber);
+    }
+
+    @PostMapping("/add")
+    public void addPPE(@RequestParam PPE ppe) {
+        chainCodeControllerService.addPPE(ppe);
     }
 
     @GetMapping("/exit")
