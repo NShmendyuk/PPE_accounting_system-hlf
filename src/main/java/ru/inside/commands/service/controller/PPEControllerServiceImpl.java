@@ -83,9 +83,6 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         try {
             log.info("try to add ppe into chaincode");
             chainCodeControllerService.addPPE(ppe);
-            log.info("ppe {} added into chaincode. \nppe info: {}; \nwith employee {}; \nwith subsidiary{}",
-                    ppe.getInventoryNumber(), ppe.toString(), ppe.getEmployee().getPersonnelNumber(),
-                    ppe.getEmployee().getSubsidiary().getName());
         } catch (NullPointerException ex) {
             log.warn("Cannot add ppe {} into chaincode", ppe.getInventoryNumber());
         } catch (Exception ex) {
