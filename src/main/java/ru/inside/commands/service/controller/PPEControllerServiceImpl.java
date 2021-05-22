@@ -56,7 +56,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             ppe = ppeService.addPPE(ppe);
         } catch (Exception ex) {
             log.error("Cannot add new ppe {}! Check inventory number for existing", inventoryNumber);
-            throw ex;
+            return ;
         }
 
         if (date != null) {
@@ -65,12 +65,16 @@ public class PPEControllerServiceImpl implements PPEControllerService {
 
         if (!ownerPersonnelNumber.equals("")) {
             try {
-                employeeService.addPPEToEmployee(ppe, ownerPersonnelNumber);
+                Employee employee = employeeService.addPPEToEmployee(ppe, ownerPersonnelNumber);
+                ppe.setEmployee(employee);
+                log.info("PPE {} is assigned to employee {}", inventoryNumber, employee.getPersonnelNumber());
             } catch (NoEntityException ex) {
                 log.error("Cannot add ppe {} to employee {}", inventoryNumber, ownerPersonnelNumber);
             }
         }
         try {
+            log.info("try to add ppe into chaincode. \nppe info: {}; \nwith employee: {}; \nwith subsidiary{}",
+                    ppe, ppe.getEmployee(), ppe.getEmployee().getSubsidiary());
             chainCodeControllerService.addPPE(ppe);
         } catch (NullPointerException ex) {
             log.warn("Cannot add ppe {} into chaincode", inventoryNumber);

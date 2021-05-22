@@ -58,6 +58,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         if (ppe.getEmployee() != null) {
             ownerName = ppe.getEmployee().getEmployeeName();
             ownerID = ppe.getEmployee().getPersonnelNumber();
+            log.info("contract (createPPE) with employee {}", ownerID);
         }
 
         String name = ppe.getName();

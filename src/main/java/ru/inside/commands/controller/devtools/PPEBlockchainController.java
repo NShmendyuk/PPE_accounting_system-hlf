@@ -45,7 +45,7 @@ public class PPEBlockchainController {
     }
 
     @PostMapping("/add")
-    public void addPPE(@RequestParam PPE ppe) {
+    public void addPPE(PPE ppe) {
         chainCodeControllerService.addPPE(ppe);
     }
 
