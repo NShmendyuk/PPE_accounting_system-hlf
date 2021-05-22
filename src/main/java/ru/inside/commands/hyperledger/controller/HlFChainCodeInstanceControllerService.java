@@ -10,6 +10,7 @@ import ru.inside.commands.hyperledger.entity.PPEContract;
 import ru.inside.commands.hyperledger.fabric.chaincode.PPEChainCodeService;
 import ru.inside.commands.hyperledger.fabric.configuration.HlfConfiguration;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,8 +75,16 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         String status = ppe.getPpeStatus().toString();
         Float price = ppe.getPrice();
         String inventoryNumber = ppe.getInventoryNumber();
-        String startUseDate = ppe.getStartUseDate().toString();
         Integer lifeTime = Integer.parseInt(Long.toString(ppe.getLifeTime().toDays()));
+        log.info("added info about ppe");
+
+        String startUseDate = "";
+        try {
+            log.info("try add start use date: {}", ppe.getStartUseDate().format(DateTimeFormatter.BASIC_ISO_DATE));
+            startUseDate = ppe.getStartUseDate().format(DateTimeFormatter.BASIC_ISO_DATE);
+        } catch (Exception ex) {
+            log.warn("Cannot parse date time to string");
+        }
 
         try {
             log.info("contract (addPPE) sending request");
