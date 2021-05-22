@@ -29,7 +29,7 @@ public class SubsidiaryPageController {
         List<SubsidiaryForm> subsidiaryForms = new ArrayList<>();
         Collection<String> mspIds = new ArrayList<>();
         try {
-            mspIds = peerDiscoveryService.getPeersInfo();
+            mspIds = peerDiscoveryService.getMSPIDsInfo();
         } catch (Exception ex) {
             log.warn("Process to find peers in hlf network were denied!");
         }

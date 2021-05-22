@@ -3,5 +3,5 @@ package ru.inside.commands.hyperledger;
 import java.util.Collection;
 
 public interface PeerDiscoveryService {
-    Collection<String> getPeersInfo();
+    Collection<String> getMSPIDsInfo();
 }

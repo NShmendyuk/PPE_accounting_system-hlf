@@ -14,14 +14,14 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class CAAuthAdmin {
-    public static void enrollAdmin(String HLF_PATH_ORG2_CONNECTION, String HLF_PEER_GRPC_URL,
+    public static void enrollAdmin(String HLF_PATH_ORG_CONNECTION, String HLF_PEER_GRPC_URL,
                                    String HLF_ADMIN_NAME, String HLF_ADMIN_PASS,
                                    String HLF_ORG_MSP_ID, String HLF_HOST_PEER_IP) throws Exception {
 
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
         props.put("pemFile",
-                HLF_PATH_ORG2_CONNECTION);
+                HLF_PATH_ORG_CONNECTION);
         props.put("allowAllHostNames", "true");
         HFCAClient caClient = HFCAClient.createNewInstance(HLF_PEER_GRPC_URL, props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();

@@ -26,8 +26,8 @@ public class SubsidiaryServiceImpl implements SubsidiaryService {
     private final SubsidiaryRepository subsidiaryRepository;
 
 
-    private String selfSubsidiaryName = "ГПН-Д2";
-    private String selfPeerMspId = "Org2MSP";
+    private String selfSubsidiaryName = "ГПН-Д1";
+    private String selfPeerMspId = "Org1MSP";
 
     @PostConstruct
     private void initSelfOrgDefinition() {

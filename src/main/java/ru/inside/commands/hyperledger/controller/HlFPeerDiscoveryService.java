@@ -19,10 +19,9 @@ public class HlFPeerDiscoveryService implements PeerDiscoveryService {
         this.network = hlfConfiguration.getNetwork();
     }
 
-    public Collection<String> getPeersInfo() {
+    public Collection<String> getMSPIDsInfo() {
         log.info("===begin info===");
         Collection<Peer> peers = network.getChannel().getPeers();
-        Collection<String> orgMSPIds = new ArrayList<>();
         log.info("===peers info===");
         peers.forEach(peer -> {
             log.info(peer.toString());
@@ -34,6 +33,6 @@ public class HlFPeerDiscoveryService implements PeerDiscoveryService {
         log.info("===discovered chaincode names===");
         log.info("{}", network.getChannel().getDiscoveredChaincodeNames().toString());
         log.info("===end info===");
-        return network.getChannel().getOrderersOrganizationMSPIDs();
+        return network.getChannel().getPeersOrganizationMSPIDs();
     }
 }

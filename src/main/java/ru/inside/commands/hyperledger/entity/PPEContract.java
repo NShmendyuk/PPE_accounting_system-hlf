@@ -25,14 +25,14 @@ public class PPEContract {
     private String name;
 
     /**
-     * Статус средства индивидуальной защиты
-     */
-    private String status;
-
-    /**
      * Цена СИЗа
      */
     private Float price;
+
+    /**
+     * Статус средства индивидуальной защиты
+     */
+    private String status;
 
     /**
      * Дата поступления СИЗа в эксплуатацию

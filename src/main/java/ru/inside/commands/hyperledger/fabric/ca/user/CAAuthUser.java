@@ -15,12 +15,12 @@ import java.util.Set;
 
 
 public class CAAuthUser {
-    public static void enrollUser(String HLF_PATH_ORG2_CONNECTION, String HLF_PEER_GRPC_URL,
+    public static void enrollUser(String HLF_PATH_ORG_CONNECTION, String HLF_PEER_GRPC_URL,
                                   String HLF_USER_NAME, String HLF_ADMIN_NAME,
                                   String HLF_ORG_AFFILATION, String HLF_ORG_MSP_ID) throws Exception {
         // Create a CA client for interacting with the CA.
         Properties props = new Properties();
-        props.put("pemFile", HLF_PATH_ORG2_CONNECTION);
+        props.put("pemFile", HLF_PATH_ORG_CONNECTION);
         props.put("allowAllHostNames", "true");
         HFCAClient caClient = HFCAClient.createNewInstance(HLF_PEER_GRPC_URL, props);
         CryptoSuite cryptoSuite = CryptoSuiteFactory.getDefault().getCryptoSuite();

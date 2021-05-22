@@ -1,4 +1,4 @@
-package ru.inside.commands.controller.old;
+package ru.inside.commands.controller.devtools;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.inside.commands.hyperledger.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.PeerDiscoveryService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -20,19 +22,23 @@ import java.util.List;
 @Slf4j
 public class PPEBlockchainController {
     private final ChainCodeControllerService chainCodeControllerService;
+    private final PeerDiscoveryService peerDiscoveryService;
 
     @Autowired
     private ApplicationContext appContext;
 
-    @GetMapping("/init/test")
-    public String getPPE() {
-        chainCodeControllerService.initTestLedger();
-        return "test ledger";
+    @GetMapping("/info")
+    public String getInfo() {
+        Collection<String> mspIds = peerDiscoveryService.getMSPIDsInfo();
+        mspIds.forEach(mspId -> {
+            log.info("found peer msp identity: {}", mspId);
+        });
+        return mspIds.toString();
     }
 
     @GetMapping("/all")
-    public List<PPEContract> getAllPPE() {
-        return chainCodeControllerService.getAllPPE();
+    public String getAllPPE() {
+        return chainCodeControllerService.getAllPPE().toString();
     }
 
     @GetMapping("/{inventoryNumber}")
