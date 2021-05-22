@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class PPEConverter {
 
-    public PPE ppeContractToPPE(PPEContract ppeContract, Employee employee) {
+    public PPE ppeContractToPPE(PPEContract ppeContract) {
         PPE ppe = new PPE();
         ppe.setName(ppeContract.getName());
         ppe.setInventoryNumber(ppeContract.getInventoryNumber());
@@ -20,7 +20,6 @@ public class PPEConverter {
         ppe.setStartUseDate(LocalDateTime.parse(ppeContract.getStartUseDate()));
         ppe.setPpeStatus(PPEStatus.valueOf(ppeContract.getStatus()));
         ppe.setPrice(ppeContract.getPrice());
-        ppe.setEmployee(employee);
         return ppe;
     }
 }

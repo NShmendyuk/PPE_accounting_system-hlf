@@ -99,21 +99,45 @@ public class PPEServiceImpl implements PPEService {
             log.warn("ChainCode getAllPPE returned null.");
         }
         List<PPE> ppeWaitList = new ArrayList<>();
+
+        Subsidiary selfSubsidiary = null;
+        try {
+            selfSubsidiary = subsidiaryService.getSelfSubsidiary();
+        } catch (NoEntityException e) {
+            log.error("Cannot find self subsidiary definition");
+        }
+        String selfSubsidiaryName = selfSubsidiary.getName();
+
         ppeContracts.forEach(ppeContract -> {
+            PPE isPPEExist = null;
             try {
-                if (ppeContract.getSubsidiary().equals(subsidiaryService.getSelfSubsidiary().getName()) &&
-                        getPPEByInventoryNumber(ppeContract.getInventoryNumber()) == null) {
-                    Employee employee = employeeService.getEmployeeByPersonnelNumber(ppeContract.getOwnerID());
-                    if (employee == null) {
-                        log.warn("employee {} not applied when transfering ppe {} by chaincode!",
-                                ppeContract.getOwnerID(), ppeContract.getInventoryNumber());
-                    } else {
-                        PPE ppe = PPEConverter.ppeContractToPPE(ppeContract, employee);
-                        ppeWaitList.add(ppe);
-                    }
+                isPPEExist = getPPEByInventoryNumber(ppeContract.getInventoryNumber());
+            } catch (NoEntityException ignore) {
+            }
+
+            if (ppeContract.getSubsidiary().equals(selfSubsidiaryName) && isPPEExist == null) {
+                Employee employee = null;
+                try {
+                    employee = employeeService.getEmployeeByPersonnelNumber(ppeContract.getOwnerID());
+                } catch (NoEntityException ignored) {
                 }
-            } catch (NoEntityException e) {
-                log.error("Cannot find self subsidiary definition");
+
+                PPE ppe = null;
+                if (employee == null) {
+                    log.warn("employee {} not applied when transfering ppe {} by chaincode!",
+                            ppeContract.getOwnerID(), ppeContract.getInventoryNumber());
+                    ppe.setEmployee(
+                            Employee.builder()
+                                    .employeeName(ppeContract.getOwnerName())
+                            .personnelNumber(ppeContract.getOwnerID())
+                            .occupation("НЕОПРЕДЕЛЕНО").build()
+                    );
+                }
+
+                ppe = PPEConverter.ppeContractToPPE(ppeContract);
+                ppe.setEmployee(employee);
+
+                ppeWaitList.add(ppe);
             }
         });
         return ppeWaitList;
