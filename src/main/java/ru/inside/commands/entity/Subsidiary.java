@@ -12,7 +12,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Subsidiary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,4 +41,9 @@ public class Subsidiary {
             joinColumns = @JoinColumn(name = "subsidiary_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
     private List<Employee> employee;
+
+    @Override
+    public String toString() {
+        return "[Subsidiary:{" + this.name + "; " + this.peerName + "}]";
+    }
 }

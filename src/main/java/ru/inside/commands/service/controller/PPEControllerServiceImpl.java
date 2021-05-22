@@ -61,9 +61,6 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         }
 
         if (!ownerPersonnelNumber.equals("")) {
-            if (date != null) {
-                ppe.setStartUseDate(LocalDateTime.of(date, LocalTime.MIDNIGHT));
-            }
             try {
                 Employee employee = employeeService.addPPEToEmployee(ppe, ownerPersonnelNumber);
                 ppe.setEmployee(employee);
@@ -74,13 +71,25 @@ public class PPEControllerServiceImpl implements PPEControllerService {
                 log.error("Something went wrong while add ppe to employee");
             }
         }
+
         try {
-            log.info("try to add ppe {} into chaincode. \nppe info: {}; \nwith employee {}; \nwith subsidiary{}",
+            addPPEToChainCode(ppeService.getPPEByInventoryNumber(inventoryNumber));
+        } catch (NoEntityException e) {
+            log.error("PPE was not added into database!!! Ask IT-developer to rewrite code!!");
+        }
+    }
+
+    private void addPPEToChainCode(PPE ppe) {
+        try {
+            log.info("try to add ppe into chaincode");
+            chainCodeControllerService.addPPE(ppe);
+            log.info("ppe {} added into chaincode. \nppe info: {}; \nwith employee {}; \nwith subsidiary{}",
                     ppe.getInventoryNumber(), ppe.toString(), ppe.getEmployee().getPersonnelNumber(),
                     ppe.getEmployee().getSubsidiary().getName());
-            chainCodeControllerService.addPPE(ppe);
         } catch (NullPointerException ex) {
-            log.warn("Cannot add ppe {} into chaincode", inventoryNumber);
+            log.warn("Cannot add ppe {} into chaincode", ppe.getInventoryNumber());
+        } catch (Exception ex) {
+            log.error("Error! Cannot add ppe {} into chaincode", ppe.getInventoryNumber());
         }
     }
 

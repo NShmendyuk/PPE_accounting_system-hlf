@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class PPE {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,6 +65,12 @@ public class PPE {
             name = "employee_ppe",
             joinColumns = @JoinColumn(name = "ppe_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
-    @Immutable
+//    @Immutable
     private Employee employee;
+
+    @Override
+    public String toString() {
+        return "[PPE:{" + this.inventoryNumber + "; " + this.name + "; " + this.price + "; " + this.startUseDate + "; " +
+                this.lifeTime + "; " + this.ppeStatus +"}]";
+    }
 }
