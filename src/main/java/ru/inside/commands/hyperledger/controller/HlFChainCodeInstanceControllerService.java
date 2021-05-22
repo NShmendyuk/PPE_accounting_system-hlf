@@ -80,8 +80,8 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
 
         String startUseDate = "";
         try {
-            log.info("try add start use date: {}", ppe.getStartUseDate().format(DateTimeFormatter.BASIC_ISO_DATE));
-            startUseDate = ppe.getStartUseDate().format(DateTimeFormatter.BASIC_ISO_DATE);
+            log.info("try add start use date: {}", ppe.getStartUseDate().toString());
+            startUseDate = ppe.getStartUseDate().toString();
         } catch (Exception ex) {
             log.warn("Cannot parse date time to string");
         }
