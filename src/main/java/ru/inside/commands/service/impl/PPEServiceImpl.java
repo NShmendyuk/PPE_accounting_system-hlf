@@ -109,6 +109,7 @@ public class PPEServiceImpl implements PPEService {
         String selfSubsidiaryName = selfSubsidiary.getName();
 
         ppeContracts.forEach(ppeContract -> {
+            //TODO: change to boolean check
             PPE isPPEExist = null;
             try {
                 isPPEExist = getPPEByInventoryNumber(ppeContract.getInventoryNumber());
@@ -130,7 +131,7 @@ public class PPEServiceImpl implements PPEService {
                             Employee.builder()
                                     .employeeName(ppeContract.getOwnerName())
                             .personnelNumber(ppeContract.getOwnerID())
-                            .occupation("НЕОПРЕДЕЛЕНО").build()
+                            .occupation("НЕОПРЕДЕЛЕНО/Требуется добавить в базу данных").build()
                     );
                 }
 
