@@ -60,7 +60,8 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             return ;
         }
 
-        if (!ownerPersonnelNumber.equals("")) {
+        if (!(ownerPersonnelNumber == null || ownerPersonnelNumber.equals("")) && (date != null)) {
+            ppe.setStartUseDate(LocalDateTime.of(date, LocalTime.MIDNIGHT));
             try {
                 Employee employee = employeeService.addPPEToEmployee(ppe, ownerPersonnelNumber);
                 ppe.setEmployee(employee);
@@ -99,7 +100,11 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             ppeForm.setPpeName(ppeContract.getName());
             ppeForm.setPrice(ppeContract.getPrice());
             ppeForm.setLifeTime(Duration.ofDays(ppeContract.getLifeTime()));
-            ppeForm.setStartUseDate(LocalDateTime.parse(ppeContract.getStartUseDate()));
+            try {
+                ppeForm.setStartUseDate(LocalDateTime.parse(ppeContract.getStartUseDate()));
+            } catch (Exception ex) {
+                log.warn("Cannot parse LocalDateTime (as String to LocalDateTime) from PPEContract");
+            }
             ppeForm.setPpeStatus(ppeContract.getStatus());
 
             ppeForm.setOwnerPersonnelNumber(ppeContract.getOwnerID());

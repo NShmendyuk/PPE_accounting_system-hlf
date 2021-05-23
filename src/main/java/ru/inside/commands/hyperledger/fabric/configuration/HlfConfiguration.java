@@ -3,6 +3,7 @@ package ru.inside.commands.hyperledger.fabric.configuration;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.inside.commands.hyperledger.fabric.ca.RegistCAClient;
 
@@ -23,9 +24,12 @@ public class HlfConfiguration {
     @Getter
     private Network network;
 
-    private final String HLF_USER_NAME = "manager-org2-01";
-    private final String HLF_CHAINCODE_NAME = "ppesmart";
-    private final String HLF_CHANNEL_NAME = "mychannel";
+    @Value("${ppe_lifecycle_accounting_system.manager_name}")
+    private String HLF_USER_NAME;
+    @Value("${ppe_lifecycle_accounting_system.hyperledger.chaincode.name}")
+    private String HLF_CHAINCODE_NAME;
+    @Value("${ppe_lifecycle_accounting_system.hyperledger.channel.name}")
+    private String HLF_CHANNEL_NAME;
 
     public HlfConfiguration () {
         try {

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class PPEStatusScheduler {
     private final PPEService ppeService;
 
-//    @Scheduled(cron = "${ppe_lifecycle_accouting_system.task.scheduling.rate.cron}", zone = "EAT")
+//    @Scheduled(cron = "${ppe_lifecycle_accounting_system.task.scheduling.rate.cron}", zone = "EAT")
     @Scheduled(fixedDelay = 60000) //TODO: DEV;
     public void onScheduleUpdatePPEStatus() {
         log.info("SCHEDULER! start process updating status.");
