@@ -21,7 +21,12 @@ public class PPEConverter {
             ppe.setName(ppeContract.getName());
             ppe.setInventoryNumber(ppeContract.getInventoryNumber());
             ppe.setLifeTime(Duration.ofDays(ppeContract.getLifeTime()));
-            ppe.setStartUseDate(LocalDateTime.parse(ppeContract.getStartUseDate(), DateTimeFormatter.ofPattern("yyyy-MM-DD'T'HH:mm")));
+            try {
+                ppe.setStartUseDate(LocalDateTime.parse(ppeContract.getStartUseDate(), DateTimeFormatter.ofPattern("yyyy-MM-DD")));
+            } catch (Exception ex) {
+                log.error("Cannot convert date time from contract ppe");
+                ppe.setStartUseDate(LocalDateTime.now());
+            }
             ppe.setPpeStatus(PPEStatus.valueOf(ppeContract.getStatus()));
             ppe.setPrice(ppeContract.getPrice());
         } catch (Exception ex) {
