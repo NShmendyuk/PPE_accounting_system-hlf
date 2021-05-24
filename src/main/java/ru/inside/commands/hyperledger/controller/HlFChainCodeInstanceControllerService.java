@@ -113,8 +113,8 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         List<PPEContract> ppeHistoryList = new ArrayList<>();
         try {
             byte[] historyBytes = chainCodeController.getPPEHistory(inventoryNumber);
-            log.info("history: {}", new ObjectMapper().readValue(historyBytes, String.class));
-            String stringJsonHistory = new ObjectMapper().readValue(historyBytes, String.class);
+            log.info("history: {}", new String(historyBytes));
+            String stringJsonHistory = new String(historyBytes);
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
