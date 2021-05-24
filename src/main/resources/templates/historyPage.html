@@ -38,14 +38,14 @@
                 <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history/previous}">
                     <input type="hidden" name="inventoryNumber" th:value="${ppeForm.inventoryNumber}" />
                     <input type="hidden" name="ppeHistoryPage" th:value="${ppeHistoryPage}" />
-                    <button type="submit" name="show_ppe_history_page" class="turn_button">Предыдущее</button>
+                    <button type="submit" name="show_ppe_history_page" class="turn_button">Новее</button>
                 </form>
             </a>
             <a>
                 <form th:method="GET" class="show_ppe_history_form" th:action="@{/ppe/history/next}">
                     <input type="hidden" name="inventoryNumber" th:value="${ppeForm.inventoryNumber}" />
                     <input type="hidden" name="ppeHistoryPage" th:value="${ppeHistoryPage}" />
-                    <button type="submit" name="show_ppe_history_page" class="turn_button">Следующее</button>
+                    <button type="submit" name="show_ppe_history_page" class="turn_button">Старее</button>
                 </form>
             </a>
             </div>
