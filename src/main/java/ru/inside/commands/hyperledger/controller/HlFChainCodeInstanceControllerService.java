@@ -124,7 +124,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
             ppeHistoryList = Arrays.asList(ppeContracts);
             log.info("contract (getPPEHistoryById) message: {}", ppeHistoryList.toString());
         } catch (Exception ex) {
-            log.error("Get ppe {} history request to chaincode were denied", inventoryNumber);
+            log.error("Get ppe {} history request to chaincode were failed!", inventoryNumber);
         }
         return ppeHistoryList;
     }
