@@ -7,46 +7,46 @@
         <link rel="stylesheet" type="text/css" th:href="@{/css/waitPageStyle.css}"/>
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-        <script type="text/javascript">
-            $(document).ready( function () {
-                $('.apply_form').submit( function () {
-                    var formdata = $(this).serialize();
-                    $.ajax({
-                        type: "POST",
-                        url: "/smart_contract/transfer/apply",
-                        data: formdata,
-                        success: function () {
-                            alert("Принято");
-                            window.location = "/waiting_apply";
-                        },
-                        error: function () {
-                            alert("Возникли ошибки при принятии средства индивидуальной защиты через смарт-контракт");
-                        }
-                    });
-                    return false;
-                });
-            });
-        </script>
-        <script type="text/javascript">
-            $(document).ready( function () {
-                $('.apply_form_all').submit( function () {
-                    var formData = $(this).serialize();
-                    $.ajax({
-                        type: "POST",
-                        url: "/smart_contract/transfer/apply/all",
-                        data: formData,
-                        success: function () {
-                            alert("Принято всё");
-                            window.location = "/waiting_apply";
-                        },
-                        error: function () {
-                            alert("Возникли ошибки при принятии всех средств индивидуальной защиты через смарт-контракт");
-                        }
-                    });
-                    return false;
-                });
-            });
-        </script>
+<!--        <script type="text/javascript">-->
+<!--            $(document).ready( function () {-->
+<!--                $('.apply_form').submit( function () {-->
+<!--                    var formdata = $(this).serialize();-->
+<!--                    $.ajax({-->
+<!--                        type: "POST",-->
+<!--                        url: "/smart_contract/transfer/apply",-->
+<!--                        data: formdata,-->
+<!--                        success: function () {-->
+<!--                            alert("Принято");-->
+<!--                            window.location = "/waiting_apply";-->
+<!--                        },-->
+<!--                        error: function () {-->
+<!--                            alert("Возникли ошибки при принятии средства индивидуальной защиты через смарт-контракт");-->
+<!--                        }-->
+<!--                    });-->
+<!--                    return false;-->
+<!--                });-->
+<!--            });-->
+<!--        </script>-->
+<!--        <script type="text/javascript">-->
+<!--            $(document).ready( function () {-->
+<!--                $('.apply_form_all').submit( function () {-->
+<!--                    var formData = $(this).serialize();-->
+<!--                    $.ajax({-->
+<!--                        type: "POST",-->
+<!--                        url: "/smart_contract/transfer/apply/all",-->
+<!--                        data: formData,-->
+<!--                        success: function () {-->
+<!--                            alert("Принято всё");-->
+<!--                            window.location = "/waiting_apply";-->
+<!--                        },-->
+<!--                        error: function () {-->
+<!--                            alert("Возникли ошибки при принятии всех средств индивидуальной защиты через смарт-контракт");-->
+<!--                        }-->
+<!--                    });-->
+<!--                    return false;-->
+<!--                });-->
+<!--            });-->
+<!--        </script>-->
     </head>
     <body>
         <h1>Система учета средств индивидуальной защиты</h1>

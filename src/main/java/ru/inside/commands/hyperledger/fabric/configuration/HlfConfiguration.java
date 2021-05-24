@@ -23,7 +23,7 @@ public class HlfConfiguration {
     @Getter
     private Network network;
 
-    private final String HLF_USER_NAME = "manager-org2-1";
+    private final String HLF_USER_NAME = "manager-org1-1";
     private final String HLF_CHAINCODE_NAME = "ppesmart";
     private final String HLF_CHANNEL_NAME = "mychannel";
 
@@ -48,7 +48,7 @@ public class HlfConfiguration {
 
         // load a CCP
         Path networkConfigPath = Paths.get("..", "..", "test-network", "organizations",
-                "peerOrganizations", "org2.example.com", "connection-org2.yaml");
+                "peerOrganizations", "org1.example.com", "connection-org1.yaml");
 
         Gateway.Builder builder = Gateway.createBuilder();
         log.info("Gateway builder created");
