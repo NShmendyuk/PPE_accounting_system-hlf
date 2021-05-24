@@ -97,6 +97,8 @@ public class PPEServiceImpl implements PPEService {
             ppeContracts = chainCodeControllerService.getAllPPE();
         } catch (NullPointerException ex) {
             log.warn("ChainCode getAllPPE returned null.");
+        } catch (Exception ex) {
+            log.error("Cannot getAllPPE from chaincode controller!!!");
         }
         List<PPE> ppeWaitList = new ArrayList<>();
 

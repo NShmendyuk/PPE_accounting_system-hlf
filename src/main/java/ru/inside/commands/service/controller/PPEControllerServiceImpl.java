@@ -143,7 +143,13 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     }
 
     public List<PPEForm> getAllInWaitList() {
-        List<PPE> ppeList = ppeService.getAllWaitFromChainCode();
+        List<PPE> ppeList = new ArrayList<>();
+        try {
+            ppeList = ppeService.getAllWaitFromChainCode();
+        } catch (Exception ex) {
+            log.error("Cannot get all wait ppe from chaincode!");
+        }
+
         List<PPEForm> ppeFormList = new ArrayList<>();
         ppeList.forEach(ppe -> {
             PPEForm ppeForm = new PPEForm();

@@ -11,7 +11,6 @@ import ru.inside.commands.hyperledger.entity.PPEContract;
 import ru.inside.commands.hyperledger.fabric.chaincode.PPEChainCodeService;
 import ru.inside.commands.hyperledger.fabric.configuration.HlfConfiguration;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +45,15 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public List<PPEContract> getAllPPE() {
         List<PPEContract> allPPE = new ArrayList<>();
         try {
-            allPPE = Arrays.asList(new ObjectMapper().readValue(chainCodeController.getAllPPE(), PPEContract[].class));
+            byte[] ppeContractBytes = chainCodeController.getAllPPE();
+            String stringPPEContract = new String(ppeContractBytes);
+            log.info("get All PPE Contract as String: {}", stringPPEContract);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+
+            PPEContract[] ppeContracts = objectMapper.readValue(stringPPEContract, PPEContract[].class);
+            allPPE = Arrays.asList(ppeContracts);
             log.info("chaincode message: {}", allPPE);
         } catch (Exception e) {
             log.error("Get All request to chaincode were denied");
@@ -101,7 +108,13 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public PPEContract getPPEByInventoryNumber(String inventoryNumber) {
         PPEContract ppeInfo = new PPEContract();
         try {
-            ppeInfo = new ObjectMapper().readValue(chainCodeController.getPPE(inventoryNumber), PPEContract.class);
+            byte[] ppeContractBytes = chainCodeController.getAllPPE();
+            String stringPPEContract = new String(ppeContractBytes);
+            log.info("get PPE Contract as String: {}", stringPPEContract);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            ppeInfo = objectMapper.readValue(stringPPEContract, PPEContract.class);
             log.info("chaincode (getPPEByInventoryNumber) message: {}", ppeInfo.toString());
         } catch (Exception ex) {
             log.error("Get ppe {} request to chaincode were denied", inventoryNumber);
@@ -162,7 +175,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public boolean checkPPEExist(String inventoryNumber) {
         String ppeInfo = "chaincode executing denied";
         try {
-            ppeInfo = Arrays.toString(chainCodeController.isPPEExist(inventoryNumber));
+            ppeInfo = new String(chainCodeController.isPPEExist(inventoryNumber));
         } catch (Exception e) {
             log.error("Check existing ppe {} sample request to chaincode were denied", inventoryNumber);
         }

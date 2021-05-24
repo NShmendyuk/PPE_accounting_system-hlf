@@ -27,6 +27,14 @@ public class MainPageController {
     @GetMapping(value = {"/", "/index", "/mainpage"})
     public ModelAndView getMainPage() {
         ModelAndView modelAndView = new ModelAndView("index");
+        try {
+            int waitAll = ppeControllerService.getAllInWaitList().size();
+            int countPPEAtSubsidiary = ppeService.getTotalPPE();
+            modelAndView.addObject("waitAll", waitAll);
+            modelAndView.addObject("countPPEAtSubsidiary", countPPEAtSubsidiary);
+        } catch (Exception ex) {
+            log.error("Cannot get wait list in main page");
+        }
         int waitAll = ppeControllerService.getAllInWaitList().size();
         int countPPEAtSubsidiary = ppeService.getTotalPPE();
         modelAndView.addObject("waitAll", waitAll);
@@ -51,7 +59,7 @@ public class MainPageController {
 
             log.info("showing {} PPE from transaction list which wait for apply", waitAllPPE.size());
         } catch (Exception ex) {
-            log.info("none");
+            log.info("Cannot get wait list in wait page");
             return modelAndView;
         }
         return modelAndView;
