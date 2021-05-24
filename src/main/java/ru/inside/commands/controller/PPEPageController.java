@@ -54,7 +54,8 @@ public class PPEPageController {
         log.info("GET request with ppe inventoryNumber: {}; show history page", inventoryNumber);
         ModelAndView modelAndView = new ModelAndView("historyPage");
 
-        int ppeHistoryPageRequest = Integer.parseInt(ppeHistoryPage.substring(0, ppeHistoryPage.indexOf("/") - 1).replace("/", "")) - 1;
+        int ppeHistoryPageRequest = Integer.parseInt(ppeHistoryPage.substring(0, ppeHistoryPage.indexOf("/"))
+                .replace("/", "")) - 1;
         ppeHistoryPageRequest = ppeHistoryPageRequest - 1;
 
         if (ppeHistoryPageRequest < 0) {
@@ -69,7 +70,7 @@ public class PPEPageController {
         }
 
         modelAndView.addObject("ppeForm", ppeHistoryForms.get(ppeHistoryPageRequest));
-        modelAndView.addObject("ppeHistoryPage", ppeHistoryPageRequest + "/" + ppeHistoryForms.size());
+        modelAndView.addObject("ppeHistoryPage", ppeHistoryPageRequest + 1 + "/" + ppeHistoryForms.size());
         return modelAndView;
     }
 
@@ -78,7 +79,10 @@ public class PPEPageController {
         log.info("GET request with ppe inventoryNumber: {}; show history page", inventoryNumber);
         ModelAndView modelAndView = new ModelAndView("historyPage");
 
-        int ppeHistoryPageRequest = Integer.parseInt(ppeHistoryPage.substring(0, ppeHistoryPage.indexOf("/") - 1).replace("/", "")) - 1;
+        int ppeHistoryPageRequest = Integer.parseInt(ppeHistoryPage.substring(0, ppeHistoryPage.indexOf("/"))
+                .replace("/", "")) - 1;
+
+
         ppeHistoryPageRequest = ppeHistoryPageRequest + 1;
 
         List<PPEForm> ppeHistoryForms = ppeControllerService.getPPEHistory(inventoryNumber);
@@ -89,12 +93,12 @@ public class PPEPageController {
             return modelAndView;
         }
 
-        if (ppeHistoryPageRequest > ppeHistoryForms.size()) {
-            ppeHistoryPageRequest = ppeHistoryForms.size();
+        if (ppeHistoryPageRequest > ppeHistoryForms.size() - 1) {
+            ppeHistoryPageRequest = ppeHistoryForms.size() - 1;
         }
 
         modelAndView.addObject("ppeForm", ppeHistoryForms.get(ppeHistoryPageRequest));
-        modelAndView.addObject("ppeHistoryPage", ppeHistoryPageRequest + "/" + ppeHistoryForms.size());
+        modelAndView.addObject("ppeHistoryPage", ppeHistoryPageRequest + 1 + "/" + ppeHistoryForms.size());
         return modelAndView;
     }
 
