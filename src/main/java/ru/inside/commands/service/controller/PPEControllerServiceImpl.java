@@ -228,16 +228,26 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             return;
         }
 
-        PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
-        ppe.setEmployee(employee);
+        PPE ppe = new PPE();
         try {
-            PPE existedPPE = ppeService.getPPEByInventoryNumber(inventoryNumber);
-            ppe.setId(existedPPE.getId());
-        } catch (NoEntityException ignored) {
+            ppe = PPEConverter.ppeContractToPPE(ppeContract);
+        } catch (Exception ex) {
+            log.error("Cannot convert ppe while apply!");
+        }
+
+        try {
+            if (ppeService.isPPEExist(inventoryNumber)) {
+                PPE existedPPE = ppeService.getPPEByInventoryNumber(inventoryNumber);
+                ppe.setId(existedPPE.getId());
+            }
+            ppeService.addPPE(ppe);
+        } catch (Exception ex) {
+            log.error("Cannot add ppe from waitlist while apply! Try to add with employee");
         }
 
         try {
             employeeService.addPPEToEmployee(ppe, employee.getPersonnelNumber());
+            log.info("ppe {} Added to employee {}!", ppe.getInventoryNumber(), employee.getPersonnelNumber());
         } catch (NoEntityException e) {
             log.error("Employee {} were deleted from database while adding new ppe {}!!! Cannot add new ppe from chaincode",
                     employee.getPersonnelNumber(), inventoryNumber);
