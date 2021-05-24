@@ -23,7 +23,7 @@ public class HlfConfiguration {
     @Getter
     private Network network;
 
-    private final String HLF_USER_NAME = "manager-org2-03";
+    private final String HLF_USER_NAME = "manager-org1-01";
     private final String HLF_CHAINCODE_NAME = "ppesmart";
     private final String HLF_CHANNEL_NAME = "mychannel";
 
