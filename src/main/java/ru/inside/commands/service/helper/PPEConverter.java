@@ -7,6 +7,8 @@ import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.enums.PPEStatus;
 import ru.inside.commands.hyperledger.entity.PPEContract;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,13 +24,24 @@ public class PPEConverter {
             ppe.setInventoryNumber(ppeContract.getInventoryNumber());
             ppe.setLifeTime(Duration.ofDays(ppeContract.getLifeTime()));
             try {
-                ppe.setStartUseDate(LocalDateTime.parse(ppeContract.getStartUseDate(), DateTimeFormatter.ofPattern("yyyy-MM-DD")));
+                LocalDateTime dateTime = LocalDateTime.parse(ppeContract.getStartUseDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                ppe.setStartUseDate(dateTime);
             } catch (Exception ex) {
                 log.error("Cannot convert date time from contract ppe");
                 ppe.setStartUseDate(LocalDateTime.now());
             }
-            ppe.setPpeStatus(PPEStatus.valueOf(ppeContract.getStatus()));
-            ppe.setPrice(ppeContract.getPrice());
+            try {
+                ppe.setPpeStatus(PPEStatus.valueOf(ppeContract.getStatus()));
+            } catch (Exception ex) {
+                log.error("Cannot convert status from contract ppe");
+                ppe.setPpeStatus(PPEStatus.COMMISSIONED);
+            }
+            try {
+                ppe.setPrice(ppeContract.getPrice());
+            } catch (Exception ex) {
+                log.error("Cannot convert price from contract ppe");
+                ppe.setPrice(0F);
+            }
         } catch (Exception ex) {
             log.error("Cannot convert contract to ppe");
         }
