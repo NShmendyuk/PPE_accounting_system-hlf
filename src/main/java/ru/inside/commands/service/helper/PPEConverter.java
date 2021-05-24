@@ -34,6 +34,7 @@ public class PPEConverter {
                 ppe.setPpeStatus(PPEStatus.valueOf(ppeContract.getStatus()));
             } catch (Exception ex) {
                 log.error("Cannot convert status from contract ppe");
+                log.error("Status error: {}", ppeContract.getStatus());
                 ppe.setPpeStatus(PPEStatus.COMMISSIONED);
             }
             try {

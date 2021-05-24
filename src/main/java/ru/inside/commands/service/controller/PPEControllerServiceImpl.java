@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,16 +178,29 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         ppeList.forEach(ppe -> {
             PPEForm ppeForm = new PPEForm();
 
-            ppeForm.setPpeName(ppe.getName());
-            ppeForm.setPrice(ppe.getPrice());
-            ppeForm.setInventoryNumber(ppe.getInventoryNumber());
-            ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
-            ppeForm.setLifeTime(ppe.getLifeTime());
-            ppeForm.setStartUseDate(ppe.getStartUseDate());
+            try {
+                ppeForm.setPpeName(ppe.getName());
+                ppeForm.setPrice(ppe.getPrice());
+                ppeForm.setInventoryNumber(ppe.getInventoryNumber());
+            } catch (Exception ex) {
+                log.error("Cannot set first info of ppe from waitList to form");
+            }
 
-            ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
-            ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
-            ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
+            try {
+                ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
+                ppeForm.setLifeTime(ppe.getLifeTime());
+                ppeForm.setStartUseDate(ppe.getStartUseDate());
+            } catch (Exception ex) {
+                log.error("Cannot set time and status info of ppe from waitList to form");
+            }
+
+            try {
+                ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
+                ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
+                ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
+            } catch (Exception ex) {
+                log.error("Cannot set second info of ppe from waitList to form");
+            }
 
             ppeFormList.add(ppeForm);
         });
