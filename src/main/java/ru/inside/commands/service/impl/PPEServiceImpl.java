@@ -90,9 +90,7 @@ public class PPEServiceImpl implements PPEService {
 
     public void transferPPE(PPE ppe, Subsidiary subsidiary) {
         chainCodeControllerService.transferPPEToSubsidiary(ppe, subsidiary);
-        ppe.setPpeStatus(PPEStatus.TRANSFER);
-        ppe.setEmployee(null);
-        ppeRepository.save(ppe);
+        ppeRepository.deleteByInventoryNumber(ppe.getInventoryNumber());
     }
 
     public List<PPE> getAllWaitFromChainCode() {
