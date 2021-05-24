@@ -8,7 +8,7 @@ import ru.inside.commands.hyperledger.fabric.ca.user.CAAuthUser;
 public class RegistCAClient {
     private final String HLF_PATH_ORG_CONNECTION =
             "../../test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem";
-    private final String HLF_PEER_GRPC_URL = "https://localhost:8054";
+    private final String HLF_PEER_GRPC_URL = "https://localhost:7054";
     private final String HLF_ADMIN_NAME = "admin";
     private final String HLF_ADMIN_PASS = "adminpw";
     private final String HLF_ORG_AFFILATION = "org1.department1";
