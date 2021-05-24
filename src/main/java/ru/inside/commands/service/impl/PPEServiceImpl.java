@@ -131,6 +131,7 @@ public class PPEServiceImpl implements PPEService {
                     Employee employee = new Employee();
                     employee.setPersonnelNumber(ppeContract.getOwnerID());
                     employee.setEmployeeName(ppeContract.getOwnerName());
+                    ppe.setEmployee(employee);
                     ppeWaitList.add(ppe);
                 }
             }
