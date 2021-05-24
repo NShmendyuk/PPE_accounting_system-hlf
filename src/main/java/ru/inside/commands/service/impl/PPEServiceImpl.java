@@ -108,8 +108,14 @@ public class PPEServiceImpl implements PPEService {
         } catch (NoEntityException e) {
             log.error("Cannot find self subsidiary definition");
         }
-        String selfSubsidiaryName = selfSubsidiary.getName();
+        String selfSubsidiaryName = "";
+        try {
+            selfSubsidiaryName = selfSubsidiary.getName();
+        } catch (Exception ex) {
+            log.error("No self subsidiary definition for name");
+        }
 
+        String finalSelfSubsidiaryName = selfSubsidiaryName;
         ppeContracts.forEach(ppeContract -> {
             //TODO: change to boolean check
             PPE isPPEExist = null;
@@ -118,14 +124,14 @@ public class PPEServiceImpl implements PPEService {
             } catch (NoEntityException ignore) {
             }
 
-            if (ppeContract.getSubsidiary().equals(selfSubsidiaryName) && isPPEExist == null) {
+            if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) && isPPEExist == null) {
                 Employee employee = null;
                 try {
                     employee = employeeService.getEmployeeByPersonnelNumber(ppeContract.getOwnerID());
                 } catch (NoEntityException ignored) {
                 }
 
-                PPE ppe = null;
+                PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
                 if (employee == null) {
                     log.warn("employee {} not applied when transfering ppe {} by chaincode!",
                             ppeContract.getOwnerID(), ppeContract.getInventoryNumber());
@@ -137,7 +143,6 @@ public class PPEServiceImpl implements PPEService {
                     );
                 }
 
-                ppe = PPEConverter.ppeContractToPPE(ppeContract);
                 ppe.setEmployee(employee);
 
                 ppeWaitList.add(ppe);

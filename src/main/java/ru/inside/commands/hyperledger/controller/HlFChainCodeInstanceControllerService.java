@@ -108,7 +108,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public PPEContract getPPEByInventoryNumber(String inventoryNumber) {
         PPEContract ppeInfo = new PPEContract();
         try {
-            byte[] ppeContractBytes = chainCodeController.getAllPPE();
+            byte[] ppeContractBytes = chainCodeController.getPPE(inventoryNumber);
             String stringPPEContract = new String(ppeContractBytes);
             log.info("get PPE Contract as String: {}", stringPPEContract);
 
