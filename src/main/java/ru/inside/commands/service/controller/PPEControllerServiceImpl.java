@@ -13,6 +13,7 @@ import ru.inside.commands.hyperledger.ChainCodeControllerService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
 import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
+import ru.inside.commands.service.SubsidiaryService;
 import ru.inside.commands.service.helper.FormConverter;
 import ru.inside.commands.service.helper.PPEConverter;
 
@@ -30,6 +31,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     private final PPEService ppeService;
     private final EmployeeService employeeService;
     private final ChainCodeControllerService chainCodeControllerService;
+    private final SubsidiaryService subsidiaryService;
 
     public PPEForm getPPEForm(String inventoryNumber) {
         PPEForm ppeForm = new PPEForm();
@@ -45,6 +47,19 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     public void addPPEForm(String name, Float price, String inventoryNumber,
                            String ownerPersonnelNumber,  LocalDate date, Long lifeTimeDays) {
         log.info("add new ppe: {}, owner: {}", name, ownerPersonnelNumber);
+
+        //TODO: refactor check
+        if (ownerPersonnelNumber == null || date == null) {
+            return;
+        }
+
+        try {
+            employeeService.getEmployeeByPersonnelNumber(ownerPersonnelNumber);
+        } catch (NoEntityException e) {
+            log.warn("Adding ppe to ppe lifecycle system were denied!");
+            return;
+        }
+
         PPE ppe = new PPE();
         ppe.setName(name);
         ppe.setPrice(price);
@@ -71,6 +86,14 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             } catch (Exception ex) {
                 log.error("Something went wrong while add ppe to employee");
             }
+        } else {
+            Employee employee = new Employee();
+            try {
+                employee.setSubsidiary(subsidiaryService.getSelfSubsidiary());
+            } catch (NoEntityException e) {
+                log.warn("Cannot set subsidiary for PPE on contract");
+            }
+            ppe.setEmployee(employee);
         }
 
         try {
