@@ -117,35 +117,41 @@ public class PPEServiceImpl implements PPEService {
 
         String finalSelfSubsidiaryName = selfSubsidiaryName;
         ppeContracts.forEach(ppeContract -> {
-            //TODO: change to boolean check
-            PPE isPPEExist = null;
-            try {
-                isPPEExist = getPPEByInventoryNumber(ppeContract.getInventoryNumber());
-            } catch (NoEntityException ignore) {
-            }
-
-            if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) && isPPEExist == null) {
-                Employee employee = null;
+            if (ppeContract.getOwnerID() == null || ppeContract.getOwnerID().equals("") ||
+                    ppeContract.getSubsidiary() == null || ppeContract.getSubsidiary().equals("") ||
+                    ppeContract.getInventoryNumber() == null || ppeContract.getInventoryNumber().equals("")) {
+                log.warn("PPEContract in chaincode have empty fields!!!");
+            } else {
+                //TODO: change to boolean check
+                PPE isPPEExist = null;
                 try {
-                    employee = employeeService.getEmployeeByPersonnelNumber(ppeContract.getOwnerID());
-                } catch (NoEntityException ignored) {
+                    isPPEExist = getPPEByInventoryNumber(ppeContract.getInventoryNumber());
+                } catch (NoEntityException ignore) {
                 }
 
-                PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
-                if (employee == null) {
-                    log.warn("employee {} not applied when transfering ppe {} by chaincode!",
-                            ppeContract.getOwnerID(), ppeContract.getInventoryNumber());
-                    ppe.setEmployee(
-                            Employee.builder()
-                                    .employeeName(ppeContract.getOwnerName())
-                            .personnelNumber(ppeContract.getOwnerID())
-                            .occupation("НЕОПРЕДЕЛЕНО/Требуется добавить в базу данных").build()
-                    );
+                if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) && isPPEExist == null) {
+                    Employee employee = null;
+                    try {
+                        employee = employeeService.getEmployeeByPersonnelNumber(ppeContract.getOwnerID());
+                    } catch (NoEntityException ignored) {
+                    }
+
+                    PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
+                    if (employee == null) {
+                        log.warn("employee {} not applied when transfering ppe {} by chaincode!",
+                                ppeContract.getOwnerID(), ppeContract.getInventoryNumber());
+                        ppe.setEmployee(
+                                Employee.builder()
+                                        .employeeName(ppeContract.getOwnerName())
+                                        .personnelNumber(ppeContract.getOwnerID())
+                                        .occupation("НЕОПРЕДЕЛЕНО/Требуется добавить в базу данных").build()
+                        );
+                    }
+
+                    ppe.setEmployee(employee);
+
+                    ppeWaitList.add(ppe);
                 }
-
-                ppe.setEmployee(employee);
-
-                ppeWaitList.add(ppe);
             }
         });
         return ppeWaitList;
