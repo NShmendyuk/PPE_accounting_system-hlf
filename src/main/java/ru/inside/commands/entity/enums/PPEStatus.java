@@ -10,6 +10,17 @@ public enum PPEStatus {
     PPEStatus() {
     }
 
+    public static PPEStatus valueOfName(String name) {
+        switch(name) {
+            case "Новый": return PPEStatus.APPLIED;
+            case "в другое ДО": return PPEStatus.TRANSFER;
+            case "Введен в эксплуатацию": return PPEStatus.COMMISSIONED;
+            case "Списан": return PPEStatus.DECOMMISSIONED;
+            case "Испорчен": return PPEStatus.SPOILED;
+            default: return PPEStatus.COMMISSIONED;
+        }
+    }
+
     @Override
     public String toString() {
         switch(this) {

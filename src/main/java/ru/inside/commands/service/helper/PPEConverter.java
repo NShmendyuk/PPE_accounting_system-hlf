@@ -31,7 +31,7 @@ public class PPEConverter {
                 ppe.setStartUseDate(LocalDateTime.now());
             }
             try {
-                ppe.setPpeStatus(PPEStatus.valueOf(ppeContract.getStatus()));
+                ppe.setPpeStatus(PPEStatus.valueOfName(ppeContract.getStatus()));
             } catch (Exception ex) {
                 log.error("Cannot convert status from contract ppe");
                 log.error("Status error: {}", ppeContract.getStatus());

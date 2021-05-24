@@ -128,6 +128,9 @@ public class PPEServiceImpl implements PPEService {
             } else {
                 if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) && !isPPEExist(ppeContract.getInventoryNumber())) {
                     PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
+                    Employee employee = new Employee();
+                    employee.setPersonnelNumber(ppeContract.getOwnerID());
+                    employee.setEmployeeName(ppeContract.getOwnerName());
                     ppeWaitList.add(ppe);
                 }
             }
