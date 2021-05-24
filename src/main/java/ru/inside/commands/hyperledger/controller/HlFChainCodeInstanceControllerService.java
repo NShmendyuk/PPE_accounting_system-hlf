@@ -1,5 +1,6 @@
 package ru.inside.commands.hyperledger.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -112,8 +113,13 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         List<PPEContract> ppeHistoryList = new ArrayList<>();
         try {
             byte[] historyBytes = chainCodeController.getPPEHistory(inventoryNumber);
-            log.info("history: {}", Arrays.toString(historyBytes));
-            PPEContract[] ppeContracts = new ObjectMapper().readValue(historyBytes, PPEContract[].class);
+            log.info("history: {}", new ObjectMapper().readValue(historyBytes, String.class));
+            String stringJsonHistory = new ObjectMapper().readValue(historyBytes, String.class);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+
+            PPEContract[] ppeContracts = objectMapper.readValue(stringJsonHistory, PPEContract[].class);
             log.info("history of {}: {}", inventoryNumber, ppeContracts);
             ppeHistoryList = Arrays.asList(ppeContracts);
             log.info("contract (getPPEHistoryById) message: {}", ppeHistoryList.toString());
