@@ -25,10 +25,8 @@ import java.util.List;
 public class SubsidiaryServiceImpl implements SubsidiaryService {
     private final SubsidiaryRepository subsidiaryRepository;
 
-    @Value("${ppe_lifecycle_accounting_system.subsidiary.name}")
-    private String selfSubsidiaryName;
-    @Value("${ppe_lifecycle_accounting_system.subsidiary.peer.msp_id}")
-    private String selfPeerMspId;
+    private String selfSubsidiaryName = "ГПН-Д1";
+    private String selfPeerMspId = "Org1MSP";
 
     @PostConstruct
     private void initSelfOrgDefinition() {
