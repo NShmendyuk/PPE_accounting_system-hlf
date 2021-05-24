@@ -90,7 +90,9 @@ public class PPEServiceImpl implements PPEService {
 
     public void transferPPE(PPE ppe, Subsidiary subsidiary) {
         chainCodeControllerService.transferPPEToSubsidiary(ppe, subsidiary);
-        ppeRepository.deleteByInventoryNumber(ppe.getInventoryNumber());
+        ppe.setPpeStatus(PPEStatus.TRANSFER);
+        ppe.setEmployee(null);
+        ppeRepository.save(ppe);
     }
 
     public List<PPE> getAllWaitFromChainCode() {
@@ -124,18 +126,27 @@ public class PPEServiceImpl implements PPEService {
                     ppeContract.getInventoryNumber() == null || ppeContract.getInventoryNumber().equals("")) {
                 log.warn("PPEContract in chaincode have empty fields!!!");
             } else {
-                if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) && !isPPEExist(ppeContract.getInventoryNumber())) {
-                    PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
-                    Employee employee = new Employee();
-                    employee.setPersonnelNumber(ppeContract.getOwnerID());
-                    employee.setEmployeeName(ppeContract.getOwnerName());
-                    try {
-                        employee.setSubsidiary(subsidiaryService.getByName(ppeContract.getSubsidiary()));
-                    } catch (Exception ex) {
-                        log.error("Cannot set subsidiary while convert ppeContract to PPE from waitList");
+                try {
+                    //it's for self org and ppe is not exist at subsidiary or exist with transfered status
+                    if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) &&
+                            (!isPPEExist(ppeContract.getInventoryNumber()) || (
+                                    isPPEExist(ppeContract.getInventoryNumber()) &&
+                                            getPPEByInventoryNumber(ppeContract.getInventoryNumber())
+                                                    .getPpeStatus().equals(PPEStatus.TRANSFER)))) {
+                        PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
+                        Employee employee = new Employee();
+                        employee.setPersonnelNumber(ppeContract.getOwnerID());
+                        employee.setEmployeeName(ppeContract.getOwnerName());
+                        try {
+                            employee.setSubsidiary(subsidiaryService.getByName(ppeContract.getSubsidiary()));
+                        } catch (Exception ex) {
+                            log.error("Cannot set subsidiary while convert ppeContract to PPE from waitList");
+                        }
+                        ppe.setEmployee(employee);
+                        ppeWaitList.add(ppe);
                     }
-                    ppe.setEmployee(employee);
-                    ppeWaitList.add(ppe);
+                } catch (NoEntityException e) {
+                    log.error("Cannot get self subsidiary definition while get all from waitList");
                 }
             }
         });
