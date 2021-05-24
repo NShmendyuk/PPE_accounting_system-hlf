@@ -111,7 +111,9 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
     public List<PPEContract> getPPEHistoryByInventoryNumber(String inventoryNumber) {
         List<PPEContract> ppeHistoryList = new ArrayList<>();
         try {
-            PPEContract[] ppeContracts = new ObjectMapper().readValue(chainCodeController.getPPEHistory(inventoryNumber), PPEContract[].class);
+            byte[] historyBytes = chainCodeController.getPPEHistory(inventoryNumber);
+            log.info("history: {}", Arrays.toString(historyBytes));
+            PPEContract[] ppeContracts = new ObjectMapper().readValue(historyBytes, PPEContract[].class);
             log.info("history of {}: {}", inventoryNumber, ppeContracts);
             ppeHistoryList = Arrays.asList(ppeContracts);
             log.info("contract (getPPEHistoryById) message: {}", ppeHistoryList.toString());
