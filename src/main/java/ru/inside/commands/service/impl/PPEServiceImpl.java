@@ -40,6 +40,10 @@ public class PPEServiceImpl implements PPEService {
                 NoEntityException.createWithParam(PPE.class.getSimpleName().toLowerCase(), inventoryNumber));
     }
 
+    public boolean isPPEExist(String inventoryNumber) {
+        return ppeRepository.existsByInventoryNumber(inventoryNumber);
+    }
+
     public int getTotalPPE() {
         return ppeRepository.findAll().size();
     }
@@ -122,34 +126,8 @@ public class PPEServiceImpl implements PPEService {
                     ppeContract.getInventoryNumber() == null || ppeContract.getInventoryNumber().equals("")) {
                 log.warn("PPEContract in chaincode have empty fields!!!");
             } else {
-                //TODO: change to boolean check
-                PPE isPPEExist = null;
-                try {
-                    isPPEExist = getPPEByInventoryNumber(ppeContract.getInventoryNumber());
-                } catch (NoEntityException ignore) {
-                }
-
-                if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) && isPPEExist == null) {
-                    Employee employee = null;
-                    try {
-                        employee = employeeService.getEmployeeByPersonnelNumber(ppeContract.getOwnerID());
-                    } catch (NoEntityException ignored) {
-                    }
-
+                if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) && !isPPEExist(ppeContract.getInventoryNumber())) {
                     PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
-                    if (employee == null) {
-                        log.warn("employee {} not applied when transfering ppe {} by chaincode!",
-                                ppeContract.getOwnerID(), ppeContract.getInventoryNumber());
-                        ppe.setEmployee(
-                                Employee.builder()
-                                        .employeeName(ppeContract.getOwnerName())
-                                        .personnelNumber(ppeContract.getOwnerID())
-                                        .occupation("НЕОПРЕДЕЛЕНО/Требуется добавить в базу данных").build()
-                        );
-                    }
-
-                    ppe.setEmployee(employee);
-
                     ppeWaitList.add(ppe);
                 }
             }
