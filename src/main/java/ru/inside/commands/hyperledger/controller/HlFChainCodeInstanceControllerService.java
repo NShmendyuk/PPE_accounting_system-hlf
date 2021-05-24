@@ -109,12 +109,15 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         PPEContract ppeInfo = new PPEContract();
         try {
             byte[] ppeContractBytes = chainCodeController.getPPE(inventoryNumber);
-            String stringPPEContract = new String(ppeContractBytes);
-            log.info("get PPE Contract as String: {}", stringPPEContract);
+
+            String stringJsonHistory = new String(ppeContractBytes);
 
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
 
-            ppeInfo = objectMapper.readValue(stringPPEContract, PPEContract.class);
+            PPEContract[] ppeContracts = objectMapper.readValue(stringJsonHistory, PPEContract[].class);
+            List<PPEContract> ppeOneList = Arrays.asList(ppeContracts);
+            ppeInfo = ppeOneList.get(0);
             log.info("chaincode (getPPEByInventoryNumber) message: {}", ppeInfo.toString());
         } catch (Exception ex) {
             log.error("Get ppe {} request to chaincode were denied", inventoryNumber);
