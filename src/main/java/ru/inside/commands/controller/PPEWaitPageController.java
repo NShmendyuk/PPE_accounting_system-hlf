@@ -25,15 +25,20 @@ public class PPEWaitPageController {
         log.info("Applying PPE {} transfer: [{}; owner: {}; from: {}; price:{}].", inventoryNumber, ppeName, ownerName, subsidiaryName, price);
         byte[] contents = ppeControllerService.applyPPEFromChainCode(inventoryNumber);
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
 
-        String filename = "apply transfer ppe (" + inventoryNumber + ") with employee ("
-                + ownerName +"); price (" + price.toString() + ") generated" + ".pdf";
-        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
-                .filename(filename, StandardCharsets.UTF_8)
-                .build();
-        headers.setContentDisposition(contentDisposition);
-        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        try {
+            headers.setContentType(MediaType.APPLICATION_PDF);
+
+            String filename = "apply transfer ppe (" + inventoryNumber + ") with employee ("
+                    + ownerName +"); price (" + price.toString() + ") generated" + ".pdf";
+            ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                    .filename(filename, StandardCharsets.UTF_8)
+                    .build();
+            headers.setContentDisposition(contentDisposition);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        } catch (Exception ex) {
+            log.error("Cannot set headers for file");
+        }
         return new ResponseEntity<>(contents, headers, HttpStatus.OK);
     }
 

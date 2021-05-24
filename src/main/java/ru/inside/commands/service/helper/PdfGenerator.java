@@ -104,10 +104,13 @@ public class PdfGenerator {
             PPEForm ppeForm = new PPEForm();
             EmployeeForm employeeForm = new EmployeeForm();
 
-            employeeForm.setEmployeeName(ppeWait.getOwnerName());
-            employeeForm.setPersonnelNumber(ppeWait.getOwnerPersonnelNumber());
-
-            ppeForm.setOwnerPersonnelNumber(ppeWait.getOwnerPersonnelNumber());
+            try {
+                employeeForm.setEmployeeName(ppeWait.getOwnerName());
+                employeeForm.setPersonnelNumber(ppeWait.getOwnerPersonnelNumber());
+                ppeForm.setOwnerPersonnelNumber(ppeWait.getOwnerPersonnelNumber());
+            } catch (Exception ex) {
+                log.error("Cannot set employee while apply all ppe");
+            }
 
             ppeForm.setSubsidiaryName("ОШИБКА!");
             try {
@@ -119,13 +122,21 @@ public class PdfGenerator {
                 log.error("Cannot find subsidiary which transfered ppe {} to this subsidiary!!", ppeWait.getInventoryNumber());
             }
 
-            ppeForm.setPrice(ppeWait.getPrice());
-            ppeForm.setPpeStatus(ppeWait.getPpeStatus());
-            ppeForm.setStartUseDate(ppeWait.getStartUseDate());
-            ppeForm.setLifeTime(ppeWait.getLifeTime());
+            try {
+                ppeForm.setPrice(ppeWait.getPrice());
+                ppeForm.setPpeStatus(ppeWait.getPpeStatus());
+                ppeForm.setStartUseDate(ppeWait.getStartUseDate());
+                ppeForm.setLifeTime(ppeWait.getLifeTime());
+            } catch (Exception ex) {
+                log.error("Cannot set main PPE info while apply all ppe");
+            }
 
-            ppeFormList.add(ppeForm);
-            employeeFormList.add(employeeForm);
+            try {
+                ppeFormList.add(ppeForm);
+                employeeFormList.add(employeeForm);
+            } catch (Exception ex) {
+                log.error("Cannot set ppe and employee form to arrayList?");
+            }
         });
 
         try {
@@ -137,22 +148,36 @@ public class PdfGenerator {
     }
 
     public File generateSingleApplyTransferDocument(PPE ppe, Employee employee) {
-        String fileName = "apply PPE: (" + ppe.getInventoryNumber() +
-                "; employee:" + employee.getPersonnelNumber()
-                +"); generated(" + LocalDate.now().toString() + ").pdf";
+        String fileName = "apply_single.pdf";
+        try {
+            fileName = "apply PPE: (" + ppe.getInventoryNumber() +
+                    "; employee:" + employee.getPersonnelNumber()
+                    +"); generated(" + LocalDate.now().toString() + ").pdf";
+        } catch (Exception ex) {
+            log.error("Cannot set file name while apply single ppe");
+        }
         List<PPEForm> ppeFormList = new ArrayList<>();
         List<EmployeeForm> employeeFormList = new ArrayList<>();
         PPEForm ppeForm = new PPEForm();
         EmployeeForm employeeForm = new EmployeeForm();
 
-        employeeForm.setPersonnelNumber(employee.getPersonnelNumber());
-        employeeForm.setEmployeeName(employee.getEmployeeName());
+        try {
+            employeeForm.setPersonnelNumber(employee.getPersonnelNumber());
+            employeeForm.setEmployeeName(employee.getEmployeeName());
+        } catch (Exception ex) {
+            log.error("Cannot set employee while apply single ppe");
+        }
 
-        ppeForm.setLifeTime(ppe.getLifeTime());
-        ppeForm.setStartUseDate(ppe.getStartUseDate());
-        ppeForm.setPrice(ppe.getPrice());
-        ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
-        ppeForm.setSubsidiaryName("ОШИБКА!");
+        try {
+            ppeForm.setLifeTime(ppe.getLifeTime());
+            ppeForm.setStartUseDate(ppe.getStartUseDate());
+            ppeForm.setPrice(ppe.getPrice());
+            ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
+            ppeForm.setSubsidiaryName("ОШИБКА!");
+        } catch (Exception ex) {
+            log.error("Cannot set fields data to ppe while apply single ppe");
+        }
+
         try {
             String fromSubsidiary = chainCodeControllerService
                     .getPPEHistoryByInventoryNumber(ppe.getInventoryNumber())
@@ -161,12 +186,22 @@ public class PdfGenerator {
         } catch (Exception ex) {
             log.error("Cannot find subsidiary which transfered ppe {} to this subsidiary!!", ppe.getInventoryNumber());
         }
-        ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
-        ppeForm.setInventoryNumber(ppe.getInventoryNumber());
-        ppeForm.setPpeName(ppe.getName());
 
-        ppeFormList.add(ppeForm);
-        employeeFormList.add(employeeForm);
+        try {
+            ppeForm.setOwnerPersonnelNumber(employee.getPersonnelNumber());
+            ppeForm.setInventoryNumber(ppe.getInventoryNumber());
+            ppeForm.setPpeName(ppe.getName());
+        } catch (Exception ex) {
+            log.error("Cannot set main data to ppe field while apply single ppe");
+        }
+
+        try {
+            ppeFormList.add(ppeForm);
+            employeeFormList.add(employeeForm);
+        } catch (Exception ex) {
+            log.error("Cannot add ppe or employee to array list?");
+        }
+
         try {
             return generateApplyWithData(ppeFormList, employeeFormList, fileName);
         } catch (Exception e) {
