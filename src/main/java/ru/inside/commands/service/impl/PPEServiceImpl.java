@@ -131,6 +131,11 @@ public class PPEServiceImpl implements PPEService {
                     Employee employee = new Employee();
                     employee.setPersonnelNumber(ppeContract.getOwnerID());
                     employee.setEmployeeName(ppeContract.getOwnerName());
+                    try {
+                        employee.setSubsidiary(subsidiaryService.getByName(ppeContract.getSubsidiary()));
+                    } catch (Exception ex) {
+                        log.error("Cannot set subsidiary while convert ppeContract to PPE from waitList");
+                    }
                     ppe.setEmployee(employee);
                     ppeWaitList.add(ppe);
                 }

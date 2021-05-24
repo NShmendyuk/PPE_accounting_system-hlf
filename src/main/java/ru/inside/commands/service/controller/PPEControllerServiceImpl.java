@@ -197,9 +197,19 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             try {
                 ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
                 ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
-                ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
             } catch (Exception ex) {
                 log.error("Cannot set second info of ppe from waitList to form");
+            }
+
+            try {
+                ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
+            } catch (Exception ex) {
+                log.warn("Set subsidiary to self subsidiary");
+                try {
+                    ppeForm.setSubsidiaryName(subsidiaryService.getSelfSubsidiary().getName());
+                } catch (NoEntityException e) {
+                    log.error("Cannot get self subsidiary definition while convert ppe to form from waitList!!!");
+                }
             }
 
             ppeFormList.add(ppeForm);
