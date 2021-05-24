@@ -11,8 +11,9 @@ import java.util.List;
 
 public interface PPEService {
     PPE getPPEByInventoryNumber(String inventoryNumber) throws NoEntityException;
+    List<PPE> getAllPPE();
     PPE addPPE(PPE ppe);
-    int getTotalPPE();
+    long getTotalPPE();
     void updateAllStatus();
     void transferPPE(PPE ppe, Subsidiary subsidiary);
     void dismissPPE(String inventoryNumber) throws NoEntityException;

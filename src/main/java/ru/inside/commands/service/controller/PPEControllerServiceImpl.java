@@ -2,6 +2,7 @@ package ru.inside.commands.service.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
@@ -16,7 +17,10 @@ import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.SubsidiaryService;
 import ru.inside.commands.service.helper.FormConverter;
 import ru.inside.commands.service.helper.PPEConverter;
+import ru.inside.commands.service.helper.PdfGenerator;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +37,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     private final EmployeeService employeeService;
     private final ChainCodeControllerService chainCodeControllerService;
     private final SubsidiaryService subsidiaryService;
+    private final PdfGenerator pdfGenerator;
 
     public PPEForm getPPEForm(String inventoryNumber) {
         PPEForm ppeForm = new PPEForm();
@@ -43,6 +48,34 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         }
         log.info("Found: {}", ppeForm.toString());
         return ppeForm;
+    }
+
+    public List<PPEForm> getAllPPEForms() {
+        List<PPE> ppeList = ppeService.getAllPPE();
+        List<PPEForm> ppeFormList = new ArrayList<>();
+
+        ppeList.forEach(ppe -> {
+            PPEForm ppeForm = new PPEForm();
+            ppeForm.setPpeName(ppe.getName());
+            ppeForm.setInventoryNumber(ppe.getInventoryNumber());
+            ppeForm.setLifeTime(ppe.getLifeTime());
+            ppeForm.setStartUseDate(ppe.getStartUseDate());
+            ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
+            ppeForm.setPrice(ppe.getPrice());
+            try {
+                ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
+                ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
+                ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
+            } catch (Exception ex) {
+                ppeForm.setOwnerName("Неопределено");
+                ppeForm.setOwnerPersonnelNumber("Отсутствует");
+                //TODO: stubbed (need enum)
+                ppeForm.setSubsidiaryName("НЕОПРЕДЕЛЕНО");
+            }
+            ppeFormList.add(ppeForm);
+        });
+
+        return ppeFormList;
     }
 
     public void addPPEForm(String name, Float price, String inventoryNumber,
@@ -217,7 +250,39 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         return ppeFormList;
     }
 
-    public void applyPPEFromChainCode(String inventoryNumber) {
+    public byte[] applyPPEFromChainCode(String inventoryNumber) {
+        PPE ppe = applyPPEProcess(inventoryNumber);
+        Employee employee = applyToEmployeeProcess(ppe);
+        File file = pdfGenerator.generateSingleApplyTransferDocument(ppe, employee);
+        byte[] bytePdfArray = new byte[0];
+        try {
+            bytePdfArray = FileUtils.readFileToByteArray(file);
+        } catch (IOException e) {
+            log.warn("generated file not found");
+        }
+        return bytePdfArray;
+    }
+
+    public byte[] applyAllPPEFromChainCode() {
+        List<PPEForm> waitAllPPE = getAllInWaitList();
+
+        waitAllPPE.forEach(ppeForm -> {
+            PPE ppe = applyPPEProcess(ppeForm.getInventoryNumber());
+            applyToEmployeeProcess(ppe);
+        });
+
+        File file = pdfGenerator.generateAllApplyTransferDocument(waitAllPPE);
+
+        byte[] bytePdfArray = new byte[0];
+        try {
+            bytePdfArray = FileUtils.readFileToByteArray(file);
+        } catch (IOException e) {
+            log.warn("generated file not found");
+        }
+        return bytePdfArray;
+    }
+
+    private PPE applyPPEProcess(String inventoryNumber) {
         PPEContract ppeContract = chainCodeControllerService.getPPEByInventoryNumber(inventoryNumber);
         Employee employee;
         try {
@@ -225,7 +290,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         } catch (NoEntityException e) {
             log.error("Cannot find employee {} for transfering ppe {} from another subsidiary by chaincode",
                     ppeContract.getOwnerID(), inventoryNumber);
-            return;
+            return new PPE();
         }
 
         PPE ppe = new PPE();
@@ -240,23 +305,25 @@ public class PPEControllerServiceImpl implements PPEControllerService {
                 PPE existedPPE = ppeService.getPPEByInventoryNumber(inventoryNumber);
                 ppe.setId(existedPPE.getId());
             }
-            ppeService.addPPE(ppe);
+            ppe.setEmployee(employee);
+            return ppeService.addPPE(ppe);
         } catch (Exception ex) {
             log.error("Cannot add ppe from waitlist while apply! Try to add with employee");
         }
+        return ppe;
+    }
+
+    private Employee applyToEmployeeProcess(PPE ppe) {
+        Employee employee = ppe.getEmployee();
 
         try {
-            employeeService.addPPEToEmployee(ppe, employee.getPersonnelNumber());
-            log.info("ppe {} Added to employee {}!", ppe.getInventoryNumber(), employee.getPersonnelNumber());
+            log.info("add ppe {} to employee {}!", ppe.getInventoryNumber(), employee.getPersonnelNumber());
+            return employeeService.addPPEToEmployee(ppe, employee.getPersonnelNumber());
         } catch (NoEntityException e) {
             log.error("Employee {} were deleted from database while adding new ppe {}!!! Cannot add new ppe from chaincode",
-                    employee.getPersonnelNumber(), inventoryNumber);
+                    employee.getPersonnelNumber(), ppe.getInventoryNumber());
         }
+        return employee;
     }
 
-    public void applyAllPPEFromChainCode(List<PPEForm> ppeWaitList) {
-        ppeWaitList.forEach(ppeForm -> {
-            applyPPEFromChainCode(ppeForm.getInventoryNumber());
-        });
-    }
 }

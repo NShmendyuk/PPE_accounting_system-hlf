@@ -7,11 +7,12 @@ import java.util.List;
 
 public interface PPEControllerService {
     PPEForm getPPEForm(String inventoryNumber);
+    List<PPEForm> getAllPPEForms();
     void addPPEForm(String name, Float price, String inventoryNumber,
                     String ownerPersonnelNumber, LocalDate date, Long lifeTimeDays);
     List<PPEForm> getPPEHistory(String inventoryNumber);
     void decommissioning(String employeePersonnelNumber, String inventoryNumber);
     List<PPEForm> getAllInWaitList();
-    void applyPPEFromChainCode(String inventoryNumber);
-    void applyAllPPEFromChainCode(List<PPEForm> ppeWaitList);
+    byte[] applyPPEFromChainCode(String inventoryNumber);
+    byte[] applyAllPPEFromChainCode();
 }

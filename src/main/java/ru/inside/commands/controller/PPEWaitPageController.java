@@ -3,10 +3,12 @@ package ru.inside.commands.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.service.controller.PPEControllerService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -17,17 +19,37 @@ public class PPEWaitPageController {
     private final PPEControllerService ppeControllerService;
 
     @PostMapping("/apply")
-    public void applyPPEFromSmartContract(@RequestParam String inventoryNumber, @RequestParam String ppeName,
+    public ResponseEntity<byte[]> applyPPEFromSmartContract(@RequestParam String inventoryNumber, @RequestParam String ppeName,
                                           @RequestParam String ownerName, @RequestParam String subsidiaryName,
                                           @RequestParam Float price) {
         log.info("Applying PPE {} transfer: [{}; owner: {}; from: {}; price:{}].", inventoryNumber, ppeName, ownerName, subsidiaryName, price);
-        ppeControllerService.applyPPEFromChainCode(inventoryNumber);
+        byte[] contents = ppeControllerService.applyPPEFromChainCode(inventoryNumber);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        String filename = "apply transfer ppe (" + inventoryNumber + ") with employee ("
+                + ownerName +"); price (" + price.toString() + ") generated" + ".pdf";
+        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                .filename(filename, StandardCharsets.UTF_8)
+                .build();
+        headers.setContentDisposition(contentDisposition);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return new ResponseEntity<>(contents, headers, HttpStatus.OK);
     }
 
     @PostMapping("/apply/all")
-    public void applyAllPPEFromSmartContract() {
+    public ResponseEntity<byte[]> applyAllPPEFromSmartContract() {
         log.info("Applying all PPE transfers.");
-        List<PPEForm> waitAllPPE = ppeControllerService.getAllInWaitList();
-        ppeControllerService.applyAllPPEFromChainCode(waitAllPPE);
+        byte[] contents = ppeControllerService.applyAllPPEFromChainCode();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        String filename = "apply transfer all PPE generated" + ".pdf";
+        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                .filename(filename, StandardCharsets.UTF_8)
+                .build();
+        headers.setContentDisposition(contentDisposition);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return new ResponseEntity<>(contents, headers, HttpStatus.OK);
     }
 }

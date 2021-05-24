@@ -40,12 +40,16 @@ public class PPEServiceImpl implements PPEService {
                 NoEntityException.createWithParam(PPE.class.getSimpleName().toLowerCase(), inventoryNumber));
     }
 
+    public List<PPE> getAllPPE() {
+        return ppeRepository.findAll();
+    }
+
     public boolean isPPEExist(String inventoryNumber) {
         return ppeRepository.existsByInventoryNumber(inventoryNumber);
     }
 
-    public int getTotalPPE() {
-        return ppeRepository.findAll().size();
+    public long getTotalPPE() {
+        return ppeRepository.findAll().stream().filter(ppe -> !ppe.getPpeStatus().equals(PPEStatus.TRANSFER)).count();
     }
 
     public PPE addPPE(PPE ppe) {

@@ -44,6 +44,9 @@
     <body>
         <h1>Система учета средств индивидуальной защиты</h1>
         <h2>Газпромнефть-Цифровые решения</h2>
+        <form action="/" method="get">
+            <input type="submit" value="Назад" name="Submit"/>
+        </form>
         <h3>Управление средствами индивидуальной защиты</h3>
 
         <div class="wrapper">
@@ -98,6 +101,30 @@
 
                     <button type="submit" class="apply_button">Сохранить</button>
                 </form>
+            </p>
+            <p>
+                <table>
+                    <tr>
+                        <td>Название</td>
+                        <td>Инвентарный номер</td>
+                        <td>ФИО сотрудника</td>
+                        <td>Табельный номер сотрудника</td>
+                        <td>Срок годности</td>
+                        <td>Дата начала эксплуатации</td>
+                        <td>Статус</td>
+                        <td>Цена</td>
+                    </tr>
+                    <tr th:each="ppeInStock: ${ppesInStock}">
+                        <td th:text="${ppeInStock.ppeName}"></td>
+                        <td th:text="${ppeInStock.inventoryNumber}"></td>
+                        <td th:text="${ppeInStock.ownerName}"></td>
+                        <td th:text="${ppeInStock.ownerPersonnelNumber}"></td>
+                        <td th:text="${ppeInStock.lifeTime == null} ? '' : ${ppeInStock.lifeTime.toDays()}">...</td>
+                        <td th:text="${ppeInStock.startUseDate == null} ? '' : ${#temporals.format(ppeInStock.startUseDate, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${ppeInStock.ppeStatus}"></td>
+                        <td th:text="${ppeInStock.price}"></td>
+                    </tr>
+                </table>
             </p>
         </div>
     </body>

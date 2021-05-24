@@ -21,6 +21,13 @@ h3 {
     vertical-align: bottom;
 }
 
+table {
+    width: 50%;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    border: 1px solid #dddddd;
+    border-collapse: collapse;
+}
 
 table.ppe_search_table {
     width: 50%;
@@ -45,6 +52,7 @@ input {
     margin-top: 3px;
     margin-bottom: 3px;
 }
+
 
 .apply_button {
     background-color: rgb(50 255 50)

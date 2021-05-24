@@ -26,6 +26,10 @@ public class PPEPageController {
     @GetMapping("")
     public ModelAndView getPPEPage() {
         ModelAndView modelAndView = new ModelAndView("ppePage");
+
+        List<PPEForm> ppeFormList = ppeControllerService.getAllPPEForms();
+
+        modelAndView.addObject("ppesInStock", ppeFormList);
         modelAndView.addObject("ppeForm", new PPEForm());
         return modelAndView;
     }

@@ -1,10 +1,10 @@
 @font-face {
-    src: url('/Fonts/CALIBRI.TTF');
+    src: url('/fonts/calibri.ttf');
     -fs-pdf-font-embed: embed;
     -fs-pdf-font-encoding: Identity-H;
 }
 
 body {
-    font-family: Arial Unicode MS, Lucida Sans Unicode, Arial, verdana, arial, helvetica, sans-serif;
+    font-family: Calibri, serif;
     font-size: 8.8pt;
 }

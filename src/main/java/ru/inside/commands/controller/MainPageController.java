@@ -27,16 +27,14 @@ public class MainPageController {
     @GetMapping(value = {"/", "/index", "/mainpage"})
     public ModelAndView getMainPage() {
         ModelAndView modelAndView = new ModelAndView("index");
+        int waitAll = 0;
+        long countPPEAtSubsidiary = 0L;
         try {
-            int waitAll = ppeControllerService.getAllInWaitList().size();
-            int countPPEAtSubsidiary = ppeService.getTotalPPE();
-            modelAndView.addObject("waitAll", waitAll);
-            modelAndView.addObject("countPPEAtSubsidiary", countPPEAtSubsidiary);
+            waitAll = ppeControllerService.getAllInWaitList().size();
+            countPPEAtSubsidiary = ppeService.getTotalPPE();
         } catch (Exception ex) {
             log.error("Cannot get wait list in main page");
         }
-        int waitAll = ppeControllerService.getAllInWaitList().size();
-        int countPPEAtSubsidiary = ppeService.getTotalPPE();
         modelAndView.addObject("waitAll", waitAll);
         modelAndView.addObject("countPPEAtSubsidiary", countPPEAtSubsidiary);
         return modelAndView;

@@ -2,10 +2,7 @@ package ru.inside.commands.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.inside.commands.entity.forms.EmployeeForm;
@@ -13,6 +10,7 @@ import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.entity.forms.SubsidiaryForm;
 import ru.inside.commands.service.controller.EmployeeControllerService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -75,8 +73,12 @@ public class EmployeePageController {
         byte[] contents = employeeControllerService.transferEmployeeToSubsidiary(personnelNumber, name);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        String filename = personnelNumber + "_to_" + name + "_transfer" + ".pdf";
-        headers.setContentDispositionFormData(filename, filename);
+
+        String filename = "transfer employee (" + personnelNumber + ") to (" + name + ") generated" + ".pdf";
+        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                .filename(filename, StandardCharsets.UTF_8)
+                .build();
+        headers.setContentDisposition(contentDisposition);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
         return new ResponseEntity<>(contents, headers, HttpStatus.OK);
     }
