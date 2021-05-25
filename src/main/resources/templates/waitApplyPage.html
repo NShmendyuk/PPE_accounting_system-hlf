@@ -82,6 +82,7 @@
                     <th>Название</th>
                     <th>Инвентарный номер</th>
                     <th>ФИО владельца</th>
+                    <th>Табельный номер владельца</th>
                     <th>дата введения в эксплуатацию</th>
                     <th>срок жизни, дней</th>
                     <th>цена, руб</th>
@@ -90,6 +91,7 @@
                     <td th:text="${ppe.ppeName}"> </td>
                     <td th:text="${ppe.inventoryNumber}"> </td>
                     <td th:text="${ppe.ownerName}"> </td>
+                    <td th:text="${ppe.ownerPersonnelNumber}"> </td>
                     <td th:text="${#temporals.format(ppe.startUseDate, 'dd MM yyyy')}"> </td>
                     <td th:text="${ppe.lifeTime.toDays()}"> </td>
                     <td th:text="${ppe.price}"> </td>

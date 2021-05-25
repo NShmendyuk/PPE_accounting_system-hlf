@@ -128,6 +128,8 @@ public class PdfGenerator {
                 ppeForm.setPpeStatus(ppeWait.getPpeStatus());
                 ppeForm.setStartUseDate(ppeWait.getStartUseDate());
                 ppeForm.setLifeTime(ppeWait.getLifeTime());
+                ppeForm.setPpeName(ppeWait.getPpeName());
+                ppeForm.setInventoryNumber(ppeWait.getInventoryNumber());
             } catch (Exception ex) {
                 log.error("Cannot set main PPE info while apply all ppe");
             }

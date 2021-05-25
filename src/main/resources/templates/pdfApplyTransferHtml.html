@@ -19,7 +19,6 @@
                 border: 1px solid #dddddd;">
                 <th>ФИО</th>
                 <th>Табельный номер</th>
-                <th>Должность</th>
             </tr>
             <tr th:each="employee: ${employeeList}">
                 <td
@@ -28,9 +27,6 @@
                 <td
                     style="border: 1px solid #dddddd; padding: 5px;"
                     th:text="${employee.personnelNumber}"></td>
-                <td
-                    style="border: 1px solid #dddddd; padding: 5px;"
-                    th:text="${employee.occupation}"></td>
             </tr>
         </table>
         <p style="font-size: 22px; ">Средства индивидуальной защиты:</p>
