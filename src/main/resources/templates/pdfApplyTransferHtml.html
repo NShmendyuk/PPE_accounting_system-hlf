@@ -21,7 +21,7 @@
                 <th>Табельный номер</th>
                 <th>Должность</th>
             </tr>
-            <tr th:each="employee ${employeeList}">
+            <tr th:each="employee: ${employeeList}">
                 <td
                     style="border: 1px solid #dddddd; padding: 5px;"
                     th:text="${employee.employeeName}"></td>
