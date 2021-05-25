@@ -251,8 +251,22 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     }
 
     public byte[] applyPPEFromChainCode(String inventoryNumber) {
-        PPE ppe = applyPPEProcess(inventoryNumber);
-        Employee employee = applyToEmployeeProcess(ppe);
+        PPE ppe = new PPE();
+        try {
+            ppe = applyPPEProcess(inventoryNumber);
+            log.info("apply PPE {}", ppe.getInventoryNumber());
+        } catch (Exception ex) {
+            log.error("Cannot apply PPE when apply proccess from chaincode!");
+        }
+
+        Employee employee = new Employee();
+        try {
+            employee = applyToEmployeeProcess(ppe);
+            log.info("apply PPE for employee {}", employee.getPersonnelNumber());
+        } catch (Exception ex) {
+            log.error("Cannot apply PPE to Employee when apply process from chaincode!");
+        }
+
         File file = pdfGenerator.generateSingleApplyTransferDocument(ppe, employee);
         byte[] bytePdfArray = new byte[0];
         try {
@@ -314,9 +328,10 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     }
 
     private Employee applyToEmployeeProcess(PPE ppe) {
-        Employee employee = ppe.getEmployee();
+        Employee employee = new Employee();
 
         try {
+            employee = ppe.getEmployee();
             log.info("add ppe {} to employee {}!", ppe.getInventoryNumber(), employee.getPersonnelNumber());
             return employeeService.addPPEToEmployee(ppe, employee.getPersonnelNumber());
         } catch (NoEntityException e) {

@@ -212,11 +212,16 @@ public class PdfGenerator {
 
     private File generateApplyWithData(List<PPEForm> ppeFormList, List<EmployeeForm> employeeFormList, String fileName) throws Exception {
         String templateName = "pdfApplyTransferHtml";
+        String processedHtml = "";
 
         Context ctx = new Context();
-        ctx.setVariable("ppeList", ppeFormList);
-        ctx.setVariable("employeeList", employeeFormList);
-        String processedHtml = templateEngine.process(templateName, ctx);
+        try {
+            ctx.setVariable("ppeList", ppeFormList);
+            ctx.setVariable("employeeList", employeeFormList);
+            processedHtml = templateEngine.process(templateName, ctx);
+        } catch (Exception ex) {
+            log.error("Cannot set data for document when apply process!");
+        }
 
         FileOutputStream os = null;
         final File outputFile;
