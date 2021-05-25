@@ -269,11 +269,14 @@ public class PPEControllerServiceImpl implements PPEControllerService {
 
         File file = pdfGenerator.generateSingleApplyTransferDocument(ppe, employee);
         byte[] bytePdfArray = new byte[0];
-        try {
-            bytePdfArray = FileUtils.readFileToByteArray(file);
-        } catch (IOException e) {
-            log.warn("generated file not found");
+        if (file != null) {
+            try {
+                bytePdfArray = FileUtils.readFileToByteArray(file);
+            } catch (IOException e) {
+                log.warn("generated file not found");
+            }
         }
+
         return bytePdfArray;
     }
 
@@ -288,11 +291,14 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         File file = pdfGenerator.generateAllApplyTransferDocument(waitAllPPE);
 
         byte[] bytePdfArray = new byte[0];
-        try {
-            bytePdfArray = FileUtils.readFileToByteArray(file);
-        } catch (IOException e) {
-            log.warn("generated file not found");
+        if (file != null) {
+            try {
+                bytePdfArray = FileUtils.readFileToByteArray(file);
+            } catch (IOException e) {
+                log.warn("generated file not found");
+            }
         }
+
         return bytePdfArray;
     }
 
