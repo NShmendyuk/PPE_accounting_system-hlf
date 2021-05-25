@@ -13,6 +13,7 @@ import ru.inside.commands.entity.forms.PPEForm;
 import com.lowagie.text.pdf.BaseFont;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import ru.inside.commands.hyperledger.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.entity.PPEContract;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -148,6 +149,7 @@ public class PdfGenerator {
     }
 
     public File generateSingleApplyTransferDocument(PPE ppe, Employee employee) {
+        if (ppe == null || employee == null) return null;
         String fileName = "apply_single.pdf";
         try {
             fileName = "apply PPE: (" + ppe.getInventoryNumber() +
@@ -179,9 +181,12 @@ public class PdfGenerator {
         }
 
         try {
-            String fromSubsidiary = chainCodeControllerService
-                    .getPPEHistoryByInventoryNumber(ppe.getInventoryNumber())
-                    .get(1).getSubsidiary();
+            List<PPEContract> ppeContractHistory = chainCodeControllerService
+                    .getPPEHistoryByInventoryNumber(ppe.getInventoryNumber());
+            String fromSubsidiary = "НЕИЗВЕСТНО!";
+            if (ppeContractHistory != null && ppeContractHistory.size() > 1) {
+                fromSubsidiary = ppeContractHistory.get(1).getSubsidiary();
+            }
             ppeForm.setSubsidiaryName(fromSubsidiary);
         } catch (Exception ex) {
             log.error("Cannot find subsidiary which transfered ppe {} to this subsidiary!!", ppe.getInventoryNumber());
