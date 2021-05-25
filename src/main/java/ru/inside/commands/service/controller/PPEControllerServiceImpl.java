@@ -261,11 +261,13 @@ public class PPEControllerServiceImpl implements PPEControllerService {
 
         Employee employee = new Employee();
         try {
-            employee = applyToEmployeeProcess(ppe);
+//            employee = applyToEmployeeProcess(ppe);
+            employee = ppe.getEmployee();
             log.info("apply PPE for employee {}", employee.getPersonnelNumber());
         } catch (Exception ex) {
             log.error("Cannot apply PPE to Employee when apply process from chaincode!");
         }
+
 
         File file = pdfGenerator.generateSingleApplyTransferDocument(ppe, employee);
         byte[] bytePdfArray = new byte[0];
@@ -284,8 +286,8 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         List<PPEForm> waitAllPPE = getAllInWaitList();
 
         waitAllPPE.forEach(ppeForm -> {
-            PPE ppe = applyPPEProcess(ppeForm.getInventoryNumber());
-            applyToEmployeeProcess(ppe);
+            applyPPEProcess(ppeForm.getInventoryNumber());
+//            applyToEmployeeProcess(ppe);
         });
 
         File file = pdfGenerator.generateAllApplyTransferDocument(waitAllPPE);
