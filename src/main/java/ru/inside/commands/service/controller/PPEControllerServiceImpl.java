@@ -82,6 +82,18 @@ public class PPEControllerServiceImpl implements PPEControllerService {
                            String ownerPersonnelNumber,  LocalDate date, Long lifeTimeDays) {
         log.info("add new ppe: {}, owner: {}", name, ownerPersonnelNumber);
 
+        try {
+            boolean isPPEExistInBlockChain = chainCodeControllerService.checkPPEExist(inventoryNumber);
+            log.info("Check ppe when add to system! PPE exist status = {}", isPPEExistInBlockChain);
+            if (isPPEExistInBlockChain) {
+                return;
+//            throw new IllegalArgumentException(); //remove try-catch when throw illegalArgumentException
+            }
+        } catch (Exception ex) {
+            log.warn("Cannot check ppe from chaincode");
+        }
+
+
         //TODO: refactor check
         if (ownerPersonnelNumber == null || date == null) {
             return;
@@ -109,7 +121,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             return ;
         }
 
-        if (!(ownerPersonnelNumber == null || ownerPersonnelNumber.equals("")) && (date != null)) {
+        if (!(ownerPersonnelNumber.equals(""))) {
             ppe.setStartUseDate(LocalDateTime.of(date, LocalTime.MIDNIGHT));
             try {
                 Employee employee = employeeService.addPPEToEmployee(ppe, ownerPersonnelNumber);
@@ -335,6 +347,8 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         return ppe;
     }
 
+    //больше не требуется
+    //@Deprecated
     private Employee applyToEmployeeProcess(PPE ppe) {
         Employee employee = new Employee();
 
