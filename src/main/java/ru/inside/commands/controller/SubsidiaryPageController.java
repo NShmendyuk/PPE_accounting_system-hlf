@@ -10,6 +10,7 @@ import ru.inside.commands.entity.enums.SubsidiaryStatus;
 import ru.inside.commands.entity.forms.SubsidiaryForm;
 import ru.inside.commands.hyperledger.PeerDiscoveryService;
 import ru.inside.commands.service.SubsidiaryService;
+import ru.inside.commands.service.controller.SubsidiaryControllerService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,35 +21,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class SubsidiaryPageController {
-    private final PeerDiscoveryService peerDiscoveryService;
-    private final SubsidiaryService subsidiaryService;
+    private final SubsidiaryControllerService subsidiaryControllerService;
 
     @GetMapping
     public ModelAndView getSubsidiaryPage() {
         ModelAndView modelAndView = new ModelAndView("subsidiaryPage");
-        List<SubsidiaryForm> subsidiaryForms = new ArrayList<>();
-        Collection<String> mspIds = new ArrayList<>();
-        try {
-            mspIds = peerDiscoveryService.getMSPIDsInfo();
-        } catch (Exception ex) {
-            log.warn("Process to find peers in hlf network were denied!");
-        }
-
-
-        List<Subsidiary> subsidiaryList = subsidiaryService.getAll();
-
-        for (Subsidiary subsidiary : subsidiaryList) {
-            SubsidiaryForm subsidiaryForm = new SubsidiaryForm();
-            subsidiaryForm.setName(subsidiary.getName());
-            subsidiaryForm.setPeerName(subsidiary.getPeerName());
-            subsidiaryForm.setStatus(SubsidiaryStatus.UNACCESSED); //TODO: check by hyperledger service
-            mspIds.forEach(mspId -> {
-                if (mspId.equals(subsidiary.getPeerName())) {
-                    subsidiaryForm.setStatus(SubsidiaryStatus.ACCESSED);
-                }
-            });
-            subsidiaryForms.add(subsidiaryForm);
-        }
+        List<SubsidiaryForm> subsidiaryForms = subsidiaryControllerService.getAllAnotherSubsidiary();
 
         modelAndView.addObject("subsidiaryConnected", subsidiaryForms);
         modelAndView.addObject("subsidiaryFormApply", new SubsidiaryForm());
