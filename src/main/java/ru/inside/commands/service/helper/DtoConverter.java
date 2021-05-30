@@ -51,23 +51,4 @@ public class DtoConverter {
                 .occupation(employeeDto.getOccupation())
                 .ppe(ppe).subsidiary(subsidiary).build();
     }
-
-    public PPEDto convertPPEToDto(PPE ppe) {
-        PPEDto ppeDto = new PPEDto();
-        ppeDto.setId(ppe.getId());
-        ppeDto.setInventoryNumber(ppe.getInventoryNumber());
-        ppeDto.setLifeTime(ppe.getLifeTime());
-        ppeDto.setName(ppe.getName());
-        ppeDto.setOwnerId(ppe.getEmployee().getId());
-        ppeDto.setPpeStatus(ppe.getPpeStatus());
-        ppeDto.setPrice(ppe.getPrice());
-        ppeDto.setStartUseDate(ppe.getStartUseDate());
-        return ppeDto;
-    }
-
-    public PPE convertDtoToPPE(PPEDto ppeDto) {
-        return PPE.builder().id(ppeDto.getId()).employee(null).inventoryNumber(ppeDto.getInventoryNumber())
-                .lifeTime(ppeDto.getLifeTime()).name(ppeDto.getName()).ppeStatus(ppeDto.getPpeStatus())
-                .price(ppeDto.getPrice()).startUseDate(ppeDto.getStartUseDate()).build();
-    }
 }
