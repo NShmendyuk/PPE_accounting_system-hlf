@@ -101,7 +101,7 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
                     startUseDate, lifeTime, subsidiaryName);
             log.info("contract (addPPE) submit");
         } catch (Exception e) {
-            log.error("Add new PPE request to chaincode were denied!", e);
+            log.error("Add new PPE request to chaincode were denied!");
         }
     }
 
