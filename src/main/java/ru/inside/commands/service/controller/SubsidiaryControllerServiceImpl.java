@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Subsidiary;
+import ru.inside.commands.entity.dto.SubsidiaryDto;
 import ru.inside.commands.entity.enums.SubsidiaryStatus;
 import ru.inside.commands.entity.forms.SubsidiaryForm;
 import ru.inside.commands.hyperledger.PeerDiscoveryService;
@@ -44,9 +45,19 @@ public class SubsidiaryControllerServiceImpl implements SubsidiaryControllerServ
             SubsidiaryForm subsidiaryForm = new SubsidiaryForm();
             subsidiaryForm.setName(subsidiary.getName());
             subsidiaryForm.setPeerName(subsidiary.getPeerName());
-            subsidiaryForm.setStatus(mspIds.contains(subsidiary.getPeerName()) ? SubsidiaryStatus.ACCESSED : SubsidiaryStatus.UNACCESSED));
+            subsidiaryForm.setStatus(mspIds.contains(subsidiary.getPeerName()) ? SubsidiaryStatus.ACCESSED : SubsidiaryStatus.UNACCESSED);
             subsidiaryForms.add(subsidiaryForm);
         }
         return subsidiaryForms;
+    }
+
+    public void addSubsidiaryInfo(String name, String peerName) {
+        if (! (name.length() == 0 || peerName.length() == 0)) {
+            log.info("New Subsidiary. name: {}, peerName: {}", name, peerName);
+            SubsidiaryDto subsidiaryDto = new SubsidiaryDto();
+            subsidiaryDto.setName(name);
+            subsidiaryDto.setPeerName(peerName);
+            subsidiaryService.add(subsidiaryDto);
+        }
     }
 }

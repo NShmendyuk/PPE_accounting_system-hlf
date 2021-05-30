@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface SubsidiaryControllerService {
     List<SubsidiaryForm> getAllAnotherSubsidiary();
+    void addSubsidiaryInfo(String name, String peerName);
 }

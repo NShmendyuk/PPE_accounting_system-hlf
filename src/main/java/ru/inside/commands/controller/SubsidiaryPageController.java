@@ -36,13 +36,7 @@ public class SubsidiaryPageController {
     @PostMapping("/add")
     public ModelAndView addSubsidiary(@RequestParam String name, @RequestParam String peerName) {
         log.info("Post request to add: {}; peer name: {}", name, peerName);
-        if (! (name.length() == 0 || peerName.length() == 0)) {
-            log.info("New Subsidiary. name: {}, peerName: {}", name, peerName);
-            SubsidiaryDto subsidiaryDto = new SubsidiaryDto();
-            subsidiaryDto.setName(name);
-            subsidiaryDto.setPeerName(peerName);
-            subsidiaryService.add(subsidiaryDto);
-        }
+        subsidiaryControllerService.addSubsidiaryInfo(name, peerName);
         return getSubsidiaryPage();
     }
 }
