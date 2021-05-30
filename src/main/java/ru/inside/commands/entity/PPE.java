@@ -56,6 +56,7 @@ public class PPE {
      * Поле ppeStatus - статус средства индивидуальной защиты
      */
     @Column
+    @Enumerated(EnumType.STRING)
     private PPEStatus ppeStatus;
 
 
@@ -65,7 +66,7 @@ public class PPE {
             name = "employee_ppe",
             joinColumns = @JoinColumn(name = "ppe_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
-//    @Immutable
+    @Immutable
     private Employee employee;
 
     @Override
