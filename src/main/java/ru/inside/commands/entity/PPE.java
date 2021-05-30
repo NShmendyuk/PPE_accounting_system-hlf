@@ -66,7 +66,6 @@ public class PPE {
             name = "employee_ppe",
             joinColumns = @JoinColumn(name = "ppe_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
-    @Immutable
     private Employee employee;
 
     @Override
