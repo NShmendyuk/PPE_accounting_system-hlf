@@ -56,31 +56,32 @@ public class PPEServiceImpl implements PPEService {
         return ppeRepository.save(ppe);
     }
 
+    /**
+     * function for decommissing PPE, which have used up their service life
+     */
     public void updateAllStatus() {
         List<PPE> ppeList = ppeRepository.findAll();
-        ppeList.forEach(ppe -> {
-            if (ppe.getEmployee() != null) {
-                LocalDateTime startUseDate = ppe.getStartUseDate();
-                if (startUseDate == null) {
-                    startUseDate = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-                    ppe.setStartUseDate(startUseDate);
-                }
+        ppeList.parallelStream().filter(ppe -> ppe.getEmployee() != null)
+                .forEach(ppe -> {
+                    LocalDateTime startUseDate = ppe.getStartUseDate();
+                    if (startUseDate == null) {
+                        startUseDate = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+                        ppe.setStartUseDate(startUseDate);
+                    }
+                    LocalDateTime nowTime = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+                    Duration lifeTimeSpent = Duration.between(startUseDate, nowTime);
+                    Duration lifeTimeDuration = ppe.getLifeTime();
 
-                LocalDateTime nowTime = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-                Duration lifeTimeSpent = Duration.between(startUseDate, nowTime);
-                Duration lifeTimeDuration = ppe.getLifeTime();
+                    log.info("ppe {}: days for use: {}", ppe.getInventoryNumber(), lifeTimeDuration.minus(lifeTimeSpent).toDays());
 
-                log.info("ppe {}: days for use: {}", ppe.getInventoryNumber(), lifeTimeDuration.minus(lifeTimeSpent).toDays());
-
-                if (ppe.getPpeStatus() != PPEStatus.DECOMMISSIONED
-                        && ppe.getPpeStatus() != PPEStatus.SPOILED
-                        && lifeTimeDuration.minus(lifeTimeSpent).toDays() < 0) {
-                    ppe.setPpeStatus(PPEStatus.SPOILED);
-                    log.info("ppe {} were spoiled by time! Replacement required!", ppe.getInventoryNumber());
-                    ppeRepository.save(ppe);
-                }
-            }
-        });
+                    if (ppe.getPpeStatus() != PPEStatus.DECOMMISSIONED
+                            && ppe.getPpeStatus() != PPEStatus.SPOILED
+                            && lifeTimeDuration.minus(lifeTimeSpent).toDays() < 0) {
+                        ppe.setPpeStatus(PPEStatus.SPOILED);
+                        log.info("ppe {} were spoiled by time! Replacement required!", ppe.getInventoryNumber());
+                        ppeRepository.save(ppe);
+                    }
+            });
     }
 
 
