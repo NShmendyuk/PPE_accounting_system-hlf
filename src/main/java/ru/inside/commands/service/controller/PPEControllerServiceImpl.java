@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
+import ru.inside.commands.controller.exception.BadRequestBodyException;
+import ru.inside.commands.controller.exception.EntityCollisionException;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
@@ -77,31 +79,32 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     }
 
     public void addPPEForm(String name, Float price, String inventoryNumber,
-                           String ownerPersonnelNumber,  LocalDate date, Long lifeTimeDays) {
+                           String ownerPersonnelNumber,  LocalDate date, Long lifeTimeDays) throws EntityCollisionException, BadRequestBodyException, NoEntityException {
+        if (name == null || inventoryNumber == null || ownerPersonnelNumber == null || date == null) {
+            log.warn("Null fields found while add new ppe from controller.");
+            throw BadRequestBodyException.createWith(PPE.class.toString().toLowerCase());
+        }
         log.info("add new ppe: {}, owner: {}", name, ownerPersonnelNumber);
 
+        boolean isPPEExistInBlockChain = false;
         try {
-            boolean isPPEExistInBlockChain = chainCodeControllerService.checkPPEExist(inventoryNumber);
+            isPPEExistInBlockChain = chainCodeControllerService.checkPPEExist(inventoryNumber);
             log.info("Check ppe when add to system! PPE exist status = {}", isPPEExistInBlockChain);
-            if (isPPEExistInBlockChain) {
-                return;
-//            throw new IllegalArgumentException(); //remove try-catch when throw illegalArgumentException
-            }
         } catch (Exception ex) {
             log.warn("Cannot check ppe from chaincode");
         }
 
-
-        //TODO: refactor check
-        if (ownerPersonnelNumber == null || date == null) {
-            return;
+        if (isPPEExistInBlockChain) {
+             throw EntityCollisionException.createWith(
+                     PPE.class.toString(), inventoryNumber,
+                     "ppe exist in blockchain");
         }
 
         try {
             employeeService.getEmployeeByPersonnelNumber(ownerPersonnelNumber);
         } catch (NoEntityException e) {
             log.warn("Adding ppe to ppe lifecycle system were denied!");
-            return;
+            throw e;
         }
 
         PPE ppe = new PPE();
@@ -143,7 +146,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         try {
             addPPEToChainCode(ppeService.getPPEByInventoryNumber(inventoryNumber));
         } catch (NoEntityException e) {
-            log.error("PPE was not added into database!!! Ask IT-developer to rewrite code!!");
+            log.warn("Cannot find PPE as added in database. PPE adding to chain denied.");
         }
     }
 
@@ -344,21 +347,4 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         }
         return ppe;
     }
-
-    //больше не требуется
-    //@Deprecated
-    private Employee applyToEmployeeProcess(PPE ppe) {
-        Employee employee = new Employee();
-
-        try {
-            employee = ppe.getEmployee();
-            log.info("add ppe {} to employee {}!", ppe.getInventoryNumber(), employee.getPersonnelNumber());
-            return employeeService.addPPEToEmployee(ppe, employee.getPersonnelNumber());
-        } catch (NoEntityException e) {
-            log.error("Employee {} were deleted from database while adding new ppe {}!!! Cannot add new ppe from chaincode",
-                    employee.getPersonnelNumber(), ppe.getInventoryNumber());
-        }
-        return employee;
-    }
-
 }
