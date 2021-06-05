@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @RequiredArgsConstructor
 @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Empty Request Body.")
-public class EmptyRequestBody extends Exception {
+public class BadRequestBodyException extends Exception {
     private static final long serialVersionUID = -6219107521443488738L;
     private final String entity;
 
@@ -15,8 +15,8 @@ public class EmptyRequestBody extends Exception {
      * @param entity тип сущности
      * @return ошибка по сущности и номеру
      */
-    public static EmptyRequestBody createWith(String entity) {
-        return new EmptyRequestBody(entity);
+    public static BadRequestBodyException createWith(String entity) {
+        return new BadRequestBodyException(entity);
     }
 
     public String getMessage() {

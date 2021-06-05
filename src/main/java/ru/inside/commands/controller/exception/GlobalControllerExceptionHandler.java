@@ -13,9 +13,15 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(EmptyRequestBody.class)
-    protected ResponseEntity<Object> handleException(EmptyRequestBody e) {
+    @ExceptionHandler(BadRequestBodyException.class)
+    protected ResponseEntity<Object> handleException(BadRequestBodyException e) {
         ResponseException response = new ResponseException(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestBodyException.class)
+    protected ResponseEntity<Object> handleException(EntityCollisionException e) {
+        ResponseException response = new ResponseException(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 }
