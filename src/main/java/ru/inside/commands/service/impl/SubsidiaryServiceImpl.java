@@ -5,10 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Subsidiary;
-import ru.inside.commands.entity.dto.SubsidiaryDto;
 import ru.inside.commands.repository.SubsidiaryRepository;
 import ru.inside.commands.service.SubsidiaryService;
-import ru.inside.commands.service.helper.DtoConverter;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -33,35 +31,14 @@ public class SubsidiaryServiceImpl implements SubsidiaryService {
         }
     }
 
-    public SubsidiaryDto get(Long id) throws NoEntityException {
-        Subsidiary subsidiary = subsidiaryRepository.findById(id).orElseThrow(() ->
-            NoEntityException.createWithId(Subsidiary.class.getSimpleName().toLowerCase(), id));
-        return DtoConverter.convertSubsidiaryToDto(subsidiary);
-    }
-
     public Subsidiary getSelfSubsidiary() throws NoEntityException {
         return subsidiaryRepository.findByName(selfSubsidiaryName).orElseThrow(() ->
                 NoEntityException.createWithParam(Subsidiary.class.getSimpleName(), selfSubsidiaryName));
     }
 
     public Subsidiary getByName(String subsidiaryName) throws NoEntityException {
-        Subsidiary subsidiary = subsidiaryRepository.findByName(subsidiaryName).orElseThrow(() ->
+        return subsidiaryRepository.findByName(subsidiaryName).orElseThrow(() ->
                 NoEntityException.createWithParam(Subsidiary.class.getSimpleName().toLowerCase(), subsidiaryName));
-        return subsidiary;
-    }
-
-    public SubsidiaryDto add(SubsidiaryDto subsidiaryDto){
-        for (Subsidiary subsidiary : subsidiaryRepository.findAll()) {
-            if (subsidiary.getName().equals(subsidiaryDto.getName())) {
-                subsidiary.setPeerName(subsidiaryDto.getPeerName());
-                return DtoConverter.convertSubsidiaryToDto(subsidiaryRepository.save(subsidiary));
-            }
-            if (subsidiary.getPeerName().equals(subsidiaryDto.getPeerName())) {
-                subsidiary.setName(subsidiaryDto.getName());
-                return DtoConverter.convertSubsidiaryToDto(subsidiaryRepository.save(subsidiary));
-            }
-        }
-        return DtoConverter.convertSubsidiaryToDto(subsidiaryRepository.save(DtoConverter.convertDtoToSubsidiary(subsidiaryDto)));
     }
 
     public Subsidiary add(Subsidiary subsidiary) {
