@@ -11,7 +11,6 @@ public interface PPEService {
     List<PPE> getAllPPE();
     PPE addPPE(PPE ppe);
     long getTotalPPE();
-    void updateAllStatus();
     void transferPPE(PPE ppe, Subsidiary subsidiary);
     void dismissPPE(String inventoryNumber) throws NoEntityException;
     List<PPE> getAllWaitFromChainCode();

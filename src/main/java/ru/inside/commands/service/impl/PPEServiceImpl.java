@@ -15,9 +15,6 @@ import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.SubsidiaryService;
 import ru.inside.commands.service.helper.PPEConverter;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,35 +46,6 @@ public class PPEServiceImpl implements PPEService {
     public PPE addPPE(PPE ppe) {
         return ppeRepository.save(ppe);
     }
-
-    /**
-     * function for decommissing PPE, which have used up their service life
-     */
-    public void updateAllStatus() {
-        List<PPE> ppeList = ppeRepository.findAll();
-        ppeList.parallelStream().filter(ppe -> ppe.getEmployee() != null)
-                .forEach(ppe -> {
-                    LocalDateTime startUseDate = ppe.getStartUseDate();
-                    if (startUseDate == null) {
-                        startUseDate = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-                        ppe.setStartUseDate(startUseDate);
-                    }
-                    LocalDateTime nowTime = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
-                    Duration lifeTimeSpent = Duration.between(startUseDate, nowTime);
-                    Duration lifeTimeDuration = ppe.getLifeTime();
-
-                    log.info("ppe {}: days for use: {}", ppe.getInventoryNumber(), lifeTimeDuration.minus(lifeTimeSpent).toDays());
-
-                    if (ppe.getPpeStatus() != PPEStatus.DECOMMISSIONED
-                            && ppe.getPpeStatus() != PPEStatus.SPOILED
-                            && lifeTimeDuration.minus(lifeTimeSpent).toDays() < 0) {
-                        ppe.setPpeStatus(PPEStatus.SPOILED);
-                        log.info("ppe {} were spoiled by time! Replacement required!", ppe.getInventoryNumber());
-                        ppeRepository.save(ppe);
-                    }
-            });
-    }
-
 
     public void dismissPPE(String inventoryNumber) throws NoEntityException {
         PPE ppe = ppeRepository.findByInventoryNumber(inventoryNumber).orElseThrow(() ->
