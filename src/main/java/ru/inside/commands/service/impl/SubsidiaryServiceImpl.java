@@ -2,21 +2,15 @@ package ru.inside.commands.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.controller.exception.NoEntityException;
-import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.Subsidiary;
-import ru.inside.commands.entity.dto.EmployeeDto;
 import ru.inside.commands.entity.dto.SubsidiaryDto;
-import ru.inside.commands.repository.EmployeeRepository;
 import ru.inside.commands.repository.SubsidiaryRepository;
 import ru.inside.commands.service.SubsidiaryService;
 import ru.inside.commands.service.helper.DtoConverter;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

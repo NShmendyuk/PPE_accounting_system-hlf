@@ -2,7 +2,6 @@ package ru.inside.commands.entity;
 
 import com.sun.istack.NotNull;
 import lombok.*;
-import org.hibernate.annotations.Immutable;
 import ru.inside.commands.entity.enums.PPEStatus;
 
 import javax.persistence.*;

@@ -3,14 +3,13 @@ package ru.inside.commands.hyperledger.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.Network;
 import org.hyperledger.fabric.sdk.Peer;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.inside.commands.hyperledger.PeerDiscoveryService;
 import ru.inside.commands.hyperledger.fabric.configuration.HlfConfiguration;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
-@Service
+@Component
 @Slf4j
 public class HlFPeerDiscoveryService implements PeerDiscoveryService {
     private Network network;
@@ -20,7 +19,12 @@ public class HlFPeerDiscoveryService implements PeerDiscoveryService {
     }
 
     public Collection<String> getMSPIDsInfo() {
-        log.info("===begin info===");
+        logPeerInfo();
+
+        return network.getChannel().getPeersOrganizationMSPIDs();
+    }
+
+    private void logPeerInfo() {
         Collection<Peer> peers = network.getChannel().getPeers();
         log.info("===peers info===");
         peers.forEach(peer -> {
@@ -33,6 +37,5 @@ public class HlFPeerDiscoveryService implements PeerDiscoveryService {
         log.info("===discovered chaincode names===");
         log.info("{}", network.getChannel().getDiscoveredChaincodeNames().toString());
         log.info("===end info===");
-        return network.getChannel().getPeersOrganizationMSPIDs();
     }
 }

@@ -2,7 +2,6 @@ package ru.inside.commands.service;
 
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Subsidiary;
-import ru.inside.commands.entity.dto.EmployeeDto;
 import ru.inside.commands.entity.dto.SubsidiaryDto;
 
 import java.util.List;

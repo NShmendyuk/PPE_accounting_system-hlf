@@ -12,7 +12,6 @@ import ru.inside.commands.hyperledger.PeerDiscoveryService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
 
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

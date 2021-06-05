@@ -8,7 +8,6 @@ import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.Subsidiary;
 import ru.inside.commands.entity.dto.EmployeeDto;
-import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.enums.PPEStatus;
 import ru.inside.commands.repository.EmployeeRepository;
 import ru.inside.commands.repository.SubsidiaryRepository;

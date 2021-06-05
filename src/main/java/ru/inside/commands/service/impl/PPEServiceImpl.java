@@ -7,17 +7,12 @@ import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.Subsidiary;
-import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.enums.PPEStatus;
-import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.hyperledger.ChainCodeControllerService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
-import ru.inside.commands.repository.EmployeeRepository;
 import ru.inside.commands.repository.PPERepository;
-import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.SubsidiaryService;
-import ru.inside.commands.service.helper.DtoConverter;
 import ru.inside.commands.service.helper.PPEConverter;
 
 import java.time.Duration;
@@ -32,7 +27,6 @@ import java.util.List;
 public class PPEServiceImpl implements PPEService {
     private final ChainCodeControllerService chainCodeControllerService;
     private final SubsidiaryService subsidiaryService;
-    private final EmployeeService employeeService;
     private final PPERepository ppeRepository;
 
     public PPE getPPEByInventoryNumber(String inventoryNumber) throws NoEntityException {
