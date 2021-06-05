@@ -19,7 +19,7 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(BadRequestBodyException.class)
+    @ExceptionHandler(EntityCollisionException.class)
     protected ResponseEntity<Object> handleException(EntityCollisionException e) {
         ResponseException response = new ResponseException(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
