@@ -12,7 +12,7 @@ import ru.inside.commands.entity.forms.PPEForm;
 
 import com.lowagie.text.pdf.BaseFont;
 import org.xhtmlrenderer.pdf.ITextRenderer;
-import ru.inside.commands.hyperledger.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.service.ChainCodeControllerService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
 
 import java.io.File;

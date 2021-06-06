@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
+import ru.inside.commands.controller.exception.BadRequestBodyException;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
@@ -12,6 +13,7 @@ import ru.inside.commands.entity.enums.SubsidiaryStatus;
 import ru.inside.commands.entity.forms.EmployeeForm;
 import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.entity.forms.SubsidiaryForm;
+import ru.inside.commands.hyperledger.service.ChainCodeControllerService;
 import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.SubsidiaryService;
@@ -28,6 +30,7 @@ import java.util.List;
 public class EmployeeControllerServiceImpl implements EmployeeControllerService {
     private final EmployeeService employeeService;
     private final SubsidiaryService subsidiaryService;
+    private final ChainCodeControllerService chainCodeControllerService;
     private final PPEService ppeService;
     private final PdfGenerator pdfGenerator;
 
@@ -107,14 +110,16 @@ public class EmployeeControllerServiceImpl implements EmployeeControllerService 
         return subsidiaryFormList;
     }
 
-    public byte[] transferEmployeeToSubsidiary(String personnelNumber, String subsidiaryName) {
+    public byte[] transferEmployeeToSubsidiary(String personnelNumber, String subsidiaryName) throws NoEntityException, BadRequestBodyException {
         try {
             String selfSubsidiaryName = subsidiaryService.getSelfSubsidiary().getName();
             if (subsidiaryName.equals(selfSubsidiaryName)) {
                 log.warn("transfer to self organization not valid!");
-                return new byte[0];
+                throw BadRequestBodyException.createWith(Subsidiary.class.toString().toLowerCase());
             }
-        } catch (NoEntityException ignored) {
+        } catch (NoEntityException ex) {
+            log.error("Cannot find Subsidiary {}", subsidiaryName);
+            throw ex;
         }
 
         Employee employee;
@@ -122,7 +127,7 @@ public class EmployeeControllerServiceImpl implements EmployeeControllerService 
             employee = employeeService.getEmployeeByPersonnelNumber(personnelNumber);
         } catch (NoEntityException e) {
             log.error("Cannot find employee {}!! Cannot transfer to {}", personnelNumber, subsidiaryName);
-            return null;
+            throw e;
         }
 
         Subsidiary subsidiary;
@@ -134,9 +139,11 @@ public class EmployeeControllerServiceImpl implements EmployeeControllerService 
             return "NOT FOUND! NOT TRANSFERED".getBytes();
         }
         employee.getPpe().forEach(ppe -> {
-            ppeService.transferPPE(ppe, subsidiary);
             log.info("need to transfer by smartContract for ppe: {}, status: {} to {}",
                     ppe.getName(), ppe.getPpeStatus(), subsidiary.getName());
+            if (chainCodeControllerService.transferPPEToSubsidiary(ppe, subsidiary)) {
+                ppeService.transferPPE(ppe, subsidiary);
+            }
         });
 
         File file = pdfGenerator.generateTransferDocument(employee, subsidiaryName);
@@ -162,7 +169,7 @@ public class EmployeeControllerServiceImpl implements EmployeeControllerService 
         employee.setOccupation(occupation);
         employee.setPersonnelNumber(personnelNumber);
         try {
-            employeeService.addEmployee(employee);
+            employeeService.addEmployee(employee, subsidiaryService.getSelfSubsidiary());
         } catch (NoEntityException e) {
             log.error("Add employee to database failed!");
         }

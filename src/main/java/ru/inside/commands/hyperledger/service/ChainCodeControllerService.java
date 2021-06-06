@@ -1,4 +1,4 @@
-package ru.inside.commands.hyperledger;
+package ru.inside.commands.hyperledger.service;
 
 import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.Subsidiary;
@@ -12,7 +12,7 @@ public interface ChainCodeControllerService {
     PPEContract getPPEByInventoryNumber(String inventoryNumber);
     void addPPE(PPE ppe);
     void changePPE(PPE ppe);
-    void transferPPEToSubsidiary(PPE ppe, Subsidiary anotherSubsidiary);
+    boolean transferPPEToSubsidiary(PPE ppe, Subsidiary anotherSubsidiary);
     List<PPEContract> getPPEHistoryByInventoryNumber(String inventoryNumber);
 
     void deletePPE(String inventoryNumber);

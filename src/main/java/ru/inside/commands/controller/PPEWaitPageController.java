@@ -7,6 +7,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import ru.inside.commands.service.controller.PPEControllerService;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @RestController
@@ -24,24 +25,21 @@ public class PPEWaitPageController {
         byte[] contents = ppeControllerService.applyPPEFromChainCode(inventoryNumber);
         HttpHeaders headers = new HttpHeaders();
 
-        try {
-            headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentType(MediaType.APPLICATION_PDF);
 
-            String filename = "apply transfer ppe (" + inventoryNumber + ") with employee ("
-                    + ownerName +"); price (" + price.toString() + ") generated" + ".pdf";
-            ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
-                    .filename(filename, StandardCharsets.UTF_8)
-                    .build();
-            headers.setContentDisposition(contentDisposition);
-            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        } catch (Exception ex) {
-            log.error("Cannot set headers for file");
-        }
+        String filename = "apply transfer ppe (" + inventoryNumber + ") with employee ("
+                + ownerName +"); price (" + price.toString() + ") generated" + ".pdf";
+        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                .filename(filename, StandardCharsets.UTF_8)
+                .build();
+        headers.setContentDisposition(contentDisposition);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
         return new ResponseEntity<>(contents, headers, HttpStatus.OK);
     }
 
     @PostMapping("/apply/all")
-    public ResponseEntity<byte[]> applyAllPPEFromSmartContract() {
+    public ResponseEntity<byte[]> applyAllPPEFromSmartContract() throws IOException {
         log.info("Applying all PPE transfers.");
         byte[] contents = ppeControllerService.applyAllPPEFromChainCode();
         HttpHeaders headers = new HttpHeaders();

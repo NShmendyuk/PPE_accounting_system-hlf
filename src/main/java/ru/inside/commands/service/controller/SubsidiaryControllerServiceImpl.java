@@ -7,7 +7,7 @@ import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Subsidiary;
 import ru.inside.commands.entity.enums.SubsidiaryStatus;
 import ru.inside.commands.entity.forms.SubsidiaryForm;
-import ru.inside.commands.hyperledger.PeerDiscoveryService;
+import ru.inside.commands.hyperledger.service.PeerDiscoveryService;
 import ru.inside.commands.service.SubsidiaryService;
 
 import java.util.*;

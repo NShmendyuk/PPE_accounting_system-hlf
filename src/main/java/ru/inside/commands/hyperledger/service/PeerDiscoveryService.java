@@ -1,4 +1,4 @@
-package ru.inside.commands.hyperledger;
+package ru.inside.commands.hyperledger.service;
 
 import java.util.Collection;
 

@@ -10,7 +10,6 @@ import ru.inside.commands.entity.Subsidiary;
 import ru.inside.commands.entity.enums.PPEStatus;
 import ru.inside.commands.repository.EmployeeRepository;
 import ru.inside.commands.service.EmployeeService;
-import ru.inside.commands.service.SubsidiaryService;
 
 import java.util.List;
 
@@ -19,7 +18,6 @@ import java.util.List;
 @Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
-    private final SubsidiaryService subsidiaryService;
 
     public Employee getEmployeeByPersonnelNumber(String personnelNumber) throws NoEntityException {
         return employeeRepository.findByPersonnelNumber(personnelNumber).orElseThrow(() ->
@@ -38,16 +36,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.info("employee {} were deleted from organization", personnelNumber);
     }
 
-    public Employee addEmployee(Employee employee) {
-        Subsidiary subsidiary;
-        if (employee.getSubsidiary() == null) {
-            try {
-                subsidiary = subsidiaryService.getSelfSubsidiary();
-                employee.setSubsidiary(subsidiary);
-            } catch (NoEntityException e) {
-                log.warn("Self definition for subsidiary not found while add new employee {}", employee.getPersonnelNumber());
-            }
-        }
+    public Employee addEmployee(Employee employee, Subsidiary selfSubsidiary) {
+        employee.setSubsidiary(selfSubsidiary);
         return employeeRepository.save(employee);
     }
 
@@ -61,5 +51,4 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return employeeRepository.save(employee);
     }
-
 }

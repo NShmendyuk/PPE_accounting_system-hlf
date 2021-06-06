@@ -26,7 +26,7 @@ public class RegistCAClient {
                     HLF_ORG_AFFILATION, HLF_ORG_MSP_ID);
             log.info("user enrolled");
         } catch (Exception e) {
-            log.error("Cannot enroll users", e);
+            log.error("Cannot enroll users. Check path file and blockchain instances");
         }
     }
 }

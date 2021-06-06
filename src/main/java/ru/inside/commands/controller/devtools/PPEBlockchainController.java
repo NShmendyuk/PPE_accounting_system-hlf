@@ -7,8 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 import ru.inside.commands.entity.PPE;
-import ru.inside.commands.hyperledger.ChainCodeControllerService;
-import ru.inside.commands.hyperledger.PeerDiscoveryService;
+import ru.inside.commands.hyperledger.service.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.service.PeerDiscoveryService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
 
 import java.util.Collection;

@@ -1,10 +1,10 @@
-package ru.inside.commands.hyperledger.controller;
+package ru.inside.commands.hyperledger.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.Network;
 import org.hyperledger.fabric.sdk.Peer;
 import org.springframework.stereotype.Component;
-import ru.inside.commands.hyperledger.PeerDiscoveryService;
+import ru.inside.commands.hyperledger.service.PeerDiscoveryService;
 import ru.inside.commands.hyperledger.fabric.configuration.HlfConfiguration;
 
 import java.util.Collection;

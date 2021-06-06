@@ -5,6 +5,7 @@ import ru.inside.commands.controller.exception.EntityCollisionException;
 import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.forms.PPEForm;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface PPEControllerService {
     void decommissioning(String employeePersonnelNumber, String inventoryNumber);
     List<PPEForm> getAllInWaitList();
     byte[] applyPPEFromChainCode(String inventoryNumber);
-    byte[] applyAllPPEFromChainCode();
+    byte[] applyAllPPEFromChainCode() throws IOException;
 }

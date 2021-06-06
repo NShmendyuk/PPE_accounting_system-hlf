@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import ru.inside.commands.controller.exception.BadRequestBodyException;
+import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.forms.EmployeeForm;
 import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.entity.forms.SubsidiaryForm;
@@ -45,10 +47,14 @@ public class EmployeePageController {
     @GetMapping("/transfer")
     public ModelAndView getTransferEmployeePage(@RequestParam String personnelNumber) {
         log.info("transfer page request. employee with personnelNumber: \"{}\"", personnelNumber);
+
         ModelAndView modelAndView = new ModelAndView("transferEmployeePage");
+
         EmployeeForm employeeForm = employeeControllerService.getEmployeeByPersonnelNumber(personnelNumber);
         List<SubsidiaryForm> subsidiaryFormList = employeeControllerService.getAllSubsidiary();
+
         log.info("transfer page request. show select options with: {}", subsidiaryFormList);
+
         modelAndView.addObject("employee", employeeForm);
         modelAndView.addObject("subsidiaryList", subsidiaryFormList);
         return modelAndView;
@@ -58,17 +64,14 @@ public class EmployeePageController {
     public ModelAndView addEmployee(@RequestParam String name, @RequestParam String occupation,
                             @RequestParam String personnelNumber) {
         log.info("POST request, add new employee with name: {}, occupation: {}, personnelNumber: {}", name, occupation, personnelNumber);
-        try {
-            employeeControllerService.addEmployee(name, occupation, personnelNumber);
-        } catch (Exception ex) {
-            log.warn("Some warnings were catch when add new employee {}.", personnelNumber);
-        }
+        employeeControllerService.addEmployee(name, occupation, personnelNumber);
+
         return new ModelAndView("redirect:/employee");
     }
 
     @PostMapping("/transfer")
     public ResponseEntity<byte[]> transferEmployeeToSubsidiaryWithPPEs(
-            @RequestParam String personnelNumber, @RequestParam String name) {
+            @RequestParam String personnelNumber, @RequestParam String name) throws BadRequestBodyException, NoEntityException {
         log.info("transfer employee with personnelNumber ({}) to another subsidiary ({})", personnelNumber, name);
         byte[] contents = employeeControllerService.transferEmployeeToSubsidiary(personnelNumber, name);
         HttpHeaders headers = new HttpHeaders();

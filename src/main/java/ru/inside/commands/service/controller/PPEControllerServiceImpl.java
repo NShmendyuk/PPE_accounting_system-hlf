@@ -11,8 +11,9 @@ import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.enums.PPEStatus;
 import ru.inside.commands.entity.forms.PPEForm;
-import ru.inside.commands.hyperledger.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.service.ChainCodeControllerService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
+import ru.inside.commands.service.ChainCodeWaitService;
 import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.SubsidiaryService;
@@ -37,6 +38,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     private final EmployeeService employeeService;
     private final ChainCodeControllerService chainCodeControllerService;
     private final SubsidiaryService subsidiaryService;
+    private final ChainCodeWaitService chainCodeWaitService;
     private final PdfGenerator pdfGenerator;
 
     public PPEForm getPPEForm(String inventoryNumber) {
@@ -201,7 +203,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         });
         employee.setPpe(updatedPPEList);
         try {
-            employeeService.addEmployee(employee);
+            employeeService.addEmployee(employee, subsidiaryService.getSelfSubsidiary());
         } catch (NoEntityException e) {
             log.error("Cannot update list of ppe to employee {} by saving", employeePersonnelNumber);
         }
@@ -210,42 +212,29 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         } catch (NoEntityException e) {
             log.error("ppe {} not found while executing process to decommission!", inventoryNumber);
         }
+        chainCodeControllerService.deletePPE(inventoryNumber);
     }
 
     public List<PPEForm> getAllInWaitList() {
         List<PPE> ppeList = new ArrayList<>();
         try {
-            ppeList = ppeService.getAllWaitFromChainCode();
+            ppeList = chainCodeWaitService.getAllWaitFromChainCode(subsidiaryService.getSelfSubsidiary());
         } catch (Exception ex) {
             log.error("Cannot get all wait ppe from chaincode!");
         }
 
         List<PPEForm> ppeFormList = new ArrayList<>();
         ppeList.forEach(ppe -> {
+            //TODO: refactoring
             PPEForm ppeForm = new PPEForm();
-
-            try {
-                ppeForm.setPpeName(ppe.getName());
-                ppeForm.setPrice(ppe.getPrice());
-                ppeForm.setInventoryNumber(ppe.getInventoryNumber());
-            } catch (Exception ex) {
-                log.error("Cannot set first info of ppe from waitList to form");
-            }
-
-            try {
-                ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
-                ppeForm.setLifeTime(ppe.getLifeTime());
-                ppeForm.setStartUseDate(ppe.getStartUseDate());
-            } catch (Exception ex) {
-                log.error("Cannot set time and status info of ppe from waitList to form");
-            }
-
-            try {
-                ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
-                ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
-            } catch (Exception ex) {
-                log.error("Cannot set second info of ppe from waitList to form");
-            }
+            ppeForm.setPpeName(ppe.getName());
+            ppeForm.setPrice(ppe.getPrice());
+            ppeForm.setInventoryNumber(ppe.getInventoryNumber());
+            ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
+            ppeForm.setLifeTime(ppe.getLifeTime());
+            ppeForm.setStartUseDate(ppe.getStartUseDate());
+            ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
+            ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
 
             try {
                 ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
@@ -295,23 +284,18 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         return bytePdfArray;
     }
 
-    public byte[] applyAllPPEFromChainCode() {
+    public byte[] applyAllPPEFromChainCode() throws IOException {
         List<PPEForm> waitAllPPE = getAllInWaitList();
 
         waitAllPPE.forEach(ppeForm -> {
             applyPPEProcess(ppeForm.getInventoryNumber());
-//            applyToEmployeeProcess(ppe);
         });
 
         File file = pdfGenerator.generateAllApplyTransferDocument(waitAllPPE);
 
         byte[] bytePdfArray = new byte[0];
         if (file != null) {
-            try {
-                bytePdfArray = FileUtils.readFileToByteArray(file);
-            } catch (IOException e) {
-                log.warn("generated file not found");
-            }
+            bytePdfArray = FileUtils.readFileToByteArray(file);
         }
 
         return bytePdfArray;

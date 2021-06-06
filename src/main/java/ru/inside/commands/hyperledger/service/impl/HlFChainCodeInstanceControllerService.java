@@ -1,4 +1,4 @@
-package ru.inside.commands.hyperledger.controller;
+package ru.inside.commands.hyperledger.service.impl;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.Subsidiary;
-import ru.inside.commands.hyperledger.ChainCodeControllerService;
+import ru.inside.commands.hyperledger.service.ChainCodeControllerService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
 import ru.inside.commands.hyperledger.fabric.chaincode.PPEChainCodeService;
 import ru.inside.commands.hyperledger.fabric.configuration.HlfConfiguration;
@@ -189,15 +189,17 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         return ppeInfo.equals("true");
     }
 
-    public void transferPPEToSubsidiary(PPE ppe, Subsidiary anotherSubsidiary) {
+    public boolean transferPPEToSubsidiary(PPE ppe, Subsidiary anotherSubsidiary) {
         String inventoryNumber = ppe.getInventoryNumber();
         String toSubsidiary = anotherSubsidiary.getName();
 
         try {
             chainCodeController.transferPPEToAnotherSubsidiary(inventoryNumber, toSubsidiary);
             log.info("contract (transferPPEToSubsidiary) submit");
+            return true;
         } catch (Exception e) {
             log.error("transfer ppe {} request to chaincode were denied", inventoryNumber);
         }
+        return false;
     }
 }
