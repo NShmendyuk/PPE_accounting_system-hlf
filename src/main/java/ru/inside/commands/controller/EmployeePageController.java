@@ -51,7 +51,7 @@ public class EmployeePageController {
         ModelAndView modelAndView = new ModelAndView("transferEmployeePage");
 
         EmployeeForm employeeForm = employeeControllerService.getEmployeeByPersonnelNumber(personnelNumber);
-        List<SubsidiaryForm> subsidiaryFormList = employeeControllerService.getAllSubsidiary();
+        List<SubsidiaryForm> subsidiaryFormList = employeeControllerService.getAllOtherSubsidiary();
 
         log.info("transfer page request. show select options with: {}", subsidiaryFormList);
 

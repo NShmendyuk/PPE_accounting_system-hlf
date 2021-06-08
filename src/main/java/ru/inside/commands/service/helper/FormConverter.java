@@ -17,7 +17,9 @@ public class FormConverter {
         if (ppe.getEmployee() != null) {
             ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
             ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber().toString());
-            ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
+            if (ppe.getEmployee().getSubsidiary() != null) {
+                ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
+            }
         }
         return ppeForm;
     }

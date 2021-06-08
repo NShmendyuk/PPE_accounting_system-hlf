@@ -12,7 +12,7 @@ public interface EmployeeControllerService {
     List<EmployeeForm> getAllEmployee();
     List<PPEForm> getAllPPEOfEmployee(String personnelNumber);
     EmployeeForm getEmployeeByPersonnelNumber(String personnelNumber);
-    List<SubsidiaryForm> getAllSubsidiary();
+    List<SubsidiaryForm> getAllOtherSubsidiary();
     byte[] transferEmployeeToSubsidiary(String personnelNumber, String subsidiaryName) throws NoEntityException, BadRequestBodyException;
     void addEmployee(String name, String occupation, String personnelNumber);
 }

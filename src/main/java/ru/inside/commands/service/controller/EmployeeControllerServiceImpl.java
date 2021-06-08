@@ -97,10 +97,17 @@ public class EmployeeControllerServiceImpl implements EmployeeControllerService 
         return employeeForm;
     }
 
-    public List<SubsidiaryForm> getAllSubsidiary() {
+    public List<SubsidiaryForm> getAllOtherSubsidiary() {
         List<SubsidiaryForm> subsidiaryFormList = new ArrayList<>();
         List<Subsidiary> subsidiaryList = subsidiaryService.getAll();
-        subsidiaryList.forEach(subsidiary -> {
+        subsidiaryList.stream().filter(subsidiary -> {
+            try {
+                return (!subsidiary.getName().equals(subsidiaryService.getSelfSubsidiary().getName()));
+            } catch (NoEntityException e) {
+                log.error("Cannot find self subsidiary description");
+            }
+            return true;
+        }).forEach(subsidiary -> {
             SubsidiaryForm subsidiaryForm = new SubsidiaryForm();
             subsidiaryForm.setName(subsidiary.getName());
             subsidiaryForm.setPeerName(subsidiary.getPeerName());

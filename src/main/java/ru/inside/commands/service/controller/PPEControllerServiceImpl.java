@@ -57,21 +57,10 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         List<PPEForm> ppeFormList = new ArrayList<>();
 
         ppeList.forEach(ppe -> {
-            PPEForm ppeForm = new PPEForm();
-            ppeForm.setPpeName(ppe.getName());
-            ppeForm.setInventoryNumber(ppe.getInventoryNumber());
-            ppeForm.setLifeTime(ppe.getLifeTime());
-            ppeForm.setStartUseDate(ppe.getStartUseDate());
-            ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
-            ppeForm.setPrice(ppe.getPrice());
-            try {
-                ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
-                ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
-                ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
-            } catch (Exception ex) {
+            PPEForm ppeForm = FormConverter.getPPEAsForm(ppe);
+            if (ppeForm.getOwnerName() == null) {
                 ppeForm.setOwnerName("Неопределено");
                 ppeForm.setOwnerPersonnelNumber("Отсутствует");
-                //TODO: stubbed (need enum)
                 ppeForm.setSubsidiaryName("НЕОПРЕДЕЛЕНО");
             }
             ppeFormList.add(ppeForm);
@@ -225,28 +214,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
 
         List<PPEForm> ppeFormList = new ArrayList<>();
         ppeList.forEach(ppe -> {
-            //TODO: refactoring
-            PPEForm ppeForm = new PPEForm();
-            ppeForm.setPpeName(ppe.getName());
-            ppeForm.setPrice(ppe.getPrice());
-            ppeForm.setInventoryNumber(ppe.getInventoryNumber());
-            ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
-            ppeForm.setLifeTime(ppe.getLifeTime());
-            ppeForm.setStartUseDate(ppe.getStartUseDate());
-            ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
-            ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
-
-            try {
-                ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
-            } catch (Exception ex) {
-                log.warn("Set subsidiary to self subsidiary");
-                try {
-                    ppeForm.setSubsidiaryName(subsidiaryService.getSelfSubsidiary().getName());
-                } catch (NoEntityException e) {
-                    log.error("Cannot get self subsidiary definition while convert ppe to form from waitList!!!");
-                }
-            }
-
+            PPEForm ppeForm = FormConverter.getPPEAsForm(ppe);
             ppeFormList.add(ppeForm);
         });
         return ppeFormList;
