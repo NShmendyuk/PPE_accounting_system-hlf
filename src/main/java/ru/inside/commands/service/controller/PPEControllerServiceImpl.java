@@ -299,7 +299,6 @@ public class PPEControllerServiceImpl implements PPEControllerService {
 
         waitAllPPE.forEach(ppeForm -> {
             applyPPEProcess(ppeForm.getInventoryNumber());
-//            applyToEmployeeProcess(ppe);
         });
 
         File file = pdfGenerator.generateAllApplyTransferDocument(waitAllPPE);
@@ -330,6 +329,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
         PPE ppe = new PPE();
         try {
             ppe = PPEConverter.ppeContractToPPE(ppeContract);
+            ppe.setPpeStatus(PPEStatus.COMMISSIONED);
         } catch (Exception ex) {
             log.error("Cannot convert ppe while apply!");
         }
@@ -338,12 +338,14 @@ public class PPEControllerServiceImpl implements PPEControllerService {
             if (ppeService.isPPEExist(inventoryNumber)) {
                 PPE existedPPE = ppeService.getPPEByInventoryNumber(inventoryNumber);
                 ppe.setId(existedPPE.getId());
+                log.info("PPE {} found in inner database. Replaced", inventoryNumber);
             }
             ppe.setEmployee(employee);
             return ppeService.addPPE(ppe);
         } catch (Exception ex) {
-            log.error("Cannot add ppe from waitlist while apply! Try to add with employee");
+            log.error("Cannot add ppe {} from waitlist while apply! Try to add with employee", inventoryNumber);
         }
+        chainCodeControllerService.applyPPETransfering(inventoryNumber, PPEStatus.COMMISSIONED.toString());
         return ppe;
     }
 

@@ -19,6 +19,7 @@ public class PPEChainCodeService {
     private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_DELETE = "deletePPE";
     private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_ISEXIST = "isPPEExists";
     private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_TRANSFER = "transferPPE";
+    private String HLF_CHAINCODE_PPESMART_FUNCTION_NAME_APPLY_TRANSFER = "applyTransferPPE";
 
     public PPEChainCodeService(Contract contract) {
         this.contract = contract;
@@ -79,9 +80,14 @@ public class PPEChainCodeService {
      * @param inventoryNumber - PPE inventory number
      * @param toSubsidiary - the company to which the employee is transferred
      */
-    public void transferPPEToAnotherSubsidiary(String inventoryNumber, String toSubsidiary)
+    public void transferPPEToAnotherSubsidiary(String inventoryNumber, String toSubsidiary, String status)
             throws InterruptedException, TimeoutException, ContractException {
         log.info("transfer ppe {} by request to chaincode to subsidiary: {}", inventoryNumber, toSubsidiary);
-        contract.submitTransaction(HLF_CHAINCODE_PPESMART_FUNCTION_NAME_TRANSFER, inventoryNumber, toSubsidiary);
+        contract.submitTransaction(HLF_CHAINCODE_PPESMART_FUNCTION_NAME_TRANSFER, inventoryNumber, toSubsidiary, status);
+    }
+
+    public void applyPPETransfering(String inventoryNumber, String status) throws InterruptedException, TimeoutException, ContractException {
+        log.info("transfering ppe {} by request from chaincode applied", inventoryNumber);
+        contract.submitTransaction(HLF_CHAINCODE_PPESMART_FUNCTION_NAME_APPLY_TRANSFER, inventoryNumber, status);
     }
 }

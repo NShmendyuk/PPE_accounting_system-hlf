@@ -12,7 +12,9 @@ public interface ChainCodeControllerService {
     PPEContract getPPEByInventoryNumber(String inventoryNumber);
     void addPPE(PPE ppe);
     void changePPE(PPE ppe);
-    void transferPPEToSubsidiary(PPE ppe, Subsidiary anotherSubsidiary);
+    void transferPPEToSubsidiary(PPE ppe, Subsidiary anotherSubsidiary, String status);
+    void applyPPETransfering(String inventoryNumber, String status);
+
     List<PPEContract> getPPEHistoryByInventoryNumber(String inventoryNumber);
 
     void deletePPE(String inventoryNumber);

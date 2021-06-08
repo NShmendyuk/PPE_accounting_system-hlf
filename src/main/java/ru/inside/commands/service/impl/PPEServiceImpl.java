@@ -7,17 +7,12 @@ import ru.inside.commands.controller.exception.NoEntityException;
 import ru.inside.commands.entity.Employee;
 import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.Subsidiary;
-import ru.inside.commands.entity.dto.PPEDto;
 import ru.inside.commands.entity.enums.PPEStatus;
-import ru.inside.commands.entity.forms.PPEForm;
 import ru.inside.commands.hyperledger.ChainCodeControllerService;
 import ru.inside.commands.hyperledger.entity.PPEContract;
-import ru.inside.commands.repository.EmployeeRepository;
 import ru.inside.commands.repository.PPERepository;
-import ru.inside.commands.service.EmployeeService;
 import ru.inside.commands.service.PPEService;
 import ru.inside.commands.service.SubsidiaryService;
-import ru.inside.commands.service.helper.DtoConverter;
 import ru.inside.commands.service.helper.PPEConverter;
 
 import java.time.Duration;
@@ -32,7 +27,6 @@ import java.util.List;
 public class PPEServiceImpl implements PPEService {
     private final ChainCodeControllerService chainCodeControllerService;
     private final SubsidiaryService subsidiaryService;
-    private final EmployeeService employeeService;
     private final PPERepository ppeRepository;
 
     public PPE getPPEByInventoryNumber(String inventoryNumber) throws NoEntityException {
@@ -93,7 +87,7 @@ public class PPEServiceImpl implements PPEService {
     }
 
     public void transferPPE(PPE ppe, Subsidiary subsidiary) {
-        chainCodeControllerService.transferPPEToSubsidiary(ppe, subsidiary);
+        chainCodeControllerService.transferPPEToSubsidiary(ppe, subsidiary, PPEStatus.TRANSFER.toString());
         ppe.setPpeStatus(PPEStatus.TRANSFER);
         ppe.setEmployee(null);
         ppeRepository.save(ppe);
@@ -108,7 +102,6 @@ public class PPEServiceImpl implements PPEService {
         } catch (Exception ex) {
             log.error("Cannot getAllPPE from chaincode controller!!!");
         }
-        List<PPE> ppeWaitList = new ArrayList<>();
 
         Subsidiary selfSubsidiary = null;
         try {
@@ -124,6 +117,11 @@ public class PPEServiceImpl implements PPEService {
         }
 
         String finalSelfSubsidiaryName = selfSubsidiaryName;
+        return getWaitListForSelfSubsidiary(ppeContracts, finalSelfSubsidiaryName);
+    }
+
+    private List<PPE> getWaitListForSelfSubsidiary(List<PPEContract> ppeContracts, String selfSubsidiaryName) {
+        List<PPE> ppeWaitList = new ArrayList<>();
         ppeContracts.forEach(ppeContract -> {
             if (ppeContract.getOwnerID() == null || ppeContract.getOwnerID().equals("") ||
                     ppeContract.getSubsidiary() == null || ppeContract.getSubsidiary().equals("") ||
@@ -132,21 +130,13 @@ public class PPEServiceImpl implements PPEService {
             } else {
                 try {
                     //it's for self org and ppe is not exist at subsidiary or exist with transfered status
-                    if (ppeContract.getSubsidiary().equals(finalSelfSubsidiaryName) &&
+                    if (ppeContract.getSubsidiary().equals(selfSubsidiaryName) &&
                             (!isPPEExist(ppeContract.getInventoryNumber()) || (
                                     isPPEExist(ppeContract.getInventoryNumber()) &&
                                             getPPEByInventoryNumber(ppeContract.getInventoryNumber())
                                                     .getPpeStatus().equals(PPEStatus.TRANSFER)))) {
-                        PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
-                        Employee employee = new Employee();
-                        employee.setPersonnelNumber(ppeContract.getOwnerID());
-                        employee.setEmployeeName(ppeContract.getOwnerName());
-                        try {
-                            employee.setSubsidiary(subsidiaryService.getByName(ppeContract.getSubsidiary()));
-                        } catch (Exception ex) {
-                            log.error("Cannot set subsidiary while convert ppeContract to PPE from waitList");
-                        }
-                        ppe.setEmployee(employee);
+
+                        PPE ppe = getTransferPPEFromContract(ppeContract);
                         ppeWaitList.add(ppe);
                     }
                 } catch (NoEntityException e) {
@@ -155,5 +145,29 @@ public class PPEServiceImpl implements PPEService {
             }
         });
         return ppeWaitList;
+    }
+
+    private PPE getTransferPPEFromContract(PPEContract ppeContract) {
+        if (ppeContract.getStatus().equals(PPEStatus.COMMISSIONED.toString())) {
+            log.warn("Attemption! Found not transfered PPE {} from this subsidiary not existed in database! set price zero", ppeContract.getInventoryNumber());
+            ppeContract.setPrice(0F);
+        }
+        if (ppeContract.getStatus().equals(PPEStatus.DECOMMISSIONED.toString()) ||
+                ppeContract.getStatus().equals(PPEStatus.SPOILED.toString())) {
+            log.warn("Attemption! Found PPE {} with bad status! set price zero", ppeContract.getInventoryNumber());
+            ppeContract.setPrice(0F);
+        }
+
+        PPE ppe = PPEConverter.ppeContractToPPE(ppeContract);
+        Employee employee = new Employee();
+        employee.setPersonnelNumber(ppeContract.getOwnerID());
+        employee.setEmployeeName(ppeContract.getOwnerName());
+        try {
+            employee.setSubsidiary(subsidiaryService.getByName(ppeContract.getSubsidiary()));
+        } catch (Exception ex) {
+            log.error("Cannot set subsidiary while convert ppeContract to PPE from waitList");
+        }
+        ppe.setEmployee(employee);
+        return ppe;
     }
 }

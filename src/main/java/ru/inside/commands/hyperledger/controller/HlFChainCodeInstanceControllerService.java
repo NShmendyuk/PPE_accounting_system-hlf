@@ -3,6 +3,7 @@ package ru.inside.commands.hyperledger.controller;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.hyperledger.fabric.gateway.ContractException;
 import org.springframework.stereotype.Service;
 import ru.inside.commands.entity.PPE;
 import ru.inside.commands.entity.Subsidiary;
@@ -14,6 +15,7 @@ import ru.inside.commands.hyperledger.fabric.configuration.HlfConfiguration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @Slf4j
@@ -189,14 +191,23 @@ public class HlFChainCodeInstanceControllerService implements ChainCodeControlle
         return ppeInfo.equals("true");
     }
 
-    public void transferPPEToSubsidiary(PPE ppe, Subsidiary anotherSubsidiary) {
+    public void transferPPEToSubsidiary(PPE ppe, Subsidiary anotherSubsidiary, String status) {
         String inventoryNumber = ppe.getInventoryNumber();
         String toSubsidiary = anotherSubsidiary.getName();
 
         try {
-            chainCodeController.transferPPEToAnotherSubsidiary(inventoryNumber, toSubsidiary);
-            log.info("contract (transferPPEToSubsidiary) submit");
+            chainCodeController.transferPPEToAnotherSubsidiary(inventoryNumber, toSubsidiary, status);
+            log.info("contract (transferPPEToSubsidiary) submit for {}", inventoryNumber);
         } catch (Exception e) {
+            log.error("transfer ppe {} request to chaincode were denied", inventoryNumber);
+        }
+    }
+
+    public void applyPPETransfering(String inventoryNumber, String status) {
+        try {
+            chainCodeController.applyPPETransfering(inventoryNumber, status);
+            log.info("contract (applyPPETransfering) submit for {}", inventoryNumber);
+        } catch (InterruptedException | TimeoutException | ContractException e) {
             log.error("transfer ppe {} request to chaincode were denied", inventoryNumber);
         }
     }
