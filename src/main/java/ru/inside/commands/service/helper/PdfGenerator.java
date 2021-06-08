@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -136,7 +138,9 @@ public class PdfGenerator {
 
             try {
                 ppeFormList.add(ppeForm);
-                employeeFormList.add(employeeForm);
+                if (employeeFormList.stream().noneMatch(employeeFormFromList -> employeeFormFromList.getPersonnelNumber().equals(employeeForm.getPersonnelNumber()))) {
+                    employeeFormList.add(employeeForm);
+                }
             } catch (Exception ex) {
                 log.error("Cannot set ppe and employee form to arrayList?");
             }

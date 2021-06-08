@@ -221,42 +221,7 @@ public class PPEControllerServiceImpl implements PPEControllerService {
 
         List<PPEForm> ppeFormList = new ArrayList<>();
         ppeList.forEach(ppe -> {
-            PPEForm ppeForm = new PPEForm();
-
-            try {
-                ppeForm.setPpeName(ppe.getName());
-                ppeForm.setPrice(ppe.getPrice());
-                ppeForm.setInventoryNumber(ppe.getInventoryNumber());
-            } catch (Exception ex) {
-                log.error("Cannot set first info of ppe from waitList to form");
-            }
-
-            try {
-                ppeForm.setPpeStatus(ppe.getPpeStatus().toString());
-                ppeForm.setLifeTime(ppe.getLifeTime());
-                ppeForm.setStartUseDate(ppe.getStartUseDate());
-            } catch (Exception ex) {
-                log.error("Cannot set time and status info of ppe from waitList to form");
-            }
-
-            try {
-                ppeForm.setOwnerPersonnelNumber(ppe.getEmployee().getPersonnelNumber());
-                ppeForm.setOwnerName(ppe.getEmployee().getEmployeeName());
-            } catch (Exception ex) {
-                log.error("Cannot set second info of ppe from waitList to form");
-            }
-
-            try {
-                ppeForm.setSubsidiaryName(ppe.getEmployee().getSubsidiary().getName());
-            } catch (Exception ex) {
-                log.warn("Set subsidiary to self subsidiary");
-                try {
-                    ppeForm.setSubsidiaryName(subsidiaryService.getSelfSubsidiary().getName());
-                } catch (NoEntityException e) {
-                    log.error("Cannot get self subsidiary definition while convert ppe to form from waitList!!!");
-                }
-            }
-
+            PPEForm ppeForm = FormConverter.getPPEAsForm(ppe);
             ppeFormList.add(ppeForm);
         });
         return ppeFormList;
@@ -273,7 +238,6 @@ public class PPEControllerServiceImpl implements PPEControllerService {
 
         Employee employee = new Employee();
         try {
-//            employee = applyToEmployeeProcess(ppe);
             employee = ppe.getEmployee();
             log.info("apply PPE for employee {}", employee.getPersonnelNumber());
         } catch (Exception ex) {
@@ -295,10 +259,10 @@ public class PPEControllerServiceImpl implements PPEControllerService {
     }
 
     public byte[] applyAllPPEFromChainCode() {
-        List<PPEForm> waitAllPPE = getAllInWaitList();
+        List<PPEForm> waitAllPPE = new ArrayList<>();
 
-        waitAllPPE.forEach(ppeForm -> {
-            applyPPEProcess(ppeForm.getInventoryNumber());
+        getAllInWaitList().forEach(ppeForm -> {
+            waitAllPPE.add(FormConverter.getPPEAsForm(applyPPEProcess(ppeForm.getInventoryNumber())));
         });
 
         File file = pdfGenerator.generateAllApplyTransferDocument(waitAllPPE);
@@ -341,28 +305,18 @@ public class PPEControllerServiceImpl implements PPEControllerService {
                 log.info("PPE {} found in inner database. Replaced", inventoryNumber);
             }
             ppe.setEmployee(employee);
-            return ppeService.addPPE(ppe);
+            ppe = ppeService.addPPE(ppe);
         } catch (Exception ex) {
             log.error("Cannot add ppe {} from waitlist while apply! Try to add with employee", inventoryNumber);
         }
-        chainCodeControllerService.applyPPETransfering(inventoryNumber, PPEStatus.COMMISSIONED.toString());
+
+        if (ppeContract.getStatus().equals(PPEStatus.TRANSFER.toString())) {
+            chainCodeControllerService.applyPPETransfering(inventoryNumber, PPEStatus.COMMISSIONED.toString());
+        }
+
+        if (!ppeContract.getStatus().equals(PPEStatus.TRANSFER.toString())) {
+            ppe.setPrice(0F);
+        }
         return ppe;
     }
-
-    //больше не требуется
-    //@Deprecated
-    private Employee applyToEmployeeProcess(PPE ppe) {
-        Employee employee = new Employee();
-
-        try {
-            employee = ppe.getEmployee();
-            log.info("add ppe {} to employee {}!", ppe.getInventoryNumber(), employee.getPersonnelNumber());
-            return employeeService.addPPEToEmployee(ppe, employee.getPersonnelNumber());
-        } catch (NoEntityException e) {
-            log.error("Employee {} were deleted from database while adding new ppe {}!!! Cannot add new ppe from chaincode",
-                    employee.getPersonnelNumber(), ppe.getInventoryNumber());
-        }
-        return employee;
-    }
-
 }
